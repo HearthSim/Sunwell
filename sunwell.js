@@ -480,6 +480,14 @@
             bufferRow.height = 45;
         }
 
+        if (card.type === 'WEAPON') {
+            bufferText.width = 470;
+            bufferText.height = 250;
+
+            bufferRow.width = 470;
+            bufferRow.height = 45;
+        }
+
         var fontSize = 45;
         var smallerFirstLine = false;
         var totalLength = card.textMarkdown.replace(/\*\*/g, '').length;
@@ -494,7 +502,11 @@
             }
         }
 
-        bufferRowCtx.fillStyle = '#000';
+        if (card.type === 'WEAPON') {
+            bufferRowCtx.fillStyle = '#fff';
+        } else {
+            bufferRowCtx.fillStyle = '#000';
+        }
         bufferRowCtx.textBaseline = 'hanging';
         bufferRowCtx.font = 'condensed ' + fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
         spaceWidth = bufferRowCtx.measureText(' ').width;
@@ -624,6 +636,17 @@
             ]
         }
 
+        if (card.type === 'WEAPON') {
+            pathMiddle = .60;
+            maxWidth = 580;
+            c = [
+                {x: 10, y: 75},
+                {x: 50, y: 75},
+                {x: 500, y: 75},
+                {x: 570, y: 75}
+            ]
+        }
+
         var fontSize = 51;
 
         ctx.lineWidth = 13;
@@ -746,6 +769,12 @@
             ctx.clip();
             ctx.drawImage(t, 0, 0, t.width, t.height, 125 * s, 117 * s, 529 * s, 529 * s);
         }
+
+        if (card.type === 'WEAPON') {
+            drawEllipse(ctx, 150 * s, 135 * s, 476 * s, 468 * s);
+            ctx.clip();
+            ctx.drawImage(t, 0, 0, t.width, t.height, 150 * s, 135 * s, 476 * s, 476 * s);
+        }
         ctx.restore();
 
         ctx.drawImage(assets[sw.cardBack], 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
@@ -779,6 +808,17 @@
             ctx.drawImage(assets['title-spell'], 0, 0, 653, 217, 66 * s, 530 * s, 653 * s, 217 * s);
         }
 
+        if (card.type === 'WEAPON') {
+            if (sw.rarity) {
+                ctx.drawImage(assets[sw.rarity], 0, 0, 146, 144, 315 * s, 592 * s, 146 * s, 144 * s);
+            }
+
+            ctx.drawImage(assets['title-weapon'], 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
+
+            ctx.drawImage(assets.swords, 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
+            ctx.drawImage(assets.shield, 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
+        }
+
 
         if (card.set !== 'CORE') {
             (function () {
@@ -804,7 +844,7 @@
         if (fontsReady) {
             renderBodyText(ctx, s, card);
 
-            renderNumber(ctx, 116, 170, s, card.cost, 170, card._originalCost, true);
+            renderNumber(ctx, 116, 170, s, card.cost || 0, 170, card._originalCost, true);
 
             printCardTitle(ctx, s, card);
 
@@ -813,8 +853,13 @@
                     renderRaceText(ctx, s, card);
                 }
 
-                renderNumber(ctx, 128, 994, s, card.attack, 150, card._originalAttack);
-                renderNumber(ctx, 668, 994, s, card.health, 150, card._originalHealth);
+                renderNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
+                renderNumber(ctx, 668, 994, s, card.health || 0, 150, card._originalHealth);
+            }
+
+            if (card.type === 'WEAPON') {
+                renderNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
+                renderNumber(ctx, 668, 994, s, card.durability || 0, 150, card._originalHealth);
             }
         }
         ctx.restore();
@@ -897,12 +942,16 @@
             loadList.push('attack', 'health', 'title-spell');
 
             if (card.rarity !== 'FREE') {
-                card.sunwell.rarity = 'rarity-' + card.rarity.toLowerCase();
+                card.sunwell.rarity = 'spell-rarity-' + card.rarity.toLowerCase();
                 loadList.push(card.sunwell.rarity);
             }
+        }
+
+        if (card.type === 'WEAPON') {
+            loadList.push('swords', 'shield', 'title-weapon');
 
             if (card.rarity !== 'FREE') {
-                card.sunwell.rarity = 'spell-rarity-' + card.rarity.toLowerCase();
+                card.sunwell.rarity = 'weapon-rarity-' + card.rarity.toLowerCase();
                 loadList.push(card.sunwell.rarity);
             }
         }
@@ -950,7 +999,7 @@
         if (settings.gameId === undefined) {
             settings.gameId = settings.id;
         }
-        if(settings.textMarkdown === undefined){
+        if (settings.textMarkdown === undefined) {
             settings.textMarkdown = settings.text.replace(/<\/*b>/g, '**');
         }
 
