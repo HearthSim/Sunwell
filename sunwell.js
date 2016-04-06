@@ -784,10 +784,10 @@
 
         if (card.type === 'MINION') {
             if (sw.rarity) {
-                ctx.drawImage(assets[sw.rarity], 0, 0, 161, 112, 320 * s, 628 * s, 161 * s, 112 * s);
+                ctx.drawImage(assets[sw.rarity], 0, 0, 146, 146, 326 * s, 607 * s, 146 * s, 146 * s);
             }
 
-            ctx.drawImage(assets.title, 0, 0, 620, 157, 83 * s, 537 * s, 620 * s, 157 * s);
+            ctx.drawImage(assets.title, 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
 
             if (card.race) {
                 ctx.drawImage(assets.race, 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
