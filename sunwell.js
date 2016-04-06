@@ -629,15 +629,15 @@
             pathMiddle = .52;
             maxWidth = 580;
             c = [
-                {x: 10, y: 120},
-                {x: 212, y: 50},
-                {x: 368, y: 50},
-                {x: 570, y: 120}
+                {x: 10, y: 100},
+                {x: 212, y: 35},
+                {x: 368, y: 35},
+                {x: 570, y: 105}
             ]
         }
 
         if (card.type === 'WEAPON') {
-            pathMiddle = .60;
+            pathMiddle = .58;
             maxWidth = 580;
             c = [
                 {x: 10, y: 75},
@@ -705,6 +705,7 @@
 
             ctx.save();
             ctx.translate(p.x, p.y);
+
             ctx.scale(1.2, 1);
             //ctx.setTransform(1.2, p.r, 0, 1, p.x, p.y);
             ctx.rotate(p.r);
@@ -805,7 +806,7 @@
                 ctx.drawImage(assets[sw.rarity], 0, 0, 150, 150, 311 * s, 607 * s, 150 * s, 150 * s);
             }
 
-            ctx.drawImage(assets['title-spell'], 0, 0, 653, 217, 66 * s, 530 * s, 653 * s, 217 * s);
+            ctx.drawImage(assets['title-spell'], 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
         }
 
         if (card.type === 'WEAPON') {
