@@ -169,7 +169,7 @@
             for (var i = 0; i < loadAssets.length; i++) {
                 key = loadAssets[i];
                 isTexture = false;
-                smallTexture = true;
+                smallTexture = false;
 
                 if (key.substr(0, 2) === 'h:') {
                     isTexture = true;
@@ -180,6 +180,11 @@
                 if (key.substr(0, 2) === 't:') {
                     isTexture = true;
                     key = key.substr(2);
+                    if(assets[key] !== undefined){
+                        if(assets[key].width === 256){
+                            assets[key] = undefined;
+                        }
+                    }
                 }
 
                 if (key.substr(0, 2) === 'u:') {
