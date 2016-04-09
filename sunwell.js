@@ -16,9 +16,6 @@
         smallTextureFolder = null,
         assets = {},
         fontsReady = false,
-        cardBuffer = [],
-        renderCanvas = document.createElement('canvas'),
-        renderCanvasCtx = renderCanvas.getContext('2d'),
         renderQuery = [],
         maxRendering = 8,
         rendering = 0,
@@ -885,7 +882,7 @@
         ctx.restore();
 
         if (callback) {
-            callback(renderCanvas);
+            callback(cvs);
         }
     }
 
@@ -929,8 +926,8 @@
         resolution = renderInfo[1];
         callback = renderInfo[2];
 
-        var cvs = renderCanvas,
-            ctx = renderCanvasCtx,
+        var cvs = getBuffer(),
+            ctx = cvs.getContext('2d'),
             s = (resolution || 512) / 764,
             loadList = [];
 
@@ -938,7 +935,6 @@
         cvs.height = Math.round(cvs.width * 1.4397905759);
 
         card.sunwell = card.sunwell || {};
-
 
         card.sunwell.cardBack = card.type.substr(0, 1).toLowerCase() + card.playerClass.substr(0, 1) + card.playerClass.substr(1).toLowerCase();
         if (card.sunwell.cardBack === 'mNeutral') {
@@ -1001,13 +997,8 @@
         fetchAssets(loadList)
             .then(function () {
                 draw(cvs, ctx, card, s, callback);
-
                 rendering--;
-
-                if (renderQuery.length) {
-                    renderTick();
-                    return;
-                }
+                freeBuffer(cvs);
             });
     };
 
@@ -1019,12 +1010,16 @@
      * @param renderTarget
      */
     sunwell.createCard = function (settings, width, renderTarget) {
+        if(!settings){
+            throw new Error('No card object given');
+        }
+
         if (!renderTarget) {
             renderTarget = new Image();
         }
 
         //Make compatible to hearthstoneJSON format.
-        if (settings.gameId === undefined) {
+        if(settings.gameId === undefined) {
             settings.gameId = settings.id;
         }
         if (settings.textMarkdown === undefined) {
