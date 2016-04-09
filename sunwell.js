@@ -13,6 +13,7 @@
         belveFontPath = '/font/belwe.css',
         assetFolder = '/assets/',
         textureFolder = '/artwork/',
+        smallTextureFolder = null,
         assets = {},
         fontsReady = false,
         cardBuffer = [],
@@ -67,6 +68,7 @@
 
         assetFolder = conf.assets || assetFolder;
         textureFolder = conf.artwork || textureFolder;
+        smallTextureFolder = conf.smallArtwork || smallTextureFolder;
     };
 
     sunwell.races = {
@@ -100,10 +102,9 @@
                 },
                 active: function () {
                     fontsReady = true;
-                    for (var i = 0; i < cardBuffer.length; i++) {
-                        cardBuffer[i].draw();
+                    if(renderQuery.length){
+                        renderTick();
                     }
-                    cardBuffer = null;
                 }
             });
         }
@@ -162,11 +163,20 @@
                 result = {},
                 key,
                 isTexture,
+                smallTexture,
                 isUrl;
 
             for (var i = 0; i < loadAssets.length; i++) {
                 key = loadAssets[i];
                 isTexture = false;
+                smallTexture = true;
+
+                if (key.substr(0, 2) === 'h:') {
+                    isTexture = true;
+                    smallTexture = !!(smallTextureFolder && true);
+                    key = key.substr(2);
+                }
+
                 if (key.substr(0, 2) === 't:') {
                     isTexture = true;
                     key = key.substr(2);
@@ -195,7 +205,11 @@
                         assets[key].src = key;
                     } else {
                         if (isTexture) {
-                            assets[key].src = textureFolder + key + '.jpg';
+                            if(smallTexture){
+                                assets[key].src = smallTextureFolder + key + '.jpg';
+                            } else {
+                                assets[key].src = textureFolder + key + '.jpg';
+                            }
                         } else {
                             assets[key].src = assetFolder + key + '.png';
                         }
@@ -878,6 +892,9 @@
     }
 
     function renderTick() {
+        if(!fontsReady){
+            return;
+        }
         render();
         window.requestAnimationFrame(renderTick);
     }
@@ -969,7 +986,12 @@
             loadList.push('race');
         }
 
-        loadList.push('t:' + card.texture);
+
+        if(s <= .5){
+            loadList.push('h:' + card.texture);
+        } else {
+            loadList.push('t:' + card.texture);
+        }
 
         fetchAssets(loadList)
             .then(function () {
