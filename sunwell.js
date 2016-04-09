@@ -1004,7 +1004,7 @@
             settings.textMarkdown = settings.text.replace(/<\/*b>/g, '**');
         }
 
-        var cacheKey = settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health;
+        var cacheKey = width + '_' + settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health;
 
         settings._originalCost = settings.cost;
         settings._originalHealth = settings.health;
@@ -1026,7 +1026,7 @@
                     settings[key] = properties[key];
                 }
 
-                cacheKey = settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health + '_' + settings.health;
+                cacheKey = width + '_' + settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health + '_' + settings.health;
 
                 if (renderCache[cacheKey]) {
                     renderTarget.src = renderCache[cacheKey];
