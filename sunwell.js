@@ -446,7 +446,7 @@
      * @returns {*[]}
      */
     function finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, totalWidth) {
-        bufferTextCtx.drawImage(bufferRow, 0, 0, xPos, 45, (totalWidth / 2) - (xPos / 2), yPos, xPos, 45);
+        bufferTextCtx.drawImage(bufferRow, 0, 0, xPos, 50, (totalWidth / 2) - (xPos / 2), yPos, xPos, 45);
         xPos = 5;
         yPos += 45;
         bufferRowCtx.clearRect(0, 0, 540, 45);
@@ -486,14 +486,14 @@
         bufferText.height = 290;
 
         bufferRow.width = 540;
-        bufferRow.height = 45;
+        bufferRow.height = 50;
 
         if (card.type === 'SPELL') {
             bufferText.width = 460;
             bufferText.height = 290;
 
             bufferRow.width = 460;
-            bufferRow.height = 45;
+            bufferRow.height = 50;
         }
 
         if (card.type === 'WEAPON') {
@@ -501,7 +501,7 @@
             bufferText.height = 250;
 
             bufferRow.width = 470;
-            bufferRow.height = 45;
+            bufferRow.height = 50;
         }
 
         var fontSize = 45;
@@ -524,7 +524,9 @@
             bufferRowCtx.fillStyle = '#000';
         }
         bufferRowCtx.textBaseline = 'hanging';
-        bufferRowCtx.font = 'condensed ' + fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
+
+        bufferRowCtx.font = fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
+        console.log(bufferRowCtx.font);
         spaceWidth = bufferRowCtx.measureText(' ').width;
 
         for (i = 0; i < words.length; i++) {
@@ -548,19 +550,19 @@
                     if (chars[j + 1] === '*') {
                         if (isBold) {
                             isBold = false;
-                            bufferRowCtx.font = 'condensed ' + fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
+                            bufferRowCtx.font = fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
                         } else {
                             isBold = true;
-                            bufferRowCtx.font = 'bold condensed ' + fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
+                            bufferRowCtx.font = 'bold ' + fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
                         }
                     }
                     j += 1;
                     continue;
                 }
 
-                bufferRowCtx.fillText(char, xPos, 0);
+                bufferRowCtx.fillText(char, xPos, 0, bufferRowCtx.measureText(char).width * 0.8);
 
-                xPos += bufferRowCtx.measureText(char).width + (spaceWidth / 8);
+                xPos += (bufferRowCtx.measureText(char).width*0.8) + (spaceWidth / 8);
             }
 
             xPos += spaceWidth;
