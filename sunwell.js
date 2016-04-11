@@ -66,27 +66,6 @@
         sunwell.init();
     }
 
-    /**
-     * Overwrite the renderers source folder paths.
-     * @param conf
-     */
-    /*sunwell.setFolders = function (conf) {
-     conf = conf || {};
-     if (conf.font && conf.font !== belveFontPath) {
-     belveFontPath = conf.font || belveFontPath;
-     var l = document.createElement('link');
-     l.type = 'text/css';
-     l.rel = 'stylesheet';
-     l.media = 'screen';
-     l.href = belveFontPath;
-     document.head.appendChild(l);
-     }
-
-     assetFolder = conf.assets || assetFolder;
-     textureFolder = conf.artwork || textureFolder;
-     smallTextureFolder = conf.smallArtwork || smallTextureFolder;
-     };*/
-
     sunwell.races = {
         'enUS': {
             'MURLOC': 'Murloc',
@@ -107,39 +86,6 @@
             'TOTEM': 'Totem'
         }
     };
-
-    //Prepare the fonts.
-    /*(function () {
-     function loadFonts() {
-     WebFont.load({
-     google: {families: ['Yanone+Kaffeesatz::latin']},
-     custom: {
-     families: ['Belwe']
-     },
-     active: function () {
-     fontsReady = true;
-     if(renderQuery.length){
-     renderTick();
-     }
-     }
-     });
-     }
-
-     var l = document.createElement('link'),
-     s = document.createElement('script');
-     l.type = 'text/css';
-     l.rel = 'stylesheet';
-     l.media = 'screen';
-     l.href = belveFontPath;
-
-     s.src = '//ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';
-
-     document.head.appendChild(s);
-     document.head.appendChild(l);
-
-     s.onload = loadFonts;
-
-     })();*/
 
     /**
      * Helper function to draw the oval mask for the cards artwork.
@@ -551,7 +497,7 @@
         }
         bufferRowCtx.textBaseline = 'hanging';
 
-        bufferRowCtx.font = fontSize + 'px "' + sunwell.settings.bodyFont + '", sans-serif';
+        bufferRowCtx.font = fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
 
         spaceWidth = bufferRowCtx.measureText(' ').width;
 
@@ -576,19 +522,15 @@
                     if (chars[j + 1] === '*') {
                         if (isBold) {
                             isBold = false;
-                            console.log('bold off');
-                            bufferRowCtx.font = ' ' + fontSize + 'px "' + sunwell.settings.bodyFont + '", sans-serif';
+                            bufferRowCtx.font = ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
                         } else {
                             isBold = true;
-                            console.log('bold on');
-                            bufferRowCtx.font = 'bold ' + fontSize + 'px "' + sunwell.settings.bodyFont + '", sans-serif';
+                            bufferRowCtx.font = 'bold ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
                         }
                     }
                     j += 1;
                     continue;
                 }
-
-                console.log(bufferRowCtx.font);
 
                 bufferRowCtx.fillText(char, xPos + sunwell.settings.bodyFontOffset.x, sunwell.settings.bodyFontOffset.y);
 
