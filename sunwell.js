@@ -10,12 +10,8 @@
     'use strict';
 
     var sunwell,
-        belveFontPath = '/font/belwe.css',
-        assetFolder = '/assets/',
-        textureFolder = '/artwork/',
-        smallTextureFolder = null,
         assets = {},
-        fontsReady = false,
+        ready = false,
         renderQuery = [],
         maxRendering = 8,
         rendering = 0,
@@ -43,30 +39,53 @@
     }
 
 
-    window.sunwell = sunwell = {};
+    window.sunwell = sunwell = window.sunwell || {};
 
-    sunwell.debug = sunwell.debug || false;
+    sunwell.settings = sunwell.settings || {};
+
+    sunwell.settings.titleFont = sunwell.settings.titleFont || 'Belwe Bold';
+    sunwell.settings.bodyFont = sunwell.settings.bodyFont || 'ITC Franklin Condensed';
+    sunwell.settings.bodyFontSize = sunwell.settings.bodyFontSize || 60;
+    sunwell.settings.bodyFontOffset = sunwell.settings.bodyFontOffset || {x: 0, y: 0};
+    sunwell.settings.bodyLineHeight = sunwell.settings.bodyLineHeight || 50;
+    sunwell.settings.assetFolder = sunwell.settings.assetFolder || '/assets/';
+    sunwell.settings.textureFolder = sunwell.settings.textureFolder || '/artwork/';
+    sunwell.settings.smallTextureFolder = sunwell.settings.smallTextureFolder || null;
+    sunwell.settings.autoInit = sunwell.settings.autoInit || true;
+
+
+    sunwell.settings.debug = sunwell.settings.debug || false;
+
+    sunwell.init = function () {
+        ready = true;
+        if (renderQuery.length) {
+            renderTick();
+        }
+    };
+    if (!sunwell.settings.autoInit) {
+        sunwell.init();
+    }
 
     /**
      * Overwrite the renderers source folder paths.
      * @param conf
      */
-    sunwell.setFolders = function (conf) {
-        conf = conf || {};
-        if (conf.font && conf.font !== belveFontPath) {
-            belveFontPath = conf.font || belveFontPath;
-            var l = document.createElement('link');
-            l.type = 'text/css';
-            l.rel = 'stylesheet';
-            l.media = 'screen';
-            l.href = belveFontPath;
-            document.head.appendChild(l);
-        }
+    /*sunwell.setFolders = function (conf) {
+     conf = conf || {};
+     if (conf.font && conf.font !== belveFontPath) {
+     belveFontPath = conf.font || belveFontPath;
+     var l = document.createElement('link');
+     l.type = 'text/css';
+     l.rel = 'stylesheet';
+     l.media = 'screen';
+     l.href = belveFontPath;
+     document.head.appendChild(l);
+     }
 
-        assetFolder = conf.assets || assetFolder;
-        textureFolder = conf.artwork || textureFolder;
-        smallTextureFolder = conf.smallArtwork || smallTextureFolder;
-    };
+     assetFolder = conf.assets || assetFolder;
+     textureFolder = conf.artwork || textureFolder;
+     smallTextureFolder = conf.smallArtwork || smallTextureFolder;
+     };*/
 
     sunwell.races = {
         'enUS': {
@@ -90,37 +109,37 @@
     };
 
     //Prepare the fonts.
-    (function () {
-        function loadFonts() {
-            WebFont.load({
-                google: {families: ['Open+Sans:600,600italic,700,700italic:latin']},
-                custom: {
-                    families: ['Belwe']
-                },
-                active: function () {
-                    fontsReady = true;
-                    if(renderQuery.length){
-                        renderTick();
-                    }
-                }
-            });
-        }
+    /*(function () {
+     function loadFonts() {
+     WebFont.load({
+     google: {families: ['Yanone+Kaffeesatz::latin']},
+     custom: {
+     families: ['Belwe']
+     },
+     active: function () {
+     fontsReady = true;
+     if(renderQuery.length){
+     renderTick();
+     }
+     }
+     });
+     }
 
-        var l = document.createElement('link'),
-            s = document.createElement('script');
-        l.type = 'text/css';
-        l.rel = 'stylesheet';
-        l.media = 'screen';
-        l.href = belveFontPath;
+     var l = document.createElement('link'),
+     s = document.createElement('script');
+     l.type = 'text/css';
+     l.rel = 'stylesheet';
+     l.media = 'screen';
+     l.href = belveFontPath;
 
-        s.src = '//ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';
+     s.src = '//ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';
 
-        document.head.appendChild(s);
-        document.head.appendChild(l);
+     document.head.appendChild(s);
+     document.head.appendChild(l);
 
-        s.onload = loadFonts;
+     s.onload = loadFonts;
 
-    })();
+     })();*/
 
     /**
      * Helper function to draw the oval mask for the cards artwork.
@@ -170,15 +189,15 @@
 
                 if (key.substr(0, 2) === 'h:') {
                     isTexture = true;
-                    smallTexture = !!(smallTextureFolder && true);
+                    smallTexture = !!(sunwell.settings.smallTextureFolder && true);
                     key = key.substr(2);
                 }
 
                 if (key.substr(0, 2) === 't:') {
                     isTexture = true;
                     key = key.substr(2);
-                    if(assets[key] !== undefined){
-                        if(assets[key].width === 256){
+                    if (assets[key] !== undefined) {
+                        if (assets[key].width === 256) {
                             assets[key] = undefined;
                         }
                     }
@@ -207,13 +226,13 @@
                         assets[key].src = key;
                     } else {
                         if (isTexture) {
-                            if(smallTexture){
-                                assets[key].src = smallTextureFolder + key + '.jpg';
+                            if (smallTexture) {
+                                assets[key].src = sunwell.settings.smallTextureFolder + key + '.jpg';
                             } else {
-                                assets[key].src = textureFolder + key + '.jpg';
+                                assets[key].src = sunwell.settings.textureFolder + key + '.jpg';
                             }
                         } else {
-                            assets[key].src = assetFolder + key + '.png';
+                            assets[key].src = sunwell.settings.assetFolder + key + '.png';
                         }
                     }
                 } else {
@@ -367,7 +386,7 @@
      * @param size
      * @param [style="neutral] Either "plus", "minus" or "neutral". Default: "neutral"
      */
-    function renderNumber(targetCtx, x, y, s, number, size, originalNumber, inverseIndicators) {
+    function drawNumber(targetCtx, x, y, s, number, size, originalNumber, inverseIndicators) {
         var buffer = getBuffer();
         var bufferCtx = buffer.getContext('2d');
 
@@ -446,10 +465,19 @@
      * @returns {*[]}
      */
     function finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, totalWidth) {
-        bufferTextCtx.drawImage(bufferRow, 0, 0, xPos, 50, (totalWidth / 2) - (xPos / 2), yPos, xPos, 45);
+        if(sunwell.settings.debug){
+            bufferTextCtx.save();
+            bufferTextCtx.strokeStyle = 'red';
+            bufferTextCtx.beginPath();
+            bufferTextCtx.moveTo((totalWidth / 2) - (xPos / 2), yPos);
+            bufferTextCtx.lineTo((totalWidth / 2) + (xPos / 2), yPos);
+            bufferTextCtx.stroke();
+            bufferTextCtx.restore();
+        }
+        bufferTextCtx.drawImage(bufferRow, 0, 0, xPos, bufferRow.height, (totalWidth / 2) - (xPos / 2), yPos, xPos, bufferRow.height);
         xPos = 5;
-        yPos += 45;
-        bufferRowCtx.clearRect(0, 0, 540, 45);
+        yPos += bufferRow.height;
+        bufferRowCtx.clearRect(0, 0, 540, bufferRow.height);
 
         return [xPos, yPos];
     }
@@ -460,7 +488,7 @@
      * @param s
      * @param card
      */
-    function renderBodyText(targetCtx, s, card) {
+    function drawBodyText(targetCtx, s, card) {
         var bufferText = getBuffer(),
             bufferTextCtx = bufferText.getContext('2d'),
             bufferRow = getBuffer(),
@@ -486,14 +514,13 @@
         bufferText.height = 290;
 
         bufferRow.width = 540;
-        bufferRow.height = 50;
+        bufferRow.height = sunwell.settings.bodyLineHeight;
 
         if (card.type === 'SPELL') {
             bufferText.width = 460;
             bufferText.height = 290;
 
             bufferRow.width = 460;
-            bufferRow.height = 50;
         }
 
         if (card.type === 'WEAPON') {
@@ -501,10 +528,9 @@
             bufferText.height = 250;
 
             bufferRow.width = 470;
-            bufferRow.height = 50;
         }
 
-        var fontSize = 45;
+        var fontSize = sunwell.settings.bodyFontSize;
         var smallerFirstLine = false;
         var totalLength = card.textMarkdown.replace(/\*\*/g, '').length;
 
@@ -514,7 +540,7 @@
             }
 
             if (totalLength > 80) {
-                fontSize = 40;
+                fontSize = sunwell.settings.bodyFontSize * 0.6;
             }
         }
 
@@ -525,8 +551,8 @@
         }
         bufferRowCtx.textBaseline = 'hanging';
 
-        bufferRowCtx.font = fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
-        console.log(bufferRowCtx.font);
+        bufferRowCtx.font = fontSize + 'px "' + sunwell.settings.bodyFont + '", sans-serif';
+
         spaceWidth = bufferRowCtx.measureText(' ').width;
 
         for (i = 0; i < words.length; i++) {
@@ -550,19 +576,23 @@
                     if (chars[j + 1] === '*') {
                         if (isBold) {
                             isBold = false;
-                            bufferRowCtx.font = fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
+                            console.log('bold off');
+                            bufferRowCtx.font = ' ' + fontSize + 'px "' + sunwell.settings.bodyFont + '", sans-serif';
                         } else {
                             isBold = true;
-                            bufferRowCtx.font = 'bold ' + fontSize + 'px/1.2em "Franklin Gothic", "Open Sans", sans-serif';
+                            console.log('bold on');
+                            bufferRowCtx.font = 'bold ' + fontSize + 'px "' + sunwell.settings.bodyFont + '", sans-serif';
                         }
                     }
                     j += 1;
                     continue;
                 }
 
-                bufferRowCtx.fillText(char, xPos, 0, bufferRowCtx.measureText(char).width * 0.8);
+                console.log(bufferRowCtx.font);
 
-                xPos += (bufferRowCtx.measureText(char).width*0.8) + (spaceWidth / 8);
+                bufferRowCtx.fillText(char, xPos + sunwell.settings.bodyFontOffset.x, sunwell.settings.bodyFontOffset.y);
+
+                xPos += bufferRowCtx.measureText(char).width + (spaceWidth / 8);
             }
 
             xPos += spaceWidth;
@@ -575,13 +605,13 @@
 
         var b = contextBoundingBox(bufferTextCtx);
 
-        b.h = Math.ceil(b.h / 45) * 45;
+        b.h = Math.ceil(b.h / bufferRow.height) * bufferRow.height;
 
         targetCtx.drawImage(bufferText, b.x, b.y - 2, b.w, b.h, (bufferText.centerLeft - (b.w / 2)) * s, (bufferText.centerTop - (b.h / 2)) * s, b.w * s, (b.h + 2) * s);
 
         freeBuffer(bufferText);
 
-        if (sunwell.debug) {
+        if (sunwell.settings.debug) {
             targetCtx.save();
             targetCtx.strokeStyle = 'green';
             targetCtx.beginPath();
@@ -623,7 +653,7 @@
      * Prints the title of a card.
      * @param title
      */
-    function printCardTitle(targetCtx, s, card) {
+    function drawCardTitle(targetCtx, s, card) {
         var buffer = getBuffer();
         var title = card.title;
         buffer.width = 1024;
@@ -695,7 +725,7 @@
         begin = pathMiddle - (textWidth / 2);
         steps = textWidth / title.length;
 
-        if (sunwell.debug) {
+        if (sunwell.settings.debug) {
             ctx.save();
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 5;
@@ -747,10 +777,6 @@
 
             ctx.restore();
         }
-
-
-        //Okay, get the text boundaries
-        boundaries = contextBoundingBox(ctx);
 
         targetCtx.drawImage(
             buffer,
@@ -860,27 +886,26 @@
         }
 
 
-        if (fontsReady) {
-            renderBodyText(ctx, s, card);
+        drawBodyText(ctx, s, card);
 
-            renderNumber(ctx, 116, 170, s, card.cost || 0, 170, card._originalCost, true);
+        drawNumber(ctx, 116, 170, s, card.cost || 0, 170, card._originalCost, true);
 
-            printCardTitle(ctx, s, card);
+        drawCardTitle(ctx, s, card);
 
-            if (card.type === 'MINION') {
-                if (card.race) {
-                    renderRaceText(ctx, s, card);
-                }
-
-                renderNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
-                renderNumber(ctx, 668, 994, s, card.health || 0, 150, card._originalHealth);
+        if (card.type === 'MINION') {
+            if (card.race) {
+                renderRaceText(ctx, s, card);
             }
 
-            if (card.type === 'WEAPON') {
-                renderNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
-                renderNumber(ctx, 668, 994, s, card.durability || 0, 150, card._originalHealth);
-            }
+            drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
+            drawNumber(ctx, 668, 994, s, card.health || 0, 150, card._originalHealth);
         }
+
+        if (card.type === 'WEAPON') {
+            drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
+            drawNumber(ctx, 668, 994, s, card.durability || 0, 150, card._originalHealth);
+        }
+
         ctx.restore();
 
         if (callback) {
@@ -896,7 +921,7 @@
     }
 
     function renderTick() {
-        if(!fontsReady){
+        if (!ready) {
             return;
         }
         render();
@@ -990,7 +1015,7 @@
         }
 
 
-        if(s <= .5){
+        if (s <= .5) {
             loadList.push('h:' + card.texture);
         } else {
             loadList.push('t:' + card.texture);
@@ -1012,7 +1037,7 @@
      * @param renderTarget
      */
     sunwell.createCard = function (settings, width, renderTarget) {
-        if(!settings){
+        if (!settings) {
             throw new Error('No card object given');
         }
 
@@ -1021,7 +1046,10 @@
         }
 
         //Make compatible to hearthstoneJSON format.
-        if(settings.gameId === undefined) {
+        if(settings.title === undefined){
+            settings.title = settings.name;
+        }
+        if (settings.gameId === undefined) {
             settings.gameId = settings.id;
         }
         if (settings.textMarkdown === undefined) {
