@@ -52,6 +52,7 @@
     sunwell.settings.textureFolder = sunwell.settings.textureFolder || '/artwork/';
     sunwell.settings.smallTextureFolder = sunwell.settings.smallTextureFolder || null;
     sunwell.settings.autoInit = sunwell.settings.autoInit || true;
+    sunwell.settings.idAsTexture = sunwell.settings.idAsTexture || false;
 
 
     sunwell.settings.debug = sunwell.settings.debug || false;
@@ -996,6 +997,10 @@
         }
         if (settings.textMarkdown === undefined) {
             settings.textMarkdown = settings.text.replace(/<\/*b>/g, '**');
+        }
+
+        if(sunwell.settings.idAsTexture){
+            settings.texture = settings.gameId;
         }
 
         var cacheKey = width + '_' + settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health;
