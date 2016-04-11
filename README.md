@@ -13,20 +13,42 @@ I prepared a couple of skeleton assets for the cards via Photoshop, but the main
 included in this repository. In order to render cards, you need to obtain the card artworks and place
 them in the `/artwork` folder.
 
-You also need to obtain a copy of the Belwe font as its being used to render the cards title and number
-values. You can place the web font files in the `/font` directory. A substitute for the card body text
+You also need to obtain a copy of the Belwe and ITC Franklin Gothic font, as its being used to render the cards title, body
+and number values. You can place the web font files in the `/font` directory. A substitute for the card body text
 font will be loaded from google fonts.
 
 
 
 Usage
 -----
+Load the web fonts, used on your rendered cards through CSS, or even better: [google font loader](https://github.com/typekit/webfontloader).
 
-Simply load the `sunwell.js` inside a html document and it will load the requirements on its own.
+Set up sunwell with your own settings before loading the library itself:
 
-	<script src="sunwell.js">
+```javascript
+<script>
+	window.sunwell = {
+		settings: {
+			titleFont: 'Belwe',
+			bodyFont: 'ITC Franklin Condensed',
+			bodyFontSize: 24,
+			bodyLineHeight: 55,
+			bodyFontOffset: {x: 0, y: 0},
+			assetFolder: '/assets/',
+			textureFolder: '/artworks/',
+			smallTextureFolder: '/smallArtworks/',
+			autoInit: false,
+			debug: false
+		}
+	};
+</script>
+<script src="sunwell.js">
+```	
+
+If you set `autoInit` to `false` - which I recommend; sunwell will wait with the rendering of any cards until you call
+`sunwell.init()`. Call this methods when your web fonts have been loaded.
 	
-After being loaded, sunwell will provide the global object `sunwell` for you to interact with and
+After being loaded, sunwell will provide the methods to the global object `sunwell` for you to interact with and
 generate cards from.
 
 
