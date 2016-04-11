@@ -412,7 +412,7 @@
      * @returns {*[]}
      */
     function finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, totalWidth) {
-        if(sunwell.settings.debug){
+        if (sunwell.settings.debug) {
             bufferTextCtx.save();
             bufferTextCtx.strokeStyle = 'red';
             bufferTextCtx.beginPath();
@@ -457,10 +457,10 @@
         bufferRowCtx.setTransform(1, 0, 0, 1, 0, 0);
         bufferText.centerLeft = 390;
         bufferText.centerTop = 860;
-        bufferText.width = 540;
+        bufferText.width = 520;
         bufferText.height = 290;
 
-        bufferRow.width = 540;
+        bufferRow.width = 520;
         bufferRow.height = sunwell.settings.bodyLineHeight;
 
         if (card.type === 'SPELL') {
@@ -481,14 +481,8 @@
         var smallerFirstLine = false;
         var totalLength = card.textMarkdown.replace(/\*\*/g, '').length;
 
-        if (totalLength > 75) {
-            if (card.type === 'SPELL') {
-                smallerFirstLine = true;
-            }
-
-            if (totalLength > 80) {
-                fontSize = sunwell.settings.bodyFontSize * 0.6;
-            }
+        if (totalLength >= 75 && card.type === 'SPELL') {
+            smallerFirstLine = true;
         }
 
         if (card.type === 'WEAPON') {
@@ -509,7 +503,7 @@
 
             width = bufferRowCtx.measureText(word).width;
 
-            if (xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.6)) {
+            if (xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) {
                 smallerFirstLine = false;
                 r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
                 xPos = r[0];
@@ -989,7 +983,7 @@
         }
 
         //Make compatible to hearthstoneJSON format.
-        if(settings.title === undefined){
+        if (settings.title === undefined) {
             settings.title = settings.name;
         }
         if (settings.gameId === undefined) {
@@ -999,7 +993,7 @@
             settings.textMarkdown = settings.text.replace(/<\/*b>/g, '**');
         }
 
-        if(sunwell.settings.idAsTexture){
+        if (sunwell.settings.idAsTexture) {
             settings.texture = settings.gameId;
         }
 
