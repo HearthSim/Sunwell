@@ -920,7 +920,7 @@
                 loadList.push('dragon');
             }
 
-            if (card.rarity !== 'FREE') {
+            if (card.rarity !== 'FREE' && !(card.rarity === 'COMMON' && card.set === 'CORE')) {
                 card.sunwell.rarity = 'rarity-' + card.rarity.toLowerCase();
                 loadList.push(card.sunwell.rarity);
             }
@@ -929,7 +929,7 @@
         if (card.type === 'SPELL') {
             loadList.push('attack', 'health', 'title-spell');
 
-            if (card.rarity !== 'FREE') {
+            if (card.rarity !== 'FREE' && !(card.rarity === 'COMMON' && card.set === 'CORE')) {
                 card.sunwell.rarity = 'spell-rarity-' + card.rarity.toLowerCase();
                 loadList.push(card.sunwell.rarity);
             }
@@ -938,7 +938,7 @@
         if (card.type === 'WEAPON') {
             loadList.push('swords', 'shield', 'title-weapon');
 
-            if (card.rarity !== 'FREE') {
+            if (card.rarity !== 'FREE' && !(card.rarity === 'COMMON' && card.set === 'CORE')) {
                 card.sunwell.rarity = 'weapon-rarity-' + card.rarity.toLowerCase();
                 loadList.push(card.sunwell.rarity);
             }
