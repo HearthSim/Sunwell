@@ -157,6 +157,7 @@
 
                 if (assets[key] === undefined) {
                     assets[key] = new Image();
+                    assets[key].crossOrigin = "Anonymous";
                     assets[key].loaded = false;
                     loadingTotal++;
                     (function (key) {
