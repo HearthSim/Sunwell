@@ -840,17 +840,22 @@
                 var xPos;
 
                 if (card.type === 'SPELL') {
-                    xPos = 245;
+                    xPos = 265;
                 }
 
                 if (card.type === 'MINION') {
                     xPos = 265;
                 }
 
-                if (card.race) {
+                if (card.race && card.type === 'MINION') {
                     ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 734 * s, (281 * 0.95) * s, (244 * 0.95) * s);
                 } else {
-                    ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 734 * s, 281 * s, 244 * s);
+                    if(card.type === 'SPELL'){
+                        ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 740 * s, 253 * s, 220 * s);
+                    } else {
+                        ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 734 * s, 281 * s, 244 * s);
+                    }
+
                 }
             })();
         }
@@ -978,6 +983,11 @@
         } else {
             card.sunwell.bgLogo = 'bg-' + card.set.toLowerCase();
         }
+
+        if(card.type === 'SPELL'){
+            card.sunwell.bgLogo = 'spell-' + card.sunwell.bgLogo;
+        }
+
         loadList.push(card.sunwell.bgLogo);
 
         if (card.race) {
