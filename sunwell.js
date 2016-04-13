@@ -275,9 +275,17 @@
         var text, x;
 
         if (sunwell.races[card.language]) {
-            text = sunwell.races[card.language][card.race];
+            if (sunwell.races[card.language][card.race]) {
+                text = sunwell.races[card.language][card.race];
+            } else {
+                text = card.race;
+            }
         } else {
-            text = sunwell.races['enUS'][card.race];
+            if (sunwell.races['enUS'][card.race]) {
+                text = sunwell.races['enUS'][card.race];
+            } else {
+                text = card.race;
+            }
         }
 
         var buffer = getBuffer();
@@ -449,6 +457,7 @@
             xPos = 0,
             yPos = 0,
             isBold,
+            isItalic,
             i,
             j,
             r;
@@ -522,8 +531,16 @@
                             isBold = true;
                             bufferRowCtx.font = 'bold ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
                         }
+                        j += 1;
+                    } else {
+                        if (isItalic) {
+                            isItalic = false;
+                            bufferRowCtx.font = ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
+                        } else {
+                            isItalic = true;
+                            bufferRowCtx.font = 'italic ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
+                        }
                     }
-                    j += 1;
                     continue;
                 }
 
@@ -734,7 +751,23 @@
     function draw(cvs, ctx, card, s, callback) {
 
         var sw = card.sunwell,
+            t;
+
+        if (typeof card.texture === 'string') {
             t = assets[card.texture];
+        } else {
+            if (card.texture instanceof Image) {
+                t = card.texture;
+            } else {
+                t = getBuffer();
+                t.width = card.texture.crop.w;
+                t.height = card.texture.crop.h;
+                (function () {
+                    var tCtx = t.getContext('2d');
+                    tCtx.drawImage(card.texture.image, card.texture.crop.x, card.texture.crop.y, card.texture.crop.w, card.texture.crop.h, 0, 0, t.width, t.height);
+                })();
+            }
+        }
 
         ctx.save();
         ctx.clearRect(0, 0, cvs.width, cvs.height);
@@ -840,7 +873,7 @@
 
         if (card.type === 'WEAPON') {
             drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
-            drawNumber(ctx, 668, 994, s, card.durability || 0, 150, card._originalHealth);
+            drawNumber(ctx, 668, 994, s, card.durability || 0, 150, card._originalDurability);
         }
 
         ctx.restore();
@@ -952,10 +985,12 @@
         }
 
 
-        if (s <= .5) {
-            loadList.push('h:' + card.texture);
-        } else {
-            loadList.push('t:' + card.texture);
+        if (typeof card.texture === 'string') {
+            if (s <= .5) {
+                loadList.push('h:' + card.texture);
+            } else {
+                loadList.push('t:' + card.texture);
+            }
         }
 
         fetchAssets(loadList)
@@ -964,6 +999,13 @@
                 rendering--;
                 freeBuffer(cvs);
             });
+    };
+
+    /**
+     * This will flush sunwell's render caches.
+     */
+    sunwell.clearCache = function () {
+        renderCache = {};
     };
 
     /**
@@ -1002,6 +1044,7 @@
         settings._originalCost = settings.cost;
         settings._originalHealth = settings.health;
         settings._originalAttack = settings.attack;
+        settings._originalDurability = settings.durability;
 
         if (renderCache[cacheKey]) {
             renderTarget.src = renderCache[cacheKey];
@@ -1014,6 +1057,13 @@
 
         return {
             target: renderTarget,
+            redraw: function () {
+                cacheKey = width + '_' + settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health + '_' + settings.health;
+                delete renderCache[cacheKey];
+                queryRender(settings, width, function (result) {
+                    renderTarget.src = renderCache[cacheKey] = result.toDataURL();
+                });
+            },
             update: function (properties) {
                 for (var key in properties) {
                     settings[key] = properties[key];
