@@ -521,7 +521,7 @@
 
             width = bufferRowCtx.measureText(word).width;
 
-            if (xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) {
+            if (xPos + width > (bufferRow.width-10) || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) {
                 smallerFirstLine = false;
                 r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
                 xPos = r[0];
@@ -559,7 +559,6 @@
             }
 
             xPos += spaceWidth;
-
         }
 
         finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
