@@ -429,10 +429,18 @@
             bufferTextCtx.stroke();
             bufferTextCtx.restore();
         }
-        bufferTextCtx.drawImage(bufferRow, 0, 0, xPos, bufferRow.height, (totalWidth / 2) - (xPos / 2), yPos, xPos, bufferRow.height);
+
+        var xCalc = (totalWidth / 2) - (xPos / 2);
+
+        if(xCalc < 0){
+            xCalc = 0;
+        }
+
+        bufferTextCtx.drawImage(bufferRow, 0, 0, Math.min(xPos, bufferRow.width), bufferRow.height, xCalc, yPos, Math.min(xPos, bufferRow.width), bufferRow.height);
+
         xPos = 5;
         yPos += bufferRow.height;
-        bufferRowCtx.clearRect(0, 0, 540, bufferRow.height);
+        bufferRowCtx.clearRect(0, 0, bufferRow.width, bufferRow.height);
 
         return [xPos, yPos];
     }
@@ -460,12 +468,12 @@
             isItalic,
             i,
             j,
-            r;
+            r,
+            centerLeft,
+            centerTop;
 
-        bufferTextCtx.setTransform(1, 0, 0, 1, 0, 0);
-        bufferRowCtx.setTransform(1, 0, 0, 1, 0, 0);
-        bufferText.centerLeft = 390;
-        bufferText.centerTop = 860;
+        centerLeft = 390;
+        centerTop = 860;
         bufferText.width = 520;
         bufferText.height = 290;
 
@@ -561,7 +569,7 @@
 
         b.h = Math.ceil(b.h / bufferRow.height) * bufferRow.height;
 
-        targetCtx.drawImage(bufferText, b.x, b.y - 2, b.w, b.h, (bufferText.centerLeft - (b.w / 2)) * s, (bufferText.centerTop - (b.h / 2)) * s, b.w * s, (b.h + 2) * s);
+        targetCtx.drawImage(bufferText, b.x, b.y - 2, b.w, b.h, (centerLeft - (b.w / 2)) * s, (centerTop - (b.h / 2)) * s, b.w * s, (b.h + 2) * s);
 
         freeBuffer(bufferText);
 
@@ -569,11 +577,11 @@
             targetCtx.save();
             targetCtx.strokeStyle = 'green';
             targetCtx.beginPath();
-            targetCtx.rect((bufferText.centerLeft - (b.w / 2)) * s, (bufferText.centerTop - (b.h / 2)) * s, b.w * s, (b.h + 2) * s);
+            targetCtx.rect((centerLeft - (b.w / 2)) * s, (centerTop - (b.h / 2)) * s, b.w * s, (b.h + 2) * s);
             targetCtx.stroke();
             targetCtx.strokeStyle = 'red';
             targetCtx.beginPath();
-            targetCtx.rect((bufferText.centerLeft - (bufferText.width / 2)) * s, (bufferText.centerTop - (bufferText.height / 2)) * s, bufferText.width * s, (bufferText.height + 2) * s);
+            targetCtx.rect((centerLeft - (bufferText.width / 2)) * s, (centerTop - (bufferText.height / 2)) * s, bufferText.width * s, (bufferText.height + 2) * s);
             targetCtx.stroke();
             targetCtx.restore();
         }
