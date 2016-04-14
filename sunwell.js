@@ -16,7 +16,8 @@
         maxRendering = 8,
         rendering = 0,
         renderCache = {},
-        buffers = [];
+        buffers = [],
+        validRarity = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
 
 
     /**
@@ -36,6 +37,30 @@
      */
     function freeBuffer(buffer) {
         buffers.push(buffer);
+    }
+
+    var imgReplacement;
+
+    function getMissingImg() {
+        if (imgReplacement) {
+            return imgReplacement;
+        }
+
+        var buffer = getBuffer(),
+            bufferctx = buffer.getContext('2d');
+        buffer.width = buffer.height = 512;
+        bufferctx.save();
+        bufferctx.fillStyle = 'grey';
+        bufferctx.fillRect(0, 0, 512, 512);
+        bufferctx.fill();
+        bufferctx.fillStyle = 'red';
+        bufferctx.textAlign = 'center';
+        bufferctx.textBaseline = 'middle';
+        bufferctx.font = '50px Belwe, serif';
+        bufferctx.fillText('missing artwork', 256, 256);
+        bufferctx.restore();
+        imgReplacement = buffer.toDataURL();
+        return imgReplacement;
     }
 
 
@@ -169,11 +194,25 @@
                                 resolve(result);
                             }
                         });
+                        assets[key].addEventListener('error', function () {
+                            loaded++;
+
+                            if (assets[key].isTexture) {
+                                console.log('Replacing ' + assets[key].src + ' with substitute.');
+                                assets[key].src = getMissingImg();
+                                assets[key].loaded = true;
+                                result[key] = assets[key];
+                                if (loaded >= loadingTotal) {
+                                    resolve(result);
+                                }
+                            }
+                        });
                     })(key);
                     if (isUrl) {
                         assets[key].src = key;
                     } else {
                         if (isTexture) {
+                            assets[key].isTexture = true;
                             if (smallTexture) {
                                 assets[key].src = sunwell.settings.smallTextureFolder + key + '.jpg';
                             } else {
@@ -764,10 +803,16 @@
         freeBuffer(buffer);
     }
 
+    (function () {
+        assets['empty'] = new Image();
+        assets['empty'].src = getMissingImg();
+    })();
+
     function draw(cvs, ctx, card, s, callback) {
 
         var sw = card.sunwell,
             t;
+
 
         if (typeof card.texture === 'string') {
             t = assets[card.texture];
@@ -783,6 +828,10 @@
                     tCtx.drawImage(card.texture.image, card.texture.crop.x, card.texture.crop.y, card.texture.crop.w, card.texture.crop.h, 0, 0, t.width, t.height);
                 })();
             }
+        }
+
+        if(!t){
+            t = assets['empty'];
         }
 
         ctx.save();
@@ -809,6 +858,7 @@
         ctx.restore();
 
         ctx.drawImage(assets[sw.cardBack], 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
+
         ctx.drawImage(assets.gem, 0, 0, 182, 180, 24 * s, 82 * s, 182 * s, 180 * s);
 
 
@@ -955,9 +1005,7 @@
         card.sunwell = card.sunwell || {};
 
         card.sunwell.cardBack = card.type.substr(0, 1).toLowerCase() + card.playerClass.substr(0, 1) + card.playerClass.substr(1).toLowerCase();
-        if (card.sunwell.cardBack === 'mNeutral') {
-            card.sunwell.cardBack = 'mGeneric';
-        }
+
         loadList.push(card.sunwell.cardBack);
 
         loadList.push('gem');
@@ -1011,7 +1059,7 @@
         }
 
 
-        if (typeof card.texture === 'string') {
+        if (typeof card.texture === 'string' && card.set !== 'CHEAT') {
             if (s <= .5) {
                 loadList.push('h:' + card.texture);
             } else {
@@ -1048,6 +1096,11 @@
 
         if (!renderTarget) {
             renderTarget = new Image();
+        }
+
+        //Make compatible to tech cards
+        if (validRarity.indexOf(settings.rarity) === -1) {
+            settings.rarity = 'FREE';
         }
 
         //Make compatible to hearthstoneJSON format.
