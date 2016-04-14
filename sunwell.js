@@ -56,7 +56,7 @@
         bufferctx.fillStyle = 'red';
         bufferctx.textAlign = 'center';
         bufferctx.textBaseline = 'middle';
-        bufferctx.font = '50px Belwe, serif';
+        bufferctx.font = '50px Belwe';
         bufferctx.fillText('missing artwork', 256, 256);
         bufferctx.restore();
         imgReplacement = buffer.toDataURL();
@@ -190,6 +190,9 @@
                             loaded++;
                             assets[key].loaded = true;
                             result[key] = assets[key];
+                            if (!assets[key].width || !assets[key].height) {
+                                assets[key].src = getMissingImg();
+                            }
                             if (loaded >= loadingTotal) {
                                 resolve(result);
                             }
@@ -197,14 +200,11 @@
                         assets[key].addEventListener('error', function () {
                             loaded++;
 
-                            if (assets[key].isTexture) {
-                                console.log('Replacing ' + assets[key].src + ' with substitute.');
-                                assets[key].src = getMissingImg();
-                                assets[key].loaded = true;
-                                result[key] = assets[key];
-                                if (loaded >= loadingTotal) {
-                                    resolve(result);
-                                }
+                            assets[key].src = getMissingImg();
+                            assets[key].loaded = true;
+                            result[key] = assets[key];
+                            if (loaded >= loadingTotal) {
+                                resolve(result);
                             }
                         });
                     })(key);
@@ -476,7 +476,19 @@
             xCalc = 0;
         }
 
-        bufferTextCtx.drawImage(bufferRow, 0, 0, Math.min(xPos, bufferRow.width), bufferRow.height, xCalc, yPos, Math.min(xPos, bufferRow.width), bufferRow.height);
+        if (xPos > 0 && bufferRow.width > 0) {
+            bufferTextCtx.drawImage(
+                bufferRow,
+                0,
+                0,
+                xPos > bufferRow.width ? bufferRow.width : xPos,
+                bufferRow.height,
+                xCalc,
+                yPos,
+                Math.min(xPos, bufferRow.width),
+                bufferRow.height
+            );
+        }
 
         xPos = 5;
         yPos += bufferRow.height;
@@ -830,7 +842,7 @@
             }
         }
 
-        if(!t){
+        if (!t) {
             t = assets['empty'];
         }
 
