@@ -433,7 +433,7 @@
 
         var xCalc = (totalWidth / 2) - (xPos / 2);
 
-        if(xCalc < 0){
+        if (xCalc < 0) {
             xCalc = 0;
         }
 
@@ -479,7 +479,6 @@
         bufferText.height = 290;
 
         bufferRow.width = 520;
-        bufferRow.height = sunwell.settings.bodyLineHeight;
 
         if (card.type === 'SPELL') {
             bufferText.width = 460;
@@ -496,8 +495,17 @@
         }
 
         var fontSize = sunwell.settings.bodyFontSize;
-        var smallerFirstLine = false;
+        var lineHeight = sunwell.settings.bodyLineHeight;
         var totalLength = card.textMarkdown.replace(/\*\*/g, '').length;
+        var smallerFirstLine = false;
+
+        if (totalLength >= 100) {
+            fontSize = sunwell.settings.bodyFontSize * 0.8;
+            lineHeight = sunwell.settings.bodyLineHeight * 0.8;
+        }
+
+        bufferRow.height = lineHeight;
+
 
         if (totalLength >= 75 && card.type === 'SPELL') {
             smallerFirstLine = true;
@@ -521,7 +529,7 @@
 
             width = bufferRowCtx.measureText(word).width;
 
-            if (xPos + width > (bufferRow.width-10) || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) {
+            if (xPos + width > (bufferRow.width - 10) || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) {
                 smallerFirstLine = false;
                 r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
                 xPos = r[0];
@@ -858,7 +866,7 @@
                 if (card.race && card.type === 'MINION') {
                     ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 734 * s, (281 * 0.95) * s, (244 * 0.95) * s);
                 } else {
-                    if(card.type === 'SPELL'){
+                    if (card.type === 'SPELL') {
                         ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 740 * s, 253 * s, 220 * s);
                     } else {
                         ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 734 * s, 281 * s, 244 * s);
@@ -992,7 +1000,7 @@
             card.sunwell.bgLogo = 'bg-' + card.set.toLowerCase();
         }
 
-        if(card.type === 'SPELL'){
+        if (card.type === 'SPELL') {
             card.sunwell.bgLogo = 'spell-' + card.sunwell.bgLogo;
         }
 
