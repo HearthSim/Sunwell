@@ -13,12 +13,18 @@
         assets = {},
         ready = false,
         renderQuery = [],
-        maxRendering = 8,
+        maxRendering = 12,
         rendering = 0,
         renderCache = {},
         buffers = [],
         validRarity = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
 
+    function log(msg) {
+        if (!sunwell.settings.debug) {
+            return;
+        }
+        console.log(msg);
+    }
 
     /**
      * Returns a new render buffer (canvas).
@@ -63,8 +69,15 @@
         return imgReplacement;
     }
 
+    function getAsset(id) {
+        return assets[id] || imgReplacement;
+    }
 
     window.sunwell = sunwell = window.sunwell || {};
+
+    sunwell._buffers = buffers;
+    sunwell._renderQuery = renderQuery;
+    sunwell._activeRenders = rendering;
 
     sunwell.settings = sunwell.settings || {};
 
@@ -823,11 +836,20 @@
     function draw(cvs, ctx, card, s, callback) {
 
         var sw = card.sunwell,
-            t;
+            t,
+            drawTimeout,
+            drawProgress = 0;
 
+        drawTimeout = setTimeout(function () {
+            console.log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
+            console.log(card);
+            if (callback) {
+                callback(cvs);
+            }
+        }, 5000);
 
         if (typeof card.texture === 'string') {
-            t = assets[card.texture];
+            t = getAsset(card.texture);
         } else {
             if (card.texture instanceof Image) {
                 t = card.texture;
@@ -842,12 +864,12 @@
             }
         }
 
-        if (!t) {
-            t = assets['empty'];
-        }
+        drawProgress = 2;
 
         ctx.save();
         ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+        drawProgress = 3;
 
         ctx.save();
         if (card.type === 'MINION') {
@@ -869,48 +891,57 @@
         }
         ctx.restore();
 
-        ctx.drawImage(assets[sw.cardBack], 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
+        drawProgress = 4;
 
-        ctx.drawImage(assets.gem, 0, 0, 182, 180, 24 * s, 82 * s, 182 * s, 180 * s);
+        ctx.drawImage(getAsset(sw.cardBack), 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
 
+        drawProgress = 5;
+
+        ctx.drawImage(getAsset('gem'), 0, 0, 182, 180, 24 * s, 82 * s, 182 * s, 180 * s);
+
+        drawProgress = 6;
 
         if (card.type === 'MINION') {
             if (sw.rarity) {
-                ctx.drawImage(assets[sw.rarity], 0, 0, 146, 146, 326 * s, 607 * s, 146 * s, 146 * s);
+                ctx.drawImage(getAsset(sw.rarity), 0, 0, 146, 146, 326 * s, 607 * s, 146 * s, 146 * s);
             }
 
-            ctx.drawImage(assets.title, 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
+            ctx.drawImage(getAsset('title'), 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
 
             if (card.race) {
-                ctx.drawImage(assets.race, 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
+                ctx.drawImage(getAsset('race'), 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
             }
 
-            ctx.drawImage(assets.attack, 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
-            ctx.drawImage(assets.health, 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
+            ctx.drawImage(getAsset('attack'), 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
+            ctx.drawImage(getAsset('health'), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
 
             if (card.rarity === 'LEGENDARY') {
-                ctx.drawImage(assets.dragon, 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
+                ctx.drawImage(getAsset('dragon'), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
             }
         }
 
+        drawProgress = 7;
+
         if (card.type === 'SPELL') {
             if (sw.rarity) {
-                ctx.drawImage(assets[sw.rarity], 0, 0, 150, 150, 311 * s, 607 * s, 150 * s, 150 * s);
+                ctx.drawImage(getAsset(sw.rarity), 0, 0, 149, 149, 311 * s, 607 * s, 150 * s, 150 * s);
             }
 
-            ctx.drawImage(assets['title-spell'], 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
+            ctx.drawImage(getAsset('title-spell'), 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
         }
 
         if (card.type === 'WEAPON') {
             if (sw.rarity) {
-                ctx.drawImage(assets[sw.rarity], 0, 0, 146, 144, 315 * s, 592 * s, 146 * s, 144 * s);
+                ctx.drawImage(getAsset(sw.rarity), 0, 0, 146, 144, 315 * s, 592 * s, 146 * s, 144 * s);
             }
 
-            ctx.drawImage(assets['title-weapon'], 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
+            ctx.drawImage(getAsset('title-weapon'), 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
 
-            ctx.drawImage(assets.swords, 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
-            ctx.drawImage(assets.shield, 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
+            ctx.drawImage(getAsset('swords'), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
+            ctx.drawImage(getAsset('shield'), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
         }
+
+        drawProgress = 8;
 
 
         if (card.set !== 'CORE') {
@@ -926,24 +957,31 @@
                 }
 
                 if (card.race && card.type === 'MINION') {
-                    ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 734 * s, (281 * 0.95) * s, (244 * 0.95) * s);
+                    ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 734 * s, (281 * 0.95) * s, (244 * 0.95) * s);
                 } else {
                     if (card.type === 'SPELL') {
-                        ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 740 * s, 253 * s, 220 * s);
+                        ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 740 * s, 253 * s, 220 * s);
                     } else {
-                        ctx.drawImage(assets[sw.bgLogo], 0, 0, 281, 244, xPos * s, 734 * s, 281 * s, 244 * s);
+                        ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 734 * s, 281 * s, 244 * s);
                     }
 
                 }
             })();
         }
 
+        drawProgress = 9;
 
-        drawBodyText(ctx, s, card);
+
+
+        drawProgress = 10;
 
         drawNumber(ctx, 116, 170, s, card.cost || 0, 170, card._originalCost, true);
 
+        drawProgress = 11;
+
         drawCardTitle(ctx, s, card);
+
+        drawProgress = 12;
 
         if (card.type === 'MINION') {
             if (card.race) {
@@ -954,12 +992,20 @@
             drawNumber(ctx, 668, 994, s, card.health || 0, 150, card._originalHealth);
         }
 
+        drawProgress = 13;
+
         if (card.type === 'WEAPON') {
             drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
             drawNumber(ctx, 668, 994, s, card.durability || 0, 150, card._originalDurability);
         }
 
+        drawProgress = 14;
+
+        drawBodyText(ctx, s, card);
+
         ctx.restore();
+
+        clearTimeout(drawTimeout);
 
         if (callback) {
             callback(cvs);
@@ -1005,6 +1051,8 @@
         card = renderInfo[0];
         resolution = renderInfo[1];
         callback = renderInfo[2];
+
+        log('Preparing assets for: ' + card.title);
 
         var cvs = getBuffer(),
             ctx = cvs.getContext('2d'),
@@ -1079,10 +1127,14 @@
             }
         }
 
+        log('Assets prepared, now loading');
+
         fetchAssets(loadList)
             .then(function () {
+                log('Assets loaded for: ' + card.title);
                 draw(cvs, ctx, card, s, callback);
                 rendering--;
+                log('Card rendered: ' + card.title);
                 freeBuffer(cvs);
             });
     };
@@ -1141,6 +1193,8 @@
             renderTarget.src = renderCache[cacheKey];
             return;
         }
+
+        log('Queried render: ' + settings.title);
 
         queryRender(settings, width, function (result) {
             renderTarget.src = renderCache[cacheKey] = result.toDataURL();
