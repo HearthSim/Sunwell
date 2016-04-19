@@ -1016,7 +1016,11 @@
 
         drawProgress = 14;
 
-        drawBodyText(ctx, s, card);
+        if(!card.silenced){
+            drawBodyText(ctx, s, card);
+        } else {
+            ctx.drawImage(getASset('silenced'), 0, 0, 410, 397, 222 * s, 660 * s, 410 * s, 397 * s);
+        }
 
         ctx.restore();
 
@@ -1073,7 +1077,7 @@
         var cvs = getBuffer(),
             ctx = cvs.getContext('2d'),
             s = (resolution || 512) / 764,
-            loadList = [];
+            loadList = ['silenced'];
 
         cvs.width = resolution || 512;
         cvs.height = Math.round(cvs.width * 1.4397905759);
@@ -1203,6 +1207,8 @@
         settings.healthStyle = settings.healthStyle || '0';
         settings.attackStyle = settings.attackStyle || '0';
         settings.durabilityStyle = settings.durabilityStyle || '0';
+
+        settings.silenced = settings.silenced || false;
 
         settings.width = width;
 
