@@ -103,7 +103,7 @@ Some properties are purely optional, since they are not used by sunwell, but the
 }
 ```
 
-In case of a minion or weapon card, you also need to pass `health` and/or `attack`.
+In case of a minion or weapon card, you also need to pass `health` (or `durability`, but health is fine for weapons, too) and/or `attack`.
 
 The method will return an object that provides an interface to manipulate the card after its creation.
 
@@ -112,6 +112,17 @@ You can also access the image object that contains the cards image data through 
 If you want to update certain properties on the original `cardData`, simply call `cardObj.update()` and
 pass an object with the properties you want to overwrite.
 
-If you update the `cost`, `health` and/or `attack` properties, the numbers will turn green and/or red
-on the card image, depending on the original value.
+If you want to make the numbers appear green/red, you can also pass in the following properties on your card object to both 
+`createCard()` and/or `cardObj.update()`:
+
+```javascript
+{
+	"costStyle": "0",
+	"attackStyle": "+",
+	"healthStyle": "-",
+	"durabilityStyle": "-"
+}
+```
+
+All the style default to "0". Setting the style to "+" makes the number appear green, setting it to "-" makes it appear red.
 

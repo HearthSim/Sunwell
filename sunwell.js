@@ -65,12 +65,13 @@
         bufferctx.font = '50px Belwe';
         bufferctx.fillText('missing artwork', 256, 256);
         bufferctx.restore();
-        imgReplacement = buffer.toDataURL();
+        imgReplacement = new Image();
+        imgReplacement.src = buffer.toDataURL();
         return imgReplacement;
     }
 
     function getAsset(id) {
-        return assets[id] || imgReplacement;
+        return assets[id] || getMissingImg();
     }
 
     window.sunwell = sunwell = window.sunwell || {};
@@ -125,6 +126,26 @@
             'TOTEM': 'Totem'
         }
     };
+
+    /**
+     * Calculate the checksum for an object.
+     * @param o
+     * @returns {number}
+     */
+    function checksum(o) {
+        var i, key, s = '';
+        var chk = 0x12345678;
+
+        for (key in o) {
+            s = s + key + o[key];
+        }
+
+        for (i = 0; i < s.length; i++) {
+            chk += (s.charCodeAt(i) * (i + 1));
+        }
+
+        return chk;
+    }
 
     /**
      * Helper function to draw the oval mask for the cards artwork.
@@ -204,7 +225,7 @@
                             assets[key].loaded = true;
                             result[key] = assets[key];
                             if (!assets[key].width || !assets[key].height) {
-                                assets[key].src = getMissingImg();
+                                assets[key].src = getMissingImg().src;
                             }
                             if (loaded >= loadingTotal) {
                                 resolve(result);
@@ -213,7 +234,7 @@
                         assets[key].addEventListener('error', function () {
                             loaded++;
 
-                            assets[key].src = getMissingImg();
+                            assets[key].src = getMissingImg().src;
                             assets[key].loaded = true;
                             result[key] = assets[key];
                             if (loaded >= loadingTotal) {
@@ -392,14 +413,14 @@
      * @param s
      * @param number
      * @param size
-     * @param [style="neutral] Either "plus", "minus" or "neutral". Default: "neutral"
+     * @param [drawStyle="0"] Either "+", "-" or "0". Default: "0"
      */
-    function drawNumber(targetCtx, x, y, s, number, size, originalNumber, inverseIndicators) {
+    function drawNumber(targetCtx, x, y, s, number, size, drawStyle) {
         var buffer = getBuffer();
         var bufferCtx = buffer.getContext('2d');
 
-        if (originalNumber === undefined) {
-            originalNumber = number;
+        if (drawStyle === undefined) {
+            drawStyle = '0';
         }
 
         buffer.width = 256;
@@ -421,22 +442,12 @@
 
         var color = 'white';
 
-        if (inverseIndicators) {
-            if (number > originalNumber) {
-                color = '#f00';
-            }
+        if (drawStyle === '-') {
+            color = '#f00';
+        }
 
-            if (number < originalNumber) {
-                color = '#0f0';
-            }
-        } else {
-            if (number < originalNumber) {
-                color = '#f00';
-            }
-
-            if (number > originalNumber) {
-                color = '#0f0';
-            }
+        if (drawStyle === '+') {
+            color = '#0f0';
         }
 
         for (var i = 0; i < number.length; i++) {
@@ -833,7 +844,7 @@
         assets['empty'].src = getMissingImg();
     })();
 
-    function draw(cvs, ctx, card, s, callback) {
+    function draw(cvs, ctx, card, s, callback, internalCB) {
 
         var sw = card.sunwell,
             t,
@@ -841,8 +852,9 @@
             drawProgress = 0;
 
         drawTimeout = setTimeout(function () {
-            console.log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
-            console.log(card);
+            log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
+            log(card);
+            internalCB();
             if (callback) {
                 callback(cvs);
             }
@@ -862,6 +874,10 @@
                     tCtx.drawImage(card.texture.image, card.texture.crop.x, card.texture.crop.y, card.texture.crop.w, card.texture.crop.h, 0, 0, t.width, t.height);
                 })();
             }
+        }
+
+        if (!t) {
+            t = getAsset('~');
         }
 
         drawProgress = 2;
@@ -972,10 +988,9 @@
         drawProgress = 9;
 
 
-
         drawProgress = 10;
 
-        drawNumber(ctx, 116, 170, s, card.cost || 0, 170, card._originalCost, true);
+        drawNumber(ctx, 116, 170, s, card.cost || 0, 170, card.costStyle);
 
         drawProgress = 11;
 
@@ -988,15 +1003,15 @@
                 renderRaceText(ctx, s, card);
             }
 
-            drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
-            drawNumber(ctx, 668, 994, s, card.health || 0, 150, card._originalHealth);
+            drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card.attackStyle);
+            drawNumber(ctx, 668, 994, s, card.health || 0, 150, card.healthStyle);
         }
 
         drawProgress = 13;
 
         if (card.type === 'WEAPON') {
-            drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card._originalAttack);
-            drawNumber(ctx, 668, 994, s, card.durability || 0, 150, card._originalDurability);
+            drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card.attackStyle);
+            drawNumber(ctx, 668, 994, s, card.durability || 0, 150, card.durabilityStyle);
         }
 
         drawProgress = 14;
@@ -1007,6 +1022,7 @@
 
         clearTimeout(drawTimeout);
 
+        internalCB();
         if (callback) {
             callback(cvs);
         }
@@ -1132,10 +1148,11 @@
         fetchAssets(loadList)
             .then(function () {
                 log('Assets loaded for: ' + card.title);
-                draw(cvs, ctx, card, s, callback);
-                rendering--;
-                log('Card rendered: ' + card.title);
-                freeBuffer(cvs);
+                draw(cvs, ctx, card, s, callback, function () {
+                    rendering--;
+                    log('Card rendered: ' + card.title);
+                    freeBuffer(cvs);
+                });
             });
     };
 
@@ -1182,12 +1199,14 @@
             settings.texture = settings.gameId;
         }
 
-        var cacheKey = width + '_' + settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health;
+        settings.costStyle = settings.costStyle || '0';
+        settings.healthStyle = settings.healthStyle || '0';
+        settings.attackStyle = settings.attackStyle || '0';
+        settings.durabilityStyle = settings.durabilityStyle || '0';
 
-        settings._originalCost = settings.cost;
-        settings._originalHealth = settings.health;
-        settings._originalAttack = settings.attack;
-        settings._originalDurability = settings.durability;
+        settings.width = width;
+
+        var cacheKey = checksum(settings);
 
         if (renderCache[cacheKey]) {
             renderTarget.src = renderCache[cacheKey];
@@ -1203,7 +1222,7 @@
         return {
             target: renderTarget,
             redraw: function () {
-                cacheKey = width + '_' + settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health + '_' + settings.health;
+                cacheKey = checksum(settings);
                 delete renderCache[cacheKey];
                 queryRender(settings, width, function (result) {
                     renderTarget.src = renderCache[cacheKey] = result.toDataURL();
@@ -1214,7 +1233,7 @@
                     settings[key] = properties[key];
                 }
 
-                cacheKey = width + '_' + settings.language + '_' + settings.gameId + '_' + settings.cost + '_' + settings.attack + '_' + settings.health + '_' + settings.health;
+                cacheKey = checksum(settings);
 
                 if (renderCache[cacheKey]) {
                     renderTarget.src = renderCache[cacheKey];
