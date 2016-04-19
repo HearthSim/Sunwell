@@ -1016,10 +1016,10 @@
 
         drawProgress = 14;
 
-        if(!card.silenced){
+        if(!card.silenced || card.type !== 'MINION'){
             drawBodyText(ctx, s, card);
         } else {
-            ctx.drawImage(getASset('silenced'), 0, 0, 410, 397, 222 * s, 660 * s, 410 * s, 397 * s);
+            ctx.drawImage(getAsset('silence-x'), 0, 0, 410, 397, 200 * s, 660 * s, 410 * s, 397 * s);
         }
 
         ctx.restore();
@@ -1077,7 +1077,7 @@
         var cvs = getBuffer(),
             ctx = cvs.getContext('2d'),
             s = (resolution || 512) / 764,
-            loadList = ['silenced'];
+            loadList = ['silence-x'];
 
         cvs.width = resolution || 512;
         cvs.height = Math.round(cvs.width * 1.4397905759);

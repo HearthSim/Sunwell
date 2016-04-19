@@ -112,6 +112,8 @@ You can also access the image object that contains the cards image data through 
 If you want to update certain properties on the original `cardData`, simply call `cardObj.update()` and
 pass an object with the properties you want to overwrite.
 
+###Changing the number colors
+
 If you want to make the numbers appear green/red, you can also pass in the following properties on your card object to both 
 `createCard()` and/or `cardObj.update()`:
 
@@ -126,3 +128,6 @@ If you want to make the numbers appear green/red, you can also pass in the follo
 
 All the style default to "0". Setting the style to "+" makes the number appear green, setting it to "-" makes it appear red.
 
+
+###Silence a minion
+To silence a minion, set `silenced: true` either when creating the card, or with the update function.
