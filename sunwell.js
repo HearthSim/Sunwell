@@ -47,7 +47,9 @@
 
     var imgReplacement;
 
-    function getMissingImg() {
+    function getMissingImg(assetId) {
+        log('Substitute for ' + assetId);
+
         if (imgReplacement) {
             return imgReplacement;
         }
@@ -71,7 +73,7 @@
     }
 
     function getAsset(id) {
-        return assets[id] || getMissingImg();
+        return assets[id] || getMissingImg(id);
     }
 
     window.sunwell = sunwell = window.sunwell || {};
@@ -186,7 +188,8 @@
                 key,
                 isTexture,
                 smallTexture,
-                isUrl;
+                isUrl,
+                srcURL;
 
             for (var i = 0; i < loadAssets.length; i++) {
                 key = loadAssets[i];
@@ -248,13 +251,15 @@
                         if (isTexture) {
                             assets[key].isTexture = true;
                             if (smallTexture) {
-                                assets[key].src = sunwell.settings.smallTextureFolder + key + '.jpg';
+                                srcURL = sunwell.settings.smallTextureFolder + key + '.jpg';
                             } else {
-                                assets[key].src = sunwell.settings.textureFolder + key + '.jpg';
+                                srcURL = sunwell.settings.textureFolder + key + '.jpg';
                             }
                         } else {
-                            assets[key].src = sunwell.settings.assetFolder + key + '.png';
+                            srcURL = sunwell.settings.assetFolder + key + '.png';;
                         }
+                        log('Requesting ' + srcURL);
+                        assets[key].src = srcURL;
                     }
                 } else {
                     loadingTotal++;
@@ -839,17 +844,13 @@
         freeBuffer(buffer);
     }
 
-    (function () {
-        assets['empty'] = new Image();
-        assets['empty'].src = getMissingImg();
-    })();
-
     function draw(cvs, ctx, card, s, callback, internalCB) {
 
         var sw = card.sunwell,
             t,
             drawTimeout,
-            drawProgress = 0;
+            drawProgress = 0,
+            renderStart = Date.now();
 
         drawTimeout = setTimeout(function () {
             log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
@@ -1025,6 +1026,8 @@
         ctx.restore();
 
         clearTimeout(drawTimeout);
+
+        log('Rendertime: ' + (Date.now() - renderStart) + 'ms');
 
         internalCB();
         if (callback) {
