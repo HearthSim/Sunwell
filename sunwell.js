@@ -256,7 +256,8 @@
                                 srcURL = sunwell.settings.textureFolder + key + '.jpg';
                             }
                         } else {
-                            srcURL = sunwell.settings.assetFolder + key + '.png';;
+                            srcURL = sunwell.settings.assetFolder + key + '.png';
+                            ;
                         }
                         log('Requesting ' + srcURL);
                         assets[key].src = srcURL;
@@ -892,18 +893,24 @@
         if (card.type === 'MINION') {
             drawEllipse(ctx, 180 * s, 75 * s, 430 * s, 590 * s);
             ctx.clip();
+            ctx.fillStyle = 'grey';
+            ctx.fillRect(0, 0, 765 * s, 1100 * s);
             ctx.drawImage(t, 0, 0, t.width, t.height, 100 * s, 75 * s, 590 * s, 590 * s);
         }
 
         if (card.type === 'SPELL') {
             ctx.rect(125 * s, 165 * s, 529 * s, 434 * s);
             ctx.clip();
+            ctx.fillStyle = 'grey';
+            ctx.fillRect(0, 0, 765 * s, 1100 * s);
             ctx.drawImage(t, 0, 0, t.width, t.height, 125 * s, 117 * s, 529 * s, 529 * s);
         }
 
         if (card.type === 'WEAPON') {
             drawEllipse(ctx, 150 * s, 135 * s, 476 * s, 468 * s);
             ctx.clip();
+            ctx.fillStyle = 'grey';
+            ctx.fillRect(0, 0, 765 * s, 1100 * s);
             ctx.drawImage(t, 0, 0, t.width, t.height, 150 * s, 135 * s, 476 * s, 476 * s);
         }
         ctx.restore();
@@ -1017,7 +1024,7 @@
 
         drawProgress = 14;
 
-        if(!card.silenced || card.type !== 'MINION'){
+        if (!card.silenced || card.type !== 'MINION') {
             drawBodyText(ctx, s, card);
         } else {
             ctx.drawImage(getAsset('silence-x'), 0, 0, 410, 397, 200 * s, 660 * s, 410 * s, 397 * s);
