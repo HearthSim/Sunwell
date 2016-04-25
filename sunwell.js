@@ -534,11 +534,13 @@
      * @param card
      */
     function drawBodyText(targetCtx, s, card) {
-        var bufferText = getBuffer(),
+        var manualBreak = card.text.substr(0, 3) === '[x]',
+            bufferText = getBuffer(),
             bufferTextCtx = bufferText.getContext('2d'),
             bufferRow = getBuffer(),
             bufferRowCtx = bufferRow.getContext('2d'),
-            words = card.textMarkdown.replace(/[\$#_]/g, '').split(/( |\n)/g),
+            bodyText = manualBreak ? card.text.substr(3) : card.text,
+            words = bodyText.replace(/[\$#_]/g, '').split(/( |\n)/g),
             word,
             chars,
             char,
@@ -546,8 +548,8 @@
             spaceWidth,
             xPos = 0,
             yPos = 0,
-            isBold,
-            isItalic,
+            isBold = 0,
+            isItalic = 0,
             i,
             j,
             r,
@@ -619,7 +621,7 @@
             width = bufferRowCtx.measureText(word).width;
             log('Next word: ' + word);
 
-            if (xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) {
+            if (!manualBreak && (xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.8))) {
                 log((xPos + width) + ' > ' + bufferRow.width);
                 log('Calculated line break');
                 smallerFirstLine = false;
@@ -648,29 +650,30 @@
 
                 justLineBreak = false;
 
-                if (char === '*' || char === '_') {
-                    if (chars[j + 1] === '*') {
-                        if (isBold) {
-                            log('Normal');
-                            isBold = false;
-                            bufferRowCtx.font = ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
-                        } else {
-                            log('Bold');
-                            isBold = true;
-                            bufferRowCtx.font = 'bold ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
+                if (char === '<') {
+                    if (chars[j + 1] === '/') {
+                        if (chars[j + 2] === 'b') {
+                            isBold--;
+                            j += 3;
                         }
-                        j += 1;
+
+                        if (chars[j + 2] === 'i') {
+                            isItalic--;
+                            j += 3;
+                        }
                     } else {
-                        if (isItalic) {
-                            log('Normal');
-                            isItalic = false;
-                            bufferRowCtx.font = ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
-                        } else {
-                            log('Italic');
-                            isItalic = true;
-                            bufferRowCtx.font = 'italic ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
+                        if (chars[j + 1] === 'b') {
+                            isBold++;
+                            j += 2;
+                        }
+
+                        if (chars[j + 1] === 'i') {
+                            isItalic++;
+                            j += 2;
                         }
                     }
+
+                    bufferRowCtx.font = (isBold > 0 ? 'bold ' : '') + (isItalic > 0 ? 'italic' : '') + ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
                     continue;
                 }
 
@@ -1209,12 +1212,6 @@
         renderCache = {};
     };
 
-    function html2markdown(inHTML) {
-        var result;
-        result = inHTML.replace(/<\/*b>/g, '**');
-        return result.replace(/<\/*i>/g, '*');
-    }
-
     /**
      * Creates a new card object that can also be manipulated at a later point.
      * Provide an image object as render target as output for the visual card data.
@@ -1243,9 +1240,6 @@
         if (settings.gameId === undefined) {
             settings.gameId = settings.id;
         }
-
-        settings.textMarkdown = html2markdown(settings.text);
-        settings.textMarkdown = settings.textMarkdown.replace(/^\[x]/, '');
 
         if (sunwell.settings.idAsTexture) {
             settings.texture = settings.gameId;
