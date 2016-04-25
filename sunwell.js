@@ -1207,6 +1207,7 @@
         }
         if (settings.textMarkdown === undefined) {
             settings.textMarkdown = settings.text.replace(/<\/*b>/g, '**');
+            settings.textMarkdown = settings.text.replace(/<\/*i>/g, '*');
         }
 
         if (sunwell.settings.idAsTexture) {
