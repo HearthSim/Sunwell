@@ -583,6 +583,11 @@
         var totalLength = card.textMarkdown.replace(/\*\*/g, '').length;
         var smallerFirstLine = false;
 
+        if (totalLength >= 80) {
+            fontSize = sunwell.settings.bodyFontSize * 0.9;
+            lineHeight = sunwell.settings.bodyLineHeight * 0.9;
+        }
+
         if (totalLength >= 100) {
             fontSize = sunwell.settings.bodyFontSize * 0.8;
             lineHeight = sunwell.settings.bodyLineHeight * 0.8;
@@ -630,7 +635,7 @@
                 log(char + ' ' + char.charCodeAt(0));
 
                 if (char.charCodeAt(0) === 10) {
-                    if(justLineBreak){
+                    if (justLineBreak) {
                         justLineBreak = false;
                         continue;
                     }
