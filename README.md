@@ -131,3 +131,16 @@ All the style default to "0". Setting the style to "+" makes the number appear g
 
 ###Silence a minion
 To silence a minion, set `silenced: true` either when creating the card, or with the update function.
+
+
+## Community
+
+Sunwell is a [HearthSim](http://hearthsim.info) project. All development
+happens on our IRC channel `#hearthsim` on [Freenode](https://freenode.net).
+
+
+# License
+
+Sunwell is licensed
+[MIT](http://choosealicense.com/licenses/mit/). The full license text is
+available in the `LICENSE` file in the respective implementations' folder.
