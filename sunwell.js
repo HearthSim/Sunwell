@@ -538,7 +538,7 @@
             bufferTextCtx = bufferText.getContext('2d'),
             bufferRow = getBuffer(),
             bufferRowCtx = bufferRow.getContext('2d'),
-            words = card.textMarkdown.replace(/[\$#_]/g, '').split(' '),
+            words = card.textMarkdown.replace(/[\$#_]/g, '').split(/( |\n)/g),
             word,
             chars,
             char,
@@ -552,7 +552,10 @@
             j,
             r,
             centerLeft,
-            centerTop;
+            centerTop,
+            justLineBreak;
+
+        log('Rendering body: ' + card.textMarkdown);
 
         centerLeft = 390;
         centerTop = 860;
@@ -601,7 +604,7 @@
 
         bufferRowCtx.font = fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
 
-        spaceWidth = bufferRowCtx.measureText(' ').width;
+        spaceWidth = 3;
 
         for (i = 0; i < words.length; i++) {
             word = words[i];
@@ -609,32 +612,56 @@
             chars = word.split('');
 
             width = bufferRowCtx.measureText(word).width;
+            log('Next word: ' + word);
 
-            if (xPos + width > (bufferRow.width - 10) || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) {
+            if (xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) {
+                log((xPos + width) + ' > ' + bufferRow.width);
+                log('Calculated line break');
                 smallerFirstLine = false;
                 r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
                 xPos = r[0];
                 yPos = r[1];
+                justLineBreak = true;
             }
 
             for (j = 0; j < chars.length; j++) {
                 char = chars[j];
 
-                if (char === '*') {
+                log(char + ' ' + char.charCodeAt(0));
+
+                if (char.charCodeAt(0) === 10) {
+                    if(justLineBreak){
+                        justLineBreak = false;
+                        continue;
+                    }
+                    r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
+                    xPos = r[0];
+                    yPos = r[1];
+                    log('Manual line break');
+                    continue;
+                }
+
+                justLineBreak = false;
+
+                if (char === '*' || char === '_') {
                     if (chars[j + 1] === '*') {
                         if (isBold) {
+                            log('Normal');
                             isBold = false;
                             bufferRowCtx.font = ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
                         } else {
+                            log('Bold');
                             isBold = true;
                             bufferRowCtx.font = 'bold ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
                         }
                         j += 1;
                     } else {
                         if (isItalic) {
+                            log('Normal');
                             isItalic = false;
                             bufferRowCtx.font = ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
                         } else {
+                            log('Italic');
                             isItalic = true;
                             bufferRowCtx.font = 'italic ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
                         }
@@ -1177,6 +1204,12 @@
         renderCache = {};
     };
 
+    function html2markdown(inHTML) {
+        var result;
+        result = inHTML.replace(/<\/*b>/g, '**');
+        return result.replace(/<\/*i>/g, '*');
+    }
+
     /**
      * Creates a new card object that can also be manipulated at a later point.
      * Provide an image object as render target as output for the visual card data.
@@ -1205,10 +1238,9 @@
         if (settings.gameId === undefined) {
             settings.gameId = settings.id;
         }
-        if (settings.textMarkdown === undefined) {
-            settings.textMarkdown = settings.text.replace(/<\/*b>/g, '**');
-            settings.textMarkdown = settings.text.replace(/<\/*i>/g, '*');
-        }
+
+        settings.textMarkdown = html2markdown(settings.text);
+        settings.textMarkdown = settings.textMarkdown.replace(/^\[x]/, '');
 
         if (sunwell.settings.idAsTexture) {
             settings.texture = settings.gameId;
@@ -1225,7 +1257,7 @@
 
         var cacheKey = checksum(settings);
 
-        if (renderCache[cacheKey]) {
+        if (renderCache[cacheKey] && !sunwell.settings.debug) {
             renderTarget.src = renderCache[cacheKey];
             return;
         }
@@ -1246,6 +1278,14 @@
                 });
             },
             update: function (properties) {
+                if (properties.text) {
+                    properties.markdown = html2markdown(properties.text);
+                }
+
+                if (properties.markdown) {
+                    properties.textMarkdown = properties.textMarkdown.replace(/^\[x]/, '');
+                }
+
                 for (var key in properties) {
                     settings[key] = properties[key];
                 }
