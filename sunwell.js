@@ -17,6 +17,7 @@
         rendering = 0,
         renderCache = {},
         buffers = [],
+        pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g,
         validRarity = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
 
     function log(msg) {
@@ -540,7 +541,7 @@
             bufferRow = getBuffer(),
             bufferRowCtx = bufferRow.getContext('2d'),
             bodyText = manualBreak ? card.text.substr(3) : card.text,
-            words = bodyText.replace(/[\$#_]/g, '').split(/( |\n)/g),
+            words,
             word,
             chars,
             char,
@@ -556,9 +557,20 @@
             centerLeft,
             centerTop,
             justLineBreak,
-            lineCount = 0;
+            lineCount = 0,
+            plurals,
+            pBodyText;
 
-        log('Rendering body: ' + card.text);
+
+        pBodyText = bodyText;
+        while((plurals = pluralRegex.exec(bodyText)) !== null){
+            pBodyText = pBodyText.replace(plurals[0], plurals[1] + plurals[2] + (parseInt(plurals[1], 10) === 1 ? plurals[3] : plurals[4]));
+        }
+        bodyText = pBodyText;
+
+        words = bodyText.replace(/[\$#_]/g, '').split(/( |\n)/g);
+
+        log('Rendering body: ' + bodyText);
 
         centerLeft = 390;
         centerTop = 860;
