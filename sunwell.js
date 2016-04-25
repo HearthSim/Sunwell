@@ -533,7 +533,7 @@
      * @param s
      * @param card
      */
-    function drawBodyText(targetCtx, s, card) {
+    function drawBodyText(targetCtx, s, card, forceSmallerFirstLine) {
         var manualBreak = card.text.substr(0, 3) === '[x]',
             bufferText = getBuffer(),
             bufferTextCtx = bufferText.getContext('2d'),
@@ -555,9 +555,10 @@
             r,
             centerLeft,
             centerTop,
-            justLineBreak;
+            justLineBreak,
+            lineCount = 0;
 
-        log('Rendering body: ' + card.textMarkdown);
+        log('Rendering body: ' + card.text);
 
         centerLeft = 390;
         centerTop = 860;
@@ -582,7 +583,7 @@
 
         var fontSize = sunwell.settings.bodyFontSize;
         var lineHeight = sunwell.settings.bodyLineHeight;
-        var totalLength = card.textMarkdown.replace(/\*\*/g, '').length;
+        var totalLength = card.text.replace(/<\/*.>/g, '').length;
         var smallerFirstLine = false;
 
         if (totalLength >= 80) {
@@ -599,6 +600,10 @@
 
 
         if (totalLength >= 75 && card.type === 'SPELL') {
+            smallerFirstLine = true;
+        }
+
+        if(forceSmallerFirstLine){
             smallerFirstLine = true;
         }
 
@@ -625,6 +630,7 @@
                 log((xPos + width) + ' > ' + bufferRow.width);
                 log('Calculated line break');
                 smallerFirstLine = false;
+                lineCount++;
                 r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
                 xPos = r[0];
                 yPos = r[1];
@@ -641,6 +647,7 @@
                         justLineBreak = false;
                         continue;
                     }
+                    lineCount++;
                     r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
                     xPos = r[0];
                     yPos = r[1];
@@ -685,9 +692,17 @@
             xPos += spaceWidth;
         }
 
+        lineCount++;
         finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
 
         freeBuffer(bufferRow);
+
+        if(card.type === 'SPELL' && lineCount === 4){
+            if(!smallerFirstLine && !forceSmallerFirstLine){
+                drawBodyText(targetCtx, s, card, true);
+                return;
+            }
+        }
 
         var b = contextBoundingBox(bufferTextCtx);
 
@@ -1277,14 +1292,6 @@
                 });
             },
             update: function (properties) {
-                if (properties.text) {
-                    properties.markdown = html2markdown(properties.text);
-                }
-
-                if (properties.markdown) {
-                    properties.textMarkdown = properties.textMarkdown.replace(/^\[x]/, '');
-                }
-
                 for (var key in properties) {
                     settings[key] = properties[key];
                 }
