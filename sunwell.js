@@ -54,6 +54,11 @@
         if (imgReplacement) {
             return imgReplacement;
         }
+        
+        if (sunwell.settings.misingImg) {
+            imgReplacement = sunwell.settings.misingImg;
+            return imgReplacement;
+        }
 
         var buffer = getBuffer(),
             bufferctx = buffer.getContext('2d');
@@ -95,6 +100,7 @@
     sunwell.settings.smallTextureFolder = sunwell.settings.smallTextureFolder || null;
     sunwell.settings.autoInit = sunwell.settings.autoInit || true;
     sunwell.settings.idAsTexture = sunwell.settings.idAsTexture || false;
+    sunwell.settings.misingImg = sunwell.settings.misingImg || null;
 
 
     sunwell.settings.debug = sunwell.settings.debug || false;
