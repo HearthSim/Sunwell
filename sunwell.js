@@ -101,6 +101,7 @@
     sunwell.settings.autoInit = sunwell.settings.autoInit || true;
     sunwell.settings.idAsTexture = sunwell.settings.idAsTexture || false;
     sunwell.settings.misingImg = sunwell.settings.misingImg || null;
+    sunwell.settings.sets = ['BRM', 'GVG', 'LOE', 'NAX', 'TGT', 'OG'].concat(sunwell.settings.customSets);
 
 
     sunwell.settings.debug = sunwell.settings.debug || false;
@@ -1200,7 +1201,7 @@
         }
 
 
-        if (['BRM', 'GVG', 'LOE', 'NAX', 'TGT', 'OG'].indexOf(card.set) === -1) {
+        if (sunwell.settings.sets.indexOf(card.set) === -1) {
             card.sunwell.bgLogo = 'bg-cl';
         } else {
             card.sunwell.bgLogo = 'bg-' + card.set.toLowerCase();
