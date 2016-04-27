@@ -55,9 +55,9 @@
             return imgReplacement;
         }
         
-        if (sunwell.settings.misingImg) {
-            imgReplacement = sunwell.settings.misingImg;
-            return imgReplacement;
+        if (typeof sunwell.settings.misingImg === 'string' && assets[sunwell.settings.misingImg].loaded ) {
+            imgReplacement = assets[sunwell.settings.misingImg];
+            return imgReplacement;            
         }
 
         var buffer = getBuffer(),
@@ -107,6 +107,10 @@
     sunwell.settings.debug = sunwell.settings.debug || false;
 
     sunwell.init = function () {
+        if(typeof sunwell.settings.misingImg === 'string'){
+            fetchAssets(['u:' + sunwell.settings.misingImg]);    
+        }
+                
         ready = true;
         if (renderQuery.length) {
             renderTick();
