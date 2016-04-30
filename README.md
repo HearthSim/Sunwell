@@ -132,6 +132,10 @@ All the style default to "0". Setting the style to "+" makes the number appear g
 ###Silence a minion
 To silence a minion, set `silenced: true` either when creating the card, or with the update function.
 
+###Let a card cost health instead of mana
+Introduced by [Cho'gall](http://hearthstonelabs.com/cards#lang=enUS;detail=OG_121), cards may cost health instead of mana.
+You can switch any cards cost icon by setting `costHealth: true` either when creating the card, or through the update function.
+
 
 ## Community
 
