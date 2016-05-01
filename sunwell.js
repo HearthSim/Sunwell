@@ -994,7 +994,18 @@
 
         drawProgress = 5;
 
-        ctx.drawImage(getAsset('gem'), 0, 0, 182, 180, 24 * s, 82 * s, 182 * s, 180 * s);
+        if(card.costHealth){
+            ctx.drawImage(getAsset('health'), 0, 0, 167, 218, 24 * s, 62 * s, 167 * s, 218 * s);
+            ctx.save();
+            ctx.shadowBlur=50*s;
+            ctx.shadowColor='#FF7275';
+            ctx.shadowOffsetX = 1000;
+            ctx.globalAlpha = .5;
+            ctx.drawImage(getAsset('health'), 0, 0, 167, 218, (24 * s)-1000, 62 * s, 167 * s, 218 * s);
+            ctx.restore();
+        } else {
+            ctx.drawImage(getAsset('gem'), 0, 0, 182, 180, 24 * s, 82 * s, 182 * s, 180 * s);
+        }
 
         drawProgress = 6;
 
@@ -1289,6 +1300,7 @@
         settings.durabilityStyle = settings.durabilityStyle || '0';
 
         settings.silenced = settings.silenced || false;
+        settings.costHealth = settings.costHealth || false;
 
         settings.width = width;
 
