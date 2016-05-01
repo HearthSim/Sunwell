@@ -54,6 +54,11 @@
         if (imgReplacement) {
             return imgReplacement;
         }
+        
+        if (typeof sunwell.settings.misingImg === 'string' && assets[sunwell.settings.misingImg].loaded ) {
+            imgReplacement = assets[sunwell.settings.misingImg];
+            return imgReplacement;            
+        }
 
         var buffer = getBuffer(),
             bufferctx = buffer.getContext('2d');
@@ -95,11 +100,17 @@
     sunwell.settings.smallTextureFolder = sunwell.settings.smallTextureFolder || null;
     sunwell.settings.autoInit = sunwell.settings.autoInit || true;
     sunwell.settings.idAsTexture = sunwell.settings.idAsTexture || false;
+    sunwell.settings.misingImg = sunwell.settings.misingImg || null;
+    sunwell.settings.sets = ['BRM', 'GVG', 'LOE', 'NAX', 'TGT', 'OG'].concat(sunwell.settings.customSets);
 
 
     sunwell.settings.debug = sunwell.settings.debug || false;
 
     sunwell.init = function () {
+        if(typeof sunwell.settings.misingImg === 'string'){
+            fetchAssets(['u:' + sunwell.settings.misingImg]);    
+        }
+                
         ready = true;
         if (renderQuery.length) {
             renderTick();
@@ -1205,7 +1216,7 @@
         }
 
 
-        if (['BRM', 'GVG', 'LOE', 'NAX', 'TGT', 'OG'].indexOf(card.set) === -1) {
+        if (sunwell.settings.sets.indexOf(card.set) === -1) {
             card.sunwell.bgLogo = 'bg-cl';
         } else {
             card.sunwell.bgLogo = 'bg-' + card.set.toLowerCase();
