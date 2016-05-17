@@ -31,11 +31,36 @@
      * Returns a new render buffer (canvas).
      * @returns {*}
      */
-    function getBuffer() {
+    function getBuffer(width, height, clear) {
+        var cvs;
+
         if (buffers.length) {
-            return buffers.pop();
+            if (width) {
+                for (var i = 0; i < buffers.length; i++) {
+                    if (buffers[i].width === width && buffers[i].height === height) {
+                        cvs = buffers.splice(i, 1)[0];
+                        break;
+                    }
+                }
+            } else {
+                cvs = buffers.pop();
+            }
+            if (cvs) {
+                if (clear) {
+                    cvs.getContext('2d').clearRect(0, 0, cvs.width, cvs.height);
+                }
+                return cvs;
+            }
         }
-        return document.createElement('canvas');
+
+        cvs = document.createElement('canvas');
+
+        if (width) {
+            cvs.width = width;
+            cvs.height = height;
+        }
+
+        return cvs;
     }
 
     /**
@@ -139,9 +164,15 @@
         var i, key, s = '';
         var chk = 0x12345678;
 
-        for (key in o) {
-            s = s + key + o[key];
-        }
+        s = s + o['gameId'];
+        s = s + o['playerClass'];
+        s = s + o['race'];
+        s = s + o['rarity'];
+        s = s + o['set'];
+        s = s + o['silenced'];
+        s = s + o['texture'];
+        s = s + o['type'];
+        s = s + o['width'];
 
         for (i = 0; i < s.length; i++) {
             chk += (s.charCodeAt(i) * (i + 1));
@@ -563,7 +594,7 @@
 
 
         pBodyText = bodyText;
-        while((plurals = pluralRegex.exec(bodyText)) !== null){
+        while ((plurals = pluralRegex.exec(bodyText)) !== null) {
             pBodyText = pBodyText.replace(plurals[0], plurals[1] + plurals[2] + (parseInt(plurals[1], 10) === 1 ? plurals[3] : plurals[4]));
         }
         bodyText = pBodyText;
@@ -615,7 +646,7 @@
             smallerFirstLine = true;
         }
 
-        if(forceSmallerFirstLine){
+        if (forceSmallerFirstLine) {
             smallerFirstLine = true;
         }
 
@@ -709,8 +740,8 @@
 
         freeBuffer(bufferRow);
 
-        if(card.type === 'SPELL' && lineCount === 4){
-            if(!smallerFirstLine && !forceSmallerFirstLine){
+        if (card.type === 'SPELL' && lineCount === 4) {
+            if (!smallerFirstLine && !forceSmallerFirstLine) {
                 drawBodyText(targetCtx, s, card, true);
                 return;
             }
@@ -907,7 +938,7 @@
         freeBuffer(buffer);
     }
 
-    function draw(cvs, ctx, card, s, callback, internalCB) {
+    function draw(cvs, ctx, card, s, cardObj, internalCB) {
 
         var sw = card.sunwell,
             t,
@@ -919,9 +950,6 @@
             log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
             log(card);
             internalCB();
-            if (callback) {
-                callback(cvs);
-            }
         }, 5000);
 
         if (typeof card.texture === 'string') {
@@ -949,125 +977,138 @@
         ctx.save();
         ctx.clearRect(0, 0, cvs.width, cvs.height);
 
-        drawProgress = 3;
-
-        ctx.save();
-        if (card.type === 'MINION') {
-            drawEllipse(ctx, 180 * s, 75 * s, 430 * s, 590 * s);
-            ctx.clip();
-            ctx.fillStyle = 'grey';
-            ctx.fillRect(0, 0, 765 * s, 1100 * s);
-            ctx.drawImage(t, 0, 0, t.width, t.height, 100 * s, 75 * s, 590 * s, 590 * s);
-        }
-
-        if (card.type === 'SPELL') {
-            ctx.rect(125 * s, 165 * s, 529 * s, 434 * s);
-            ctx.clip();
-            ctx.fillStyle = 'grey';
-            ctx.fillRect(0, 0, 765 * s, 1100 * s);
-            ctx.drawImage(t, 0, 0, t.width, t.height, 125 * s, 117 * s, 529 * s, 529 * s);
-        }
-
-        if (card.type === 'WEAPON') {
-            drawEllipse(ctx, 150 * s, 135 * s, 476 * s, 468 * s);
-            ctx.clip();
-            ctx.fillStyle = 'grey';
-            ctx.fillRect(0, 0, 765 * s, 1100 * s);
-            ctx.drawImage(t, 0, 0, t.width, t.height, 150 * s, 135 * s, 476 * s, 476 * s);
-        }
-        ctx.restore();
-
-        drawProgress = 4;
-
-        ctx.drawImage(getAsset(sw.cardBack), 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
-
-        drawProgress = 5;
-
-        if(card.costHealth){
-            ctx.drawImage(getAsset('health'), 0, 0, 167, 218, 24 * s, 62 * s, 167 * s, 218 * s);
-            ctx.save();
-            ctx.shadowBlur=50*s;
-            ctx.shadowColor='#FF7275';
-            ctx.shadowOffsetX = 1000;
-            ctx.globalAlpha = .5;
-            ctx.drawImage(getAsset('health'), 0, 0, 167, 218, (24 * s)-1000, 62 * s, 167 * s, 218 * s);
-            ctx.restore();
+        // >>>>> Begin Skeleton drawing
+        if (renderCache[card._cacheKey]) {
+            log('Skipping skeleton draw');
+            ctx.drawImage(renderCache[card._cacheKey], 0, 0);
         } else {
-            ctx.drawImage(getAsset('gem'), 0, 0, 182, 180, 24 * s, 82 * s, 182 * s, 180 * s);
-        }
+            drawProgress = 3;
 
-        drawProgress = 6;
-
-        if (card.type === 'MINION') {
-            if (sw.rarity) {
-                ctx.drawImage(getAsset(sw.rarity), 0, 0, 146, 146, 326 * s, 607 * s, 146 * s, 146 * s);
+            ctx.save();
+            if (card.type === 'MINION') {
+                drawEllipse(ctx, 180 * s, 75 * s, 430 * s, 590 * s);
+                ctx.clip();
+                ctx.fillStyle = 'grey';
+                ctx.fillRect(0, 0, 765 * s, 1100 * s);
+                ctx.drawImage(t, 0, 0, t.width, t.height, 100 * s, 75 * s, 590 * s, 590 * s);
             }
 
-            ctx.drawImage(getAsset('title'), 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
-
-            if (card.race) {
-                ctx.drawImage(getAsset('race'), 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
+            if (card.type === 'SPELL') {
+                ctx.rect(125 * s, 165 * s, 529 * s, 434 * s);
+                ctx.clip();
+                ctx.fillStyle = 'grey';
+                ctx.fillRect(0, 0, 765 * s, 1100 * s);
+                ctx.drawImage(t, 0, 0, t.width, t.height, 125 * s, 117 * s, 529 * s, 529 * s);
             }
 
-            ctx.drawImage(getAsset('attack'), 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
-            ctx.drawImage(getAsset('health'), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
-
-            if (card.rarity === 'LEGENDARY') {
-                ctx.drawImage(getAsset('dragon'), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
+            if (card.type === 'WEAPON') {
+                drawEllipse(ctx, 150 * s, 135 * s, 476 * s, 468 * s);
+                ctx.clip();
+                ctx.fillStyle = 'grey';
+                ctx.fillRect(0, 0, 765 * s, 1100 * s);
+                ctx.drawImage(t, 0, 0, t.width, t.height, 150 * s, 135 * s, 476 * s, 476 * s);
             }
-        }
+            ctx.restore();
 
-        drawProgress = 7;
+            drawProgress = 4;
 
-        if (card.type === 'SPELL') {
-            if (sw.rarity) {
-                ctx.drawImage(getAsset(sw.rarity), 0, 0, 149, 149, 311 * s, 607 * s, 150 * s, 150 * s);
+            ctx.drawImage(getAsset(sw.cardBack), 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
+
+            drawProgress = 5;
+
+            if (card.costHealth) {
+                ctx.drawImage(getAsset('health'), 0, 0, 167, 218, 24 * s, 62 * s, 167 * s, 218 * s);
+                ctx.save();
+                ctx.shadowBlur = 50 * s;
+                ctx.shadowColor = '#FF7275';
+                ctx.shadowOffsetX = 1000;
+                ctx.globalAlpha = .5;
+                ctx.drawImage(getAsset('health'), 0, 0, 167, 218, (24 * s) - 1000, 62 * s, 167 * s, 218 * s);
+                ctx.restore();
+            } else {
+                ctx.drawImage(getAsset('gem'), 0, 0, 182, 180, 24 * s, 82 * s, 182 * s, 180 * s);
             }
 
-            ctx.drawImage(getAsset('title-spell'), 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
-        }
+            drawProgress = 6;
 
-        if (card.type === 'WEAPON') {
-            if (sw.rarity) {
-                ctx.drawImage(getAsset(sw.rarity), 0, 0, 146, 144, 315 * s, 592 * s, 146 * s, 144 * s);
-            }
-
-            ctx.drawImage(getAsset('title-weapon'), 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
-
-            ctx.drawImage(getAsset('swords'), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
-            ctx.drawImage(getAsset('shield'), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
-        }
-
-        drawProgress = 8;
-
-
-        if (card.set !== 'CORE') {
-            (function () {
-                var xPos;
-
-                if (card.type === 'SPELL') {
-                    xPos = 265;
+            if (card.type === 'MINION') {
+                if (sw.rarity) {
+                    ctx.drawImage(getAsset(sw.rarity), 0, 0, 146, 146, 326 * s, 607 * s, 146 * s, 146 * s);
                 }
 
-                if (card.type === 'MINION') {
-                    xPos = 265;
+                ctx.drawImage(getAsset('title'), 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
+
+                if (card.race) {
+                    ctx.drawImage(getAsset('race'), 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
                 }
 
-                if (card.race && card.type === 'MINION') {
-                    ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 734 * s, (281 * 0.95) * s, (244 * 0.95) * s);
-                } else {
+                ctx.drawImage(getAsset('attack'), 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
+                ctx.drawImage(getAsset('health'), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
+
+                if (card.rarity === 'LEGENDARY') {
+                    ctx.drawImage(getAsset('dragon'), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
+                }
+            }
+
+            drawProgress = 7;
+
+            if (card.type === 'SPELL') {
+                if (sw.rarity) {
+                    ctx.drawImage(getAsset(sw.rarity), 0, 0, 149, 149, 311 * s, 607 * s, 150 * s, 150 * s);
+                }
+
+                ctx.drawImage(getAsset('title-spell'), 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
+            }
+
+            if (card.type === 'WEAPON') {
+                if (sw.rarity) {
+                    ctx.drawImage(getAsset(sw.rarity), 0, 0, 146, 144, 315 * s, 592 * s, 146 * s, 144 * s);
+                }
+
+                ctx.drawImage(getAsset('title-weapon'), 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
+
+                ctx.drawImage(getAsset('swords'), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
+                ctx.drawImage(getAsset('shield'), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
+            }
+
+            drawProgress = 8;
+
+
+            if (card.set !== 'CORE') {
+                (function () {
+                    var xPos;
+
                     if (card.type === 'SPELL') {
-                        ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 740 * s, 253 * s, 220 * s);
-                    } else {
-                        ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 734 * s, 281 * s, 244 * s);
+                        xPos = 265;
                     }
 
-                }
+                    if (card.type === 'MINION') {
+                        xPos = 265;
+                    }
+
+                    if (card.race && card.type === 'MINION') {
+                        ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 734 * s, (281 * 0.95) * s, (244 * 0.95) * s);
+                    } else {
+                        if (card.type === 'SPELL') {
+                            ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 740 * s, 253 * s, 220 * s);
+                        } else {
+                            ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 734 * s, 281 * s, 244 * s);
+                        }
+
+                    }
+                })();
+            }
+
+            drawProgress = 9;
+
+            (function () {
+                var cacheImage = new Image();
+                cacheImage.src = cvs.toDataURL();
+                renderCache[card._cacheKey] = cacheImage;
             })();
         }
 
-        drawProgress = 9;
-
+        // <<<<<<<< Finished Skeleton drawing
 
         drawProgress = 10;
 
@@ -1110,13 +1151,11 @@
         log('Rendertime: ' + (Date.now() - renderStart) + 'ms');
 
         internalCB();
-        if (callback) {
-            callback(cvs);
-        }
+        cardObj.target.src = cvs.toDataURL();
     }
 
-    function queryRender(card, resolution, callback) {
-        renderQuery.push([card, resolution, callback]);
+    function queryRender(cardProps) {
+        renderQuery.push([cardProps, this]);
         if (!rendering) {
             renderTick();
         }
@@ -1134,14 +1173,13 @@
      * Renders the HS-API object, you pass to this function.
      * @param conf
      * @param [resolution=512] The desired width of the rendered card.
-     * @return Canvas
      */
     function render() {
         if (rendering > maxRendering) {
             return;
         }
 
-        var card, resolution, callback;
+        var card, resolution, cardObj;
 
         if (!renderQuery.length) {
             return;
@@ -1152,18 +1190,24 @@
         rendering++;
 
         card = renderInfo[0];
-        resolution = renderInfo[1];
-        callback = renderInfo[2];
+        resolution = card.width;
+        cardObj = renderInfo[1];
 
-        log('Preparing assets for: ' + card.title);
-
-        var cvs = getBuffer(),
+        var cvs = getBuffer(resolution, Math.round(resolution * 1.4397905759), true),
             ctx = cvs.getContext('2d'),
-            s = (resolution || 512) / 764,
+            s = resolution / 764,
             loadList = ['silence-x'];
 
-        cvs.width = resolution || 512;
-        cvs.height = Math.round(cvs.width * 1.4397905759);
+        if (card._assetsLoaded === resolution) {
+            draw(cvs, ctx, card, s, cardObj, function () {
+                rendering--;
+                log('Card rendered: ' + card.title);
+                freeBuffer(cvs);
+            });
+            return;
+        }
+
+        log('Preparing assets for: ' + card.title);
 
         card.sunwell = card.sunwell || {};
 
@@ -1235,7 +1279,8 @@
         fetchAssets(loadList)
             .then(function () {
                 log('Assets loaded for: ' + card.title);
-                draw(cvs, ctx, card, s, callback, function () {
+                card._assetsLoaded = resolution;
+                draw(cvs, ctx, card, s, cardObj, function () {
                     rendering--;
                     log('Card rendered: ' + card.title);
                     freeBuffer(cvs);
@@ -1250,6 +1295,73 @@
         renderCache = {};
     };
 
+    sunwell.Card = function (props, width, renderTarget) {
+        if (!props) {
+            throw new Error('No card properties given');
+        }
+
+        if (!renderTarget) {
+            renderTarget = new Image();
+        }
+        this.target = renderTarget;
+
+        //Make compatible to tech cards
+        if (validRarity.indexOf(props.rarity) === -1) {
+            props.rarity = 'FREE';
+        }
+
+        //Make compatible to hearthstoneJSON format.
+        if (props.title === undefined) {
+            props.title = props.name;
+        }
+        if (props.gameId === undefined) {
+            props.gameId = props.id;
+        }
+
+        if (sunwell.settings.idAsTexture) {
+            props.texture = props.gameId;
+        }
+
+        props.costStyle = props.costStyle || '0';
+        props.healthStyle = props.healthStyle || '0';
+        props.attackStyle = props.attackStyle || '0';
+        props.durabilityStyle = props.durabilityStyle || '0';
+
+        props.silenced = props.silenced || false;
+        props.costHealth = props.costHealth || false;
+
+        props.width = width;
+
+        props._cacheKey = checksum(props);
+
+        this._props = props;
+
+        log('Queried render: ' + props.title);
+
+        this._render = queryRender.bind(this);
+
+        this._render(this._props);
+    };
+
+    sunwell.Card.prototype = {
+        target: null,
+        _render: null,
+        _props: null,
+        redraw: function () {
+            delete renderCache[this._props._cacheKey];
+            this._render(this._props);
+        },
+        update: function (props) {
+            for (var key in props) {
+                this._props[key] = props[key];
+            }
+
+            this._props._cacheKey = checksum(this._props);
+
+            this._render(this._props);
+        }
+    };
+
     /**
      * Creates a new card object that can also be manipulated at a later point.
      * Provide an image object as render target as output for the visual card data.
@@ -1258,79 +1370,6 @@
      * @param renderTarget
      */
     sunwell.createCard = function (settings, width, renderTarget) {
-        if (!settings) {
-            throw new Error('No card object given');
-        }
-
-        if (!renderTarget) {
-            renderTarget = new Image();
-        }
-
-        //Make compatible to tech cards
-        if (validRarity.indexOf(settings.rarity) === -1) {
-            settings.rarity = 'FREE';
-        }
-
-        //Make compatible to hearthstoneJSON format.
-        if (settings.title === undefined) {
-            settings.title = settings.name;
-        }
-        if (settings.gameId === undefined) {
-            settings.gameId = settings.id;
-        }
-
-        if (sunwell.settings.idAsTexture) {
-            settings.texture = settings.gameId;
-        }
-
-        settings.costStyle = settings.costStyle || '0';
-        settings.healthStyle = settings.healthStyle || '0';
-        settings.attackStyle = settings.attackStyle || '0';
-        settings.durabilityStyle = settings.durabilityStyle || '0';
-
-        settings.silenced = settings.silenced || false;
-        settings.costHealth = settings.costHealth || false;
-
-        settings.width = width;
-
-        var cacheKey = checksum(settings);
-
-        if (renderCache[cacheKey] && !sunwell.settings.debug) {
-            renderTarget.src = renderCache[cacheKey];
-            return;
-        }
-
-        log('Queried render: ' + settings.title);
-
-        queryRender(settings, width, function (result) {
-            renderTarget.src = renderCache[cacheKey] = result.toDataURL();
-        });
-
-        return {
-            target: renderTarget,
-            redraw: function () {
-                cacheKey = checksum(settings);
-                delete renderCache[cacheKey];
-                queryRender(settings, width, function (result) {
-                    renderTarget.src = renderCache[cacheKey] = result.toDataURL();
-                });
-            },
-            update: function (properties) {
-                for (var key in properties) {
-                    settings[key] = properties[key];
-                }
-
-                cacheKey = checksum(settings);
-
-                if (renderCache[cacheKey]) {
-                    renderTarget.src = renderCache[cacheKey];
-                    return;
-                }
-
-                queryRender(settings, width, function (result) {
-                    renderTarget.src = renderCache[cacheKey] = result.toDataURL();
-                });
-            }
-        };
+        return new sunwell.Card(settings, width, renderTarget);
     }
 })();
