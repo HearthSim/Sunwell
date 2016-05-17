@@ -170,6 +170,7 @@
         s = s + o['rarity'];
         s = s + o['set'];
         s = s + o['silenced'];
+        s = s + o['costHealth'];
         s = s + o['texture'];
         s = s + o['type'];
         s = s + o['width'];
@@ -1190,7 +1191,7 @@
         var cvs = getBuffer(resolution, Math.round(resolution * 1.4397905759), true),
             ctx = cvs.getContext('2d'),
             s = resolution / 764,
-            loadList = ['silence-x'];
+            loadList = ['silence-x', 'health'];
 
         if (card._assetsLoaded === resolution) {
             draw(cvs, ctx, card, s, cardObj, function () {
@@ -1212,7 +1213,7 @@
         loadList.push('gem');
 
         if (card.type === 'MINION') {
-            loadList.push('attack', 'health', 'title');
+            loadList.push('attack', 'title');
 
             if (card.rarity === 'LEGENDARY') {
                 loadList.push('dragon');
@@ -1225,7 +1226,7 @@
         }
 
         if (card.type === 'SPELL') {
-            loadList.push('attack', 'health', 'title-spell');
+            loadList.push('attack', 'title-spell');
 
             if (card.rarity !== 'FREE' && !(card.rarity === 'COMMON' && card.set === 'CORE')) {
                 card.sunwell.rarity = 'spell-rarity-' + card.rarity.toLowerCase();
