@@ -1244,7 +1244,7 @@
         }
 
 
-        if (['BRM', 'GVG', 'LOE', 'NAXX', 'TGT', 'OG'].indexOf(card.set) === -1) {
+        if (['BRM', 'GVG', 'KARA', 'LOE', 'NAXX', 'TGT', 'OG'].indexOf(card.set) === -1) {
             card.sunwell.bgLogo = 'bg-cl';
         } else {
             card.sunwell.bgLogo = 'bg-' + card.set.toLowerCase();
