@@ -656,7 +656,7 @@
         } else {
             bufferRowCtx.fillStyle = '#000';
         }
-        bufferRowCtx.textBaseline = 'hanging';
+        bufferRowCtx.textBaseline = 'middle';
 
         bufferRowCtx.font = fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
 
