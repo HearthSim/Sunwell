@@ -1077,20 +1077,23 @@
 
             if (card.set !== 'CORE') {
                 (function () {
-                    var xPos = 256;
-
-                    if (card.race && card.type === 'MINION') {
-                        ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 734 * s, (281 * 0.95) * s, (244 * 0.95) * s);
-                    } else {
-                        if (card.type === 'SPELL') {
-                            ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 281, 244, xPos * s, 740 * s, 253 * s, 220 * s);
+                    ctx.globalCompositeOperation = 'color-burn';
+                    if (card.type === 'MINION') {
+                        if (card.race) {
+                            ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 270 * s, 723 * s, 256 * s, 256 * s);
                         } else {
-                            ctx.globalAlpha = .6;
-                            ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 259, 209, xPos * s, 750 * s, 259 * s, 209 * s);
-                            ctx.globalAlpha = 1;
+                            ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 270 * s, 735 * s, 256 * s, 256 * s);
                         }
-
+                    } else if (card.type === 'SPELL') {
+                        ctx.globalAlpha = 0.7;
+                        ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 264 * s, 726 * s, 256 * s, 256 * s);
+                    } else if (card.type === 'WEAPON') {
+                        ctx.globalCompositeOperation = 'lighten';
+                        ctx.globalAlpha = 0.07;
+                        ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 264 * s, 735 * s, 256 * s, 256 * s);
                     }
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.globalAlpha = 1;
                 })();
             }
 
@@ -1244,17 +1247,10 @@
         }
 
 
-        if (['BRM', 'GVG', 'KARA', 'LOE', 'NAXX', 'TGT', 'OG'].indexOf(card.set) === -1) {
-            card.sunwell.bgLogo = 'bg-cl';
+        if (['BRM', 'GVG', 'KARA', 'LOE', 'NAXX', 'TGT', 'OG', 'GANGS'].indexOf(card.set) === -1) {
+            card.sunwell.bgLogo = 'set-classic';
         } else {
-            card.sunwell.bgLogo = 'bg-' + card.set.toLowerCase();
-        }
-
-        if (card.type === 'SPELL') {
-            card.sunwell.bgLogo = 'spell-' + card.sunwell.bgLogo;
-        }
-        if(card.type === 'WEAPON'){
-            card.sunwell.bgLogo = 'w-' + card.sunwell.bgLogo;
+            card.sunwell.bgLogo = 'set-' + card.set.toLowerCase();
         }
 
         loadList.push(card.sunwell.bgLogo);
