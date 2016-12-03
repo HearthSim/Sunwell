@@ -33,6 +33,7 @@ Set up sunwell with your own settings before loading the library itself:
 			bodyFont: 'ITC Franklin Condensed',
 			bodyFontSize: 24,
 			bodyLineHeight: 55,
+			bodyBaseline: 'middle',
 			bodyFontOffset: {x: 0, y: 0},
 			assetFolder: '/assets/',
 			textureFolder: '/artworks/',
