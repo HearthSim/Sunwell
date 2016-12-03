@@ -567,12 +567,16 @@
      * @param card
      */
     function drawBodyText(targetCtx, s, card, forceSmallerFirstLine) {
-        var manualBreak = card.text.substr(0, 3) === '[x]',
+        var cardText = card.text;
+        if (card.collectionText) {
+            cardText = card.collectionText;
+        }
+        var manualBreak = cardText.substr(0, 3) === '[x]',
             bufferText = getBuffer(),
             bufferTextCtx = bufferText.getContext('2d'),
             bufferRow = getBuffer(),
             bufferRowCtx = bufferRow.getContext('2d'),
-            bodyText = manualBreak ? card.text.substr(3) : card.text,
+            bodyText = manualBreak ? cardText.substr(3) : cardText,
             words,
             word,
             chars,
@@ -627,7 +631,7 @@
 
         var fontSize = sunwell.settings.bodyFontSize;
         var lineHeight = sunwell.settings.bodyLineHeight;
-        var totalLength = card.text.replace(/<\/*.>/g, '').length;
+        var totalLength = cardText.replace(/<\/*.>/g, '').length;
         var smallerFirstLine = false;
 
         if (totalLength >= 80) {
@@ -656,6 +660,7 @@
         } else {
             bufferRowCtx.fillStyle = '#000';
         }
+
         bufferRowCtx.textBaseline = sunwell.settings.bodyBaseline;
 
         bufferRowCtx.font = fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
@@ -1017,6 +1022,10 @@
 
             drawProgress = 5;
 
+            if (card.multiClassGroup && card.type === "MINION") {
+                ctx.drawImage(getAsset(sw.multiBanner), 0, 0, 184, 369, 17 * s, 88 * s, 184 * s, 369 * s);
+            }
+
             if (card.costHealth) {
                 ctx.drawImage(getAsset('health'), 0, 0, 167, 218, 24 * s, 62 * s, 167 * s, 218 * s);
                 ctx.save();
@@ -1259,6 +1268,10 @@
             loadList.push('race');
         }
 
+        if (['GRIMY_GOONS', 'JADE_LOTUS', 'KABAL'].indexOf(card.multiClassGroup) !== -1) {
+            card.sunwell.multiBanner = 'multi-' + card.multiClassGroup.toLowerCase();
+            loadList.push(card.sunwell.multiBanner);
+        }
 
         if (typeof card.texture === 'string' && card.set !== 'CHEAT') {
             if (s <= .5) {
