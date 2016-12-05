@@ -15,8 +15,7 @@
         renderQuery = [],
         maxRendering = 12,
         rendering = 0,
-        renderCache = {},
-        buffers = [];
+        renderCache = {};
         
     function log(msg) {
         if (!sunwell.settings.debug) {
@@ -25,23 +24,27 @@
         console.log(msg);
     }
 
-    /**
+	function WebPlatform() {
+		this.buffers = [];
+	}
+	
+	/**
      * Returns a new render buffer (canvas).
      * @returns {*}
      */
-    function getBuffer(width, height, clear) {
+    WebPlatform.prototype.getBuffer = function(width, height, clear) {
         var cvs;
 
-        if (buffers.length) {
+        if (this.buffers.length) {
             if (width) {
-                for (var i = 0; i < buffers.length; i++) {
-                    if (buffers[i].width === width && buffers[i].height === height) {
-                        cvs = buffers.splice(i, 1)[0];
+                for (var i = 0; i < this.buffers.length; i++) {
+                    if (this.buffers[i].width === width && this.buffers[i].height === height) {
+                        cvs = this.buffers.splice(i, 1)[0];
                         break;
                     }
                 }
             } else {
-                cvs = buffers.pop();
+                cvs = this.buffers.pop();
             }
             if (cvs) {
                 if (clear) {
@@ -65,10 +68,10 @@
      * Makes a new render buffer available for recycling.
      * @param buffer
      */
-    function freeBuffer(buffer) {
-        buffers.push(buffer);
+    WebPlatform.prototype.freeBuffer = function(buffer) {
+		this.buffers.push(buffer);
     }
-
+    
     var imgReplacement;
 
     function getMissingImg(assetId) {
@@ -78,7 +81,7 @@
             return imgReplacement;
         }
 
-        var buffer = getBuffer(),
+        var buffer = sunwell.settings.platform.getBuffer(),
             bufferctx = buffer.getContext('2d');
         buffer.width = buffer.height = 512;
         bufferctx.save();
@@ -102,7 +105,6 @@
 
     window.sunwell = sunwell = window.sunwell || {};
 
-    sunwell._buffers = buffers;
     sunwell._renderQuery = renderQuery;
     sunwell._activeRenders = rendering;
 
@@ -118,6 +120,7 @@
     sunwell.settings.smallTextureFolder = sunwell.settings.smallTextureFolder || null;
     sunwell.settings.autoInit = sunwell.settings.autoInit || true;
     sunwell.settings.idAsTexture = sunwell.settings.idAsTexture || false;
+    sunwell.settings.platform = sunwell.settings.platform || new WebPlatform();
 
 
     sunwell.settings.debug = sunwell.settings.debug || false;
@@ -399,7 +402,7 @@
             }
         }
 
-        var buffer = getBuffer();
+        var buffer = sunwell.settings.platform.getBuffer();
         var bufferCtx = buffer.getContext('2d');
 
         buffer.width = 300;
@@ -437,7 +440,7 @@
 
         targetCtx.drawImage(buffer, b.x, b.y, b.w, b.h, (394 - (b.w / 2)) * s, (1001 - (b.h / 2)) * s, b.w * s, b.h * s);
 
-        freeBuffer(buffer);
+        sunwell.settings.platform.freeBuffer(buffer);
     }
 
     /**
@@ -453,7 +456,7 @@
      * @param [drawStyle="0"] Either "+", "-" or "0". Default: "0"
      */
     function drawNumber(targetCtx, x, y, s, number, size, drawStyle) {
-        var buffer = getBuffer();
+        var buffer = sunwell.settings.platform.getBuffer();
         var bufferCtx = buffer.getContext('2d');
 
         if (drawStyle === undefined) {
@@ -507,7 +510,7 @@
 
         targetCtx.drawImage(buffer, b.x, b.y, b.w, b.h, (x - (b.w / 2)) * s, (y - (b.h / 2)) * s, b.w * s, b.h * s);
 
-        freeBuffer(buffer);
+        sunwell.settings.platform.freeBuffer(buffer);
     }
 
     /**
@@ -571,9 +574,9 @@
         }
         
         var manualBreak = cardText.substr(0, 3) === '[x]',
-            bufferText = getBuffer(),
+            bufferText = sunwell.settings.platform.getBuffer(),
             bufferTextCtx = bufferText.getContext('2d'),
-            bufferRow = getBuffer(),
+            bufferRow = sunwell.settings.platform.getBuffer(),
             bufferRowCtx = bufferRow.getContext('2d'),
             bodyText = manualBreak ? cardText.substr(3) : cardText,
             words,
@@ -744,7 +747,7 @@
         lineCount++;
         finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
 
-        freeBuffer(bufferRow);
+        sunwell.settings.platform.freeBuffer(bufferRow);
 
         if (card.type === 'SPELL' && lineCount === 4) {
             if (!smallerFirstLine && !forceSmallerFirstLine) {
@@ -759,7 +762,7 @@
 
         targetCtx.drawImage(bufferText, b.x, b.y - 2, b.w, b.h, (centerLeft - (b.w / 2)) * s, (centerTop - (b.h / 2)) * s, b.w * s, (b.h + 2) * s);
 
-        freeBuffer(bufferText);
+        sunwell.settings.platform.freeBuffer(bufferText);
 
         if (sunwell.settings.debug) {
             targetCtx.save();
@@ -804,7 +807,7 @@
      * @param title
      */
     function drawCardTitle(targetCtx, s, card) {
-        var buffer = getBuffer();
+        var buffer = sunwell.settings.platform.getBuffer();
         var title = card.title;
         buffer.width = 1024;
         buffer.height = 200;
@@ -941,7 +944,7 @@
             200 * s
         );
 
-        freeBuffer(buffer);
+        sunwell.settings.platform.freeBuffer(buffer);
     }
 
     function draw(cvs, ctx, card, s, cardObj, internalCB) {
@@ -964,7 +967,7 @@
             if (card.texture instanceof Image) {
                 t = card.texture;
             } else {
-                t = getBuffer();
+                t = sunwell.settings.platform.getBuffer();
                 t.width = card.texture.crop.w;
                 t.height = card.texture.crop.h;
                 (function () {
@@ -1158,7 +1161,11 @@
         log('Rendertime: ' + (Date.now() - renderStart) + 'ms');
 
         internalCB();
-        cardObj.target.src = cvs.toDataURL();
+        if (typeof cardObj.target == "function") {
+			cardObj.target();
+		} else {
+			cardObj.target.src = cvs.toDataURL();
+		}
     }
 
     function queryRender(cardProps) {
@@ -1200,7 +1207,7 @@
         resolution = card.width;
         cardObj = renderInfo[1];
 
-        var cvs = getBuffer(resolution, Math.round(resolution * 1.4397905759), true),
+        var cvs = sunwell.settings.platform.getBuffer(resolution, Math.round(resolution * 1.4397905759), true),
             ctx = cvs.getContext('2d'),
             s = resolution / 764,
             loadList = ['silence-x', 'health'];
@@ -1209,7 +1216,7 @@
             draw(cvs, ctx, card, s, cardObj, function () {
                 rendering--;
                 log('Card rendered: ' + card.title);
-                freeBuffer(cvs);
+                sunwell.settings.platform.freeBuffer(cvs);
             });
             return;
         }
@@ -1290,7 +1297,7 @@
                 draw(cvs, ctx, card, s, cardObj, function () {
                     rendering--;
                     log('Card rendered: ' + card.title);
-                    freeBuffer(cvs);
+                    sunwell.settings.platform.freeBuffer(cvs);
                 });
             });
     };
