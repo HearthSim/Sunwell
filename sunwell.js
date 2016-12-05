@@ -16,10 +16,8 @@
         maxRendering = 12,
         rendering = 0,
         renderCache = {},
-        buffers = [],
-        pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g,
-        validRarity = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
-
+        buffers = [];
+        
     function log(msg) {
         if (!sunwell.settings.debug) {
             return;
@@ -571,6 +569,7 @@
         if (card.collectionText) {
             cardText = card.collectionText;
         }
+        
         var manualBreak = cardText.substr(0, 3) === '[x]',
             bufferText = getBuffer(),
             bufferTextCtx = bufferText.getContext('2d'),
@@ -595,6 +594,7 @@
             justLineBreak,
             lineCount = 0,
             plurals,
+            pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g,
             pBodyText;
 
 
@@ -1303,6 +1303,8 @@
     };
 
     sunwell.Card = function (props, width, renderTarget) {
+		var validRarity = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
+
         if (!props) {
             throw new Error('No card properties given');
         }
