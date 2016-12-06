@@ -19,7 +19,6 @@ if (typeof window == 'undefined') {
         assetListeners = {},
         ready = false,
         renderQuery = [],
-        maxRendering = 12,
         rendering = 0,
         renderCache = {};
         
@@ -30,6 +29,12 @@ if (typeof window == 'undefined') {
         console.log(msg);
     }
 
+	var bodyFontSizeExtra = "/1em";
+	if (typeof window == 'undefined') {
+		// we run in node-canvas and we dont support ctx.font="16px/1em" notation
+		bodyFontSizeExtra = "";
+	}
+	
 	function WebPlatform() {
 		this.buffers = [];
 	}
@@ -85,15 +90,9 @@ if (typeof window == 'undefined') {
 		img.src = url;
 	}
     
-    var imgReplacement;
+    var missingImageDataUrl, missingImage;
 
-    function getMissingImg(assetId) {
-        log('Substitute for ' + assetId);
-
-        if (imgReplacement) {
-            return imgReplacement;
-        }
-
+    function generateMissingImage() {
         var buffer = sunwell.settings.platform.getBuffer(),
             bufferctx = buffer.getContext('2d');
         buffer.width = buffer.height = 512;
@@ -104,16 +103,17 @@ if (typeof window == 'undefined') {
         bufferctx.fillStyle = 'red';
         bufferctx.textAlign = 'center';
         bufferctx.textBaseline = 'middle';
-        bufferctx.font = '50px Belwe';
+        bufferctx.font = '50px ' + sunwell.settings.titleFont;
         bufferctx.fillText('missing artwork', 256, 256);
         bufferctx.restore();
-        imgReplacement = new Image();
-        imgReplacement.src = buffer.toDataURL();
-        return imgReplacement;
+        missingImageDataUrl = buffer.toDataURL();
+        missingImage = new Image();
+        missingImage.src = missingImageDataUrl;
     }
-
+    
     function getAsset(id) {
-        return assets[id] || getMissingImg(id);
+		// fallback to missingImage for the case where we request the '~' texture
+        return assets[id] || missingImage;
     }
 
 	if (typeof window != 'undefined') {
@@ -138,7 +138,9 @@ if (typeof window == 'undefined') {
     sunwell.settings.autoInit = sunwell.settings.autoInit || true;
     sunwell.settings.idAsTexture = sunwell.settings.idAsTexture || false;
     sunwell.settings.platform = sunwell.settings.platform || new WebPlatform();
+    var maxRendering = sunwell.settings.maxRendering || 12;
 
+	generateMissingImage();
 
     sunwell.settings.debug = sunwell.settings.debug || false;
 
@@ -232,7 +234,7 @@ if (typeof window == 'undefined') {
      * You can call this before you start to render any cards, but you don't have to.
      */
     function fetchAssets(loadAssets) {
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             var loaded = 0,
                 loadingTotal = 0,
                 result = {},
@@ -263,7 +265,6 @@ if (typeof window == 'undefined') {
                     }
                 }
 
-debugger;
                 if (assets[key] === undefined) {
                     assets[key] = new Image();
                     assets[key].crossOrigin = "Anonymous";
@@ -290,20 +291,21 @@ debugger;
 								resolve(result);
 							}
 							if (assetListeners[key]) {
-								for (listener in assetListeners[key]) {
-									listener(assets[key]);
+								for (var a in assetListeners[key]) {
+									assetListeners[key][a](assets[key]);
 								}
+								delete assetListeners[key]
 							}
 						}
 						function loadedCB() {
 							result[key] = assets[key];
 							if (!assets[key].width || !assets[key].height) {
-								assets[key].src = getMissingImg().src;
+								assets[key].src = missingImageDataUrl;
 							}
 							completeCB();
 						}
 						function errorCB() {
-							assets[key].src = getMissingImg().src;
+							assets[key].src = missingImageDataUrl;
 							completeCB();
 						}
 						sunwell.settings.platform.loadAsset(assets[key], srcURL, loadedCB, errorCB);
@@ -420,7 +422,7 @@ debugger;
         buffer.width = 300;
         buffer.height = 60;
 
-        bufferCtx.font = '45px Belwe';
+        bufferCtx.font = '45px ' + sunwell.settings.titleFont;
 
         bufferCtx.lineCap = 'round';
         bufferCtx.lineJoin = 'round';
@@ -484,7 +486,7 @@ debugger;
 
         var tX = 10;
 
-        bufferCtx.font = size + 'px Belwe';
+        bufferCtx.font = size + 'px ' + sunwell.settings.titleFont;
 
         bufferCtx.lineCap = 'round';
         bufferCtx.lineJoin = 'round';
@@ -581,6 +583,10 @@ debugger;
      */
     function drawBodyText(targetCtx, s, card, forceSmallerFirstLine) {
         var cardText = card.text;
+        
+        if (!cardText) {
+			return;
+		}
         if (card.collectionText) {
             cardText = card.collectionText;
         }
@@ -678,7 +684,7 @@ debugger;
 
         bufferRowCtx.textBaseline = sunwell.settings.bodyBaseline;
 
-        bufferRowCtx.font = fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
+        bufferRowCtx.font = fontSize + 'px' + bodyFontSizeExtra + ' "' + sunwell.settings.bodyFont + '", sans-serif';
 
         spaceWidth = 3;
 
@@ -744,7 +750,7 @@ debugger;
                         }
                     }
 
-                    bufferRowCtx.font = (isBold > 0 ? 'bold ' : '') + (isItalic > 0 ? 'italic' : '') + ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
+					bufferRowCtx.font = (isBold > 0 ? 'bold ' : '') + (isItalic > 0 ? 'italic' : '') + ' ' + fontSize + 'px' + bodyFontSizeExtra + ' "' + sunwell.settings.bodyFont + '", sans-serif';
                     continue;
                 }
 
@@ -877,7 +883,7 @@ debugger;
 
         while (textWidth > maxWidth && fontSize > 10) {
             fontSize -= 1;
-            ctx.font = fontSize + 'px Belwe';
+            ctx.font = fontSize + 'px ' + sunwell.settings.titleFont;
             textWidth = 0;
             for (var i = 0; i < title.length; i++) {
                 textWidth += ctx.measureText(title[i]).width + 2;
@@ -968,8 +974,8 @@ debugger;
             renderStart = Date.now();
 
         drawTimeout = setTimeout(function () {
-            log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
-            log(card);
+            console.log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
+            console.log(card);
             internalCB();
         }, 5000);
 
@@ -1218,6 +1224,7 @@ debugger;
         var renderInfo = renderQuery.shift();
 
         rendering++;
+        
 
         card = renderInfo[0];
         resolution = card.width;

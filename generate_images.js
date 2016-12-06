@@ -2,15 +2,25 @@ var Canvas = require('canvas')
   , Image = Canvas.Image;
 var fs = require("fs");
 var path = require('path')
+var mkdirp = require('mkdirp');
+var http = require('http');
+const request = require('request');
 
-console.log("hello");
+var outputDirectory = process.cwd() + "/generated_images";
+var jsonurl = "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json";
 
 function fontFile (name) {
-  return path.join(process.cwd(), '/fonts/', name)
+  return
 }
 
-Canvas.registerFont(fontFile('belwe-medium.ttf'), {family: 'Belwe-Medium'})
-Canvas.registerFont(fontFile('franklin-gothic.ttf'), {family: 'Franklin-Gothic'})
+function loadFont(name, config) {
+	var p = path.join(process.cwd(), '/fonts/', name);
+	if (!fs.existsSync(p)) {
+		console.log(p + " not found, skip font loading");
+	} else {
+		Canvas.registerFont(p, config);
+	}
+}
 
 function NodePlatform() {
 
@@ -25,14 +35,11 @@ NodePlatform.prototype.freeBuffer  = function(buffer) {
 
 NodePlatform.prototype.loadAsset = function(img, url, loaded, error) {
 	var p = __dirname + "/" + url;
-	console.log('loading ' + p);
 	fs.readFile(p, function(err, data){
 		if (err) {
-			console.log('error ' + url);
 			error();
 			return;
 		}
-		console.log('loaded ' + url);
 		img.src = data;
 		loaded();
 	});
@@ -40,7 +47,8 @@ NodePlatform.prototype.loadAsset = function(img, url, loaded, error) {
 
 sunwell = {
 	settings: {
-		bodyFont: 'Franklin-Gothic',
+		titleFont: 'Belwe-Medium',
+		bodyFont: 'ITC Franklin Gothic Std MedCd',
 		bodyFontSize: 42,
 		bodyLineHeight: 55,
 		bodyFontOffset: {x: 0, y: 30},
@@ -49,42 +57,104 @@ sunwell = {
 		smallTextureFolder: '/smallArtworks/',
 		autoInit: true,
 		idAsTexture: true,
-		debug: true,
+		debug: false,
+		parallel: 256,
 		platform: new NodePlatform()
 	}
 };
 
 require('./sunwell');
 
-var leeroy = {
-	"language": "enUS",
-	"title": "Leeroy Jenkins",
-	"text": "<b>Charge</b>. <b>Battlecry:</b> Summon two 1/1 Whelps for your opponent.",
-	"gameId": "EX1_116",
-	"set": "EXPERT1",
-	"cost": 5,
-	"attack": 6,
-	"health": 2,
-	"rarity": "LEGENDARY",
-	"type": "MINION",
-	"collectible": "1",
-	"playerClass": "NEUTRAL",
-};
+function drawAllCards(json, dir) {
+	for (var i = 0; i < Math.min(json.length, 1000000); i++) {
+		var c = json[i];
+		c.gameId = c.id;
 
-function drawCard(card) {
-	sunwell.init()
-	sunwell.createCard(leeroy, 512, function(canvas) {			
-		var out = fs.createWriteStream(__dirname + '/card' + card.gameId + '.png')
-		var stream = canvas.pngStream();
-		
-		stream.on('data', function(chunk){
-			out.write(chunk);
-		});
+		var fileName = dir + '/card_' + c.gameId + '.png';
+		if (!c.type || !c.playerClass) {
+			// Skip
+		} else if (!fs.existsSync(__dirname + "/" + sunwell.settings.textureFolder + "/" + c.gameId + '.jpg')) {
+			// Skip
+		} else if (!fs.existsSync(fileName)) {
+			(function(c, i, fileName) {
+				sunwell.createCard(c, 512, function(canvas) {
+					var out = fs.createWriteStream(fileName)
+					var stream = canvas.pngStream();
 
-		stream.on('end', function(){
-			console.log('saved png');
-		});
-	});	
+					stream.on('error', function(chunk) {
+					  console.log("Error!");
+					});
+
+					stream.on('data', function(chunk) {
+						out.write(chunk);
+					});
+
+					stream.on('end', function() {
+						console.log("saved " + i + "/" + json.length + ": " + fileName);
+						out.end();
+
+						if (i == json.length - 1) {
+							console.log("done");
+						}
+					});
+				});
+			})(c, i, fileName);
+		}
+	}
 }
 
-drawCard(leeroy);
+
+function generateLang(lang) {
+	var dir = outputDirectory + "/" + lang;
+
+	function downloadJson(url) {
+		request(url, function(error, response, body) {
+			if (!error && response.statusCode === 200) {
+				const j = JSON.parse(body)
+				drawAllCards(j, dir);
+			} else {
+				console.log("Got an error while downloading json: ", error, ", status code: ", response.statusCode)
+			}
+		})
+	}
+	mkdirp(dir, function(err) {
+		var url = jsonurl.replace("{lang}", lang);
+		downloadJson(url);
+	});
+}
+
+sunwell.init()
+
+function usage() {
+	console.log("node generate_images.js [lang1] [lang2] ...");
+	console.log("options: ");
+	console.log("        --jsonurl url: override the url where we fetch the json from.");
+	console.log("        			The url must be a template that contains '{lang}' so we can replace it afterwards.");
+	console.log('        			Defaults to "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json"');
+	process.exit();
+}
+
+langs = [];
+
+for (var i = 2; i < process.argv.length; i++) {
+	if (process.argv[i] == "--jsonurl") {
+		if (i == process.argv.length - 1) {
+			usage();
+		}
+		i++;
+		jsonurl = process.argv[i];
+	} else {
+		langs.push(process.argv[i]);
+	}
+}
+
+if (langs.length == 0) {
+	usage();
+}
+
+loadFont('belwe-medium.ttf', {family: 'Belwe-Medium'});
+loadFont('franklin-gothic.ttf', {family: 'Franklin-Gothic'})
+
+for (var i = 0; i < langs.length; i++) {
+	generateLang(langs[i]);
+}
