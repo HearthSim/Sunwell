@@ -7,13 +7,20 @@ var http = require('http');
 const request = require('request');
 
 var outputDirectory = process.cwd() + "/generated_images";
+var jsonurl = "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json";
 
 function fontFile (name) {
-  return path.join(process.cwd(), '/fonts/', name)
+  return 
 }
 
-Canvas.registerFont(fontFile('belwe-medium.ttf'), {family: 'Belwe-Medium'})
-Canvas.registerFont(fontFile('franklin-gothic.ttf'), {family: 'Franklin-Gothic'})
+function loadFont(name, config) {
+	var p = path.join(process.cwd(), '/fonts/', name);
+	if (!fs.existsSync(p)) {
+		console.log(p + " not found, skip font loading");
+	} else {
+		Canvas.registerFont(p, config);
+	}
+}
 
 function NodePlatform() {
 
@@ -60,21 +67,6 @@ sunwell = {
 };
 
 require('./sunwell');
-
-var leeroy = {
-	"language": "enUS",
-	"title": "Leeroy Jenkins",
-	"text": "<b>Charge</b>. <b>Battlecry:</b> Summon two 1/1 Whelps for your opponent.",
-	"gameId": "EX1_116",
-	"set": "EXPERT1",
-	"cost": 5,
-	"attack": 6,
-	"health": 2,
-	"rarity": "LEGENDARY",
-	"type": "MINION",
-	"collectible": "1",
-	"playerClass": "NEUTRAL",
-};
 
 function drawAllCards(json, dir) {
 	for (var i = 0; i < Math.min(json.length, 1000000); i++) {
@@ -129,22 +121,48 @@ function generateLang(lang) {
 				const j = JSON.parse(body)				
 				drawAllCards(j, dir);
 			} else {
-				console.log("Got an error: ", error, ", status code: ", response.statusCode)
+				console.log("Got an error while downloading json: ", error, ", status code: ", response.statusCode)
 			}
 		})
 	}
 	mkdirp(dir, function(err) {
-		downloadJson("https://api.hearthstonejson.com/v1/15590/" + lang + "/cards.json");
+		var url = jsonurl.replace("{lang}", lang);
+		downloadJson(url);
 	});	
 }
 
 sunwell.init()
 
-if (process.argv.length <3) {
+function usage() {
 	console.log("node generate_images.js [lang1] [lang2] ...");	
+	console.log("options: ");	
+	console.log("        --jsonurl url: override the url where we fetch the json from.");	
+	console.log("        			The url must be a template that contains '{lang}' so we can replace it afterwards.");	
+	console.log('        			Defaults to "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json"');	
 	process.exit();
 }
 
+langs = [];
+
 for (var i = 2; i < process.argv.length; i++) {
-	generateLang(process.argv[i]);
+	if (process.argv[i] == "--jsonurl") {
+		if (i == process.argv.length - 1) {
+			usage();
+		}
+		i++;
+		jsonurl = process.argv[i];
+	} else {
+		langs.push(process.argv[i]);
+	}
+}
+
+if (langs.length == 0) {
+	usage();
+}
+
+loadFont('belwe-medium.ttf', {family: 'Belwe-Medium'});
+loadFont('franklin-gothic.ttf', {family: 'Franklin-Gothic'})
+
+for (var i = 0; i < langs.length; i++) {
+	generateLang(langs[i]);
 }
