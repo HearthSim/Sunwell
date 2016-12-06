@@ -2,7 +2,9 @@ Sunwell
 =======
 
 A HTML5 canvas based renderer for hearthstone cards.
-This works in your browser through javascript.
+
+* Works in your browser through javascript and the &lt;canvas&gt; element.
+* Works from the command line with node and [node-canvas](https://github.com/Automattic/node-canvas).
 
 Requirements
 ------------
@@ -17,6 +19,17 @@ You also need to obtain a copy of the Belwe and ITC Franklin Gothic font, as its
 and number values. You can place the web font files in the `/font` directory. A substitute for the card body text
 font will be loaded from google fonts.
 
+Running in node
+------------
+
+You will need a few node dependencies and node-canvas compiled from the source for `Canvas.registerFont` to be available:
+
+    sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
+    npm install -g node-gyp
+    npm install github:automattic/node-canvas
+    npm install mkdirp
+    npm install promise
+    npm install request
 
 
 Usage
