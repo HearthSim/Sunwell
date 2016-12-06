@@ -5,21 +5,23 @@
  *
  * @author Christian Engel <hello@wearekiss.com>
  */
+if (typeof window == 'undefined') {
+	var Promise = require('promise');
+	var Canvas = require('canvas')
+	, Image = Canvas.Image;
+}
 
 (function () {
     'use strict';
 
     var sunwell,
         assets = {},
+        assetListeners = {},
         ready = false,
         renderQuery = [],
-        maxRendering = 12,
         rendering = 0,
-        renderCache = {},
-        buffers = [],
-        pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g,
-        validRarity = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
-
+        renderCache = {};
+        
     function log(msg) {
         if (!sunwell.settings.debug) {
             return;
@@ -27,23 +29,33 @@
         console.log(msg);
     }
 
-    /**
+	var bodyFontSizeExtra = "/1em";
+	if (typeof window == 'undefined') {
+		// we run in node-canvas and we dont support ctx.font="16px/1em" notation
+		bodyFontSizeExtra = "";
+	}
+	
+	function WebPlatform() {
+		this.buffers = [];
+	}
+	
+	/**
      * Returns a new render buffer (canvas).
      * @returns {*}
      */
-    function getBuffer(width, height, clear) {
+    WebPlatform.prototype.getBuffer = function(width, height, clear) {
         var cvs;
 
-        if (buffers.length) {
+        if (this.buffers.length) {
             if (width) {
-                for (var i = 0; i < buffers.length; i++) {
-                    if (buffers[i].width === width && buffers[i].height === height) {
-                        cvs = buffers.splice(i, 1)[0];
+                for (var i = 0; i < this.buffers.length; i++) {
+                    if (this.buffers[i].width === width && this.buffers[i].height === height) {
+                        cvs = this.buffers.splice(i, 1)[0];
                         break;
                     }
                 }
             } else {
-                cvs = buffers.pop();
+                cvs = this.buffers.pop();
             }
             if (cvs) {
                 if (clear) {
@@ -67,20 +79,21 @@
      * Makes a new render buffer available for recycling.
      * @param buffer
      */
-    function freeBuffer(buffer) {
-        buffers.push(buffer);
+    WebPlatform.prototype.freeBuffer = function(buffer) {
+		this.buffers.push(buffer);
     }
+    
+    WebPlatform.prototype.loadAsset = function(img, url, loaded, error) {
+        img.addEventListener('load', loaded);
+        img.addEventListener('error', error);
 
-    var imgReplacement;
+		img.src = url;
+	}
+    
+    var missingImageDataUrl, missingImage;
 
-    function getMissingImg(assetId) {
-        log('Substitute for ' + assetId);
-
-        if (imgReplacement) {
-            return imgReplacement;
-        }
-
-        var buffer = getBuffer(),
+    function generateMissingImage() {
+        var buffer = sunwell.settings.platform.getBuffer(),
             bufferctx = buffer.getContext('2d');
         buffer.width = buffer.height = 512;
         bufferctx.save();
@@ -90,21 +103,25 @@
         bufferctx.fillStyle = 'red';
         bufferctx.textAlign = 'center';
         bufferctx.textBaseline = 'middle';
-        bufferctx.font = '50px Belwe';
+        bufferctx.font = '50px ' + sunwell.settings.titleFont;
         bufferctx.fillText('missing artwork', 256, 256);
         bufferctx.restore();
-        imgReplacement = new Image();
-        imgReplacement.src = buffer.toDataURL();
-        return imgReplacement;
+        missingImageDataUrl = buffer.toDataURL();
+        missingImage = new Image();
+        missingImage.src = missingImageDataUrl;
     }
-
+    
     function getAsset(id) {
-        return assets[id] || getMissingImg(id);
+		// fallback to missingImage for the case where we request the '~' texture
+        return assets[id] || missingImage;
     }
 
-    window.sunwell = sunwell = window.sunwell || {};
+	if (typeof window != 'undefined') {
+		sunwell = window.sunwell;
+	} else {
+		sunwell = global.sunwell;
+	}
 
-    sunwell._buffers = buffers;
     sunwell._renderQuery = renderQuery;
     sunwell._activeRenders = rendering;
 
@@ -120,7 +137,10 @@
     sunwell.settings.smallTextureFolder = sunwell.settings.smallTextureFolder || null;
     sunwell.settings.autoInit = sunwell.settings.autoInit || true;
     sunwell.settings.idAsTexture = sunwell.settings.idAsTexture || false;
+    sunwell.settings.platform = sunwell.settings.platform || new WebPlatform();
+    var maxRendering = sunwell.settings.maxRendering || 12;
 
+	generateMissingImage();
 
     sunwell.settings.debug = sunwell.settings.debug || false;
 
@@ -214,9 +234,9 @@
      * You can call this before you start to render any cards, but you don't have to.
      */
     function fetchAssets(loadAssets) {
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             var loaded = 0,
-                loadingTotal = 1,
+                loadingTotal = 0,
                 result = {},
                 key,
                 isTexture,
@@ -245,76 +265,71 @@
                     }
                 }
 
-                if (key.substr(0, 2) === 'u:') {
-                    isUrl = true;
-                    key = key.substr(2);
-                }
-
                 if (assets[key] === undefined) {
                     assets[key] = new Image();
                     assets[key].crossOrigin = "Anonymous";
                     assets[key].loaded = false;
                     loadingTotal++;
-                    (function (key) {
-                        assets[key].addEventListener('load', function () {
-                            loaded++;
-                            assets[key].loaded = true;
-                            result[key] = assets[key];
-                            if (!assets[key].width || !assets[key].height) {
-                                assets[key].src = getMissingImg().src;
-                            }
-                            if (loaded >= loadingTotal) {
-                                resolve(result);
-                            }
-                        });
-                        assets[key].addEventListener('error', function () {
-                            loaded++;
 
-                            assets[key].src = getMissingImg().src;
-                            assets[key].loaded = true;
-                            result[key] = assets[key];
-                            if (loaded >= loadingTotal) {
-                                resolve(result);
-                            }
-                        });
-                    })(key);
-                    if (isUrl) {
-                        assets[key].src = key;
-                    } else {
-                        if (isTexture) {
-                            assets[key].isTexture = true;
-                            if (smallTexture) {
-                                srcURL = sunwell.settings.smallTextureFolder + key + '.jpg';
-                            } else {
-                                srcURL = sunwell.settings.textureFolder + key + '.jpg';
-                            }
-                        } else {
-                            srcURL = sunwell.settings.assetFolder + key + '.png';
-                            ;
-                        }
-                        log('Requesting ' + srcURL);
-                        assets[key].src = srcURL;
-                    }
+					if (isTexture) {
+						assets[key].isTexture = true;
+						if (smallTexture) {
+							srcURL = sunwell.settings.smallTextureFolder + key + '.jpg';
+						} else {
+							srcURL = sunwell.settings.textureFolder + key + '.jpg';
+						}
+					} else {
+						srcURL = sunwell.settings.assetFolder + key + '.png';
+					}
+					log('Requesting ' + srcURL);
+					
+					(function(key) {
+						function completeCB() {
+							loaded++;
+							assets[key].loaded = true;
+							if (loaded >= loadingTotal) {
+								resolve(result);
+							}
+							if (assetListeners[key]) {
+								for (var a in assetListeners[key]) {
+									assetListeners[key][a](assets[key]);
+								}
+								delete assetListeners[key]
+							}
+						}
+						function loadedCB() {
+							result[key] = assets[key];
+							if (!assets[key].width || !assets[key].height) {
+								assets[key].src = missingImageDataUrl;
+							}
+							completeCB();
+						}
+						function errorCB() {
+							assets[key].src = missingImageDataUrl;
+							completeCB();
+						}
+						sunwell.settings.platform.loadAsset(assets[key], srcURL, loadedCB, errorCB);
+					})(key);
+					 
+
                 } else {
                     loadingTotal++;
                     if (assets[key].loaded) {
                         loaded++;
                         result[key] = assets[key];
                     } else {
-                        (function (key) {
-                            assets[key].addEventListener('load', function () {
-                                loaded++;
-                                result[key] = assets[key];
-                                if (loaded >= loadingTotal) {
-                                    resolve(result);
-                                }
-                            });
-                        })(key);
+						assetListeners[key] = assetListeners[key] || []
+						assetListeners[key].push(function(a) {
+							loaded++;
+							result[key] = a;
+							if (loaded >= loadingTotal) {
+								resolve(result);
+							}
+						});
                     }
                 }
             }
 
-            loadingTotal--;
             if (loaded > 0 && loaded >= loadingTotal) {
                 resolve(result);
             }
@@ -401,13 +416,13 @@
             }
         }
 
-        var buffer = getBuffer();
+        var buffer = sunwell.settings.platform.getBuffer();
         var bufferCtx = buffer.getContext('2d');
 
         buffer.width = 300;
         buffer.height = 60;
 
-        bufferCtx.font = '45px Belwe';
+        bufferCtx.font = '45px ' + sunwell.settings.titleFont;
 
         bufferCtx.lineCap = 'round';
         bufferCtx.lineJoin = 'round';
@@ -439,7 +454,7 @@
 
         targetCtx.drawImage(buffer, b.x, b.y, b.w, b.h, (394 - (b.w / 2)) * s, (1001 - (b.h / 2)) * s, b.w * s, b.h * s);
 
-        freeBuffer(buffer);
+        sunwell.settings.platform.freeBuffer(buffer);
     }
 
     /**
@@ -455,7 +470,7 @@
      * @param [drawStyle="0"] Either "+", "-" or "0". Default: "0"
      */
     function drawNumber(targetCtx, x, y, s, number, size, drawStyle) {
-        var buffer = getBuffer();
+        var buffer = sunwell.settings.platform.getBuffer();
         var bufferCtx = buffer.getContext('2d');
 
         if (drawStyle === undefined) {
@@ -471,7 +486,7 @@
 
         var tX = 10;
 
-        bufferCtx.font = size + 'px Belwe';
+        bufferCtx.font = size + 'px ' + sunwell.settings.titleFont;
 
         bufferCtx.lineCap = 'round';
         bufferCtx.lineJoin = 'round';
@@ -509,7 +524,7 @@
 
         targetCtx.drawImage(buffer, b.x, b.y, b.w, b.h, (x - (b.w / 2)) * s, (y - (b.h / 2)) * s, b.w * s, b.h * s);
 
-        freeBuffer(buffer);
+        sunwell.settings.platform.freeBuffer(buffer);
     }
 
     /**
@@ -568,13 +583,18 @@
      */
     function drawBodyText(targetCtx, s, card, forceSmallerFirstLine) {
         var cardText = card.text;
+        
+        if (!cardText) {
+			return;
+		}
         if (card.collectionText) {
             cardText = card.collectionText;
         }
+        
         var manualBreak = cardText.substr(0, 3) === '[x]',
-            bufferText = getBuffer(),
+            bufferText = sunwell.settings.platform.getBuffer(),
             bufferTextCtx = bufferText.getContext('2d'),
-            bufferRow = getBuffer(),
+            bufferRow = sunwell.settings.platform.getBuffer(),
             bufferRowCtx = bufferRow.getContext('2d'),
             bodyText = manualBreak ? cardText.substr(3) : cardText,
             words,
@@ -595,6 +615,7 @@
             justLineBreak,
             lineCount = 0,
             plurals,
+            pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g,
             pBodyText;
 
 
@@ -663,7 +684,7 @@
 
         bufferRowCtx.textBaseline = sunwell.settings.bodyBaseline;
 
-        bufferRowCtx.font = fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
+        bufferRowCtx.font = fontSize + 'px' + bodyFontSizeExtra + ' "' + sunwell.settings.bodyFont + '", sans-serif';
 
         spaceWidth = 3;
 
@@ -729,7 +750,7 @@
                         }
                     }
 
-                    bufferRowCtx.font = (isBold > 0 ? 'bold ' : '') + (isItalic > 0 ? 'italic' : '') + ' ' + fontSize + 'px/1em "' + sunwell.settings.bodyFont + '", sans-serif';
+					bufferRowCtx.font = (isBold > 0 ? 'bold ' : '') + (isItalic > 0 ? 'italic' : '') + ' ' + fontSize + 'px' + bodyFontSizeExtra + ' "' + sunwell.settings.bodyFont + '", sans-serif';
                     continue;
                 }
 
@@ -744,7 +765,7 @@
         lineCount++;
         finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
 
-        freeBuffer(bufferRow);
+        sunwell.settings.platform.freeBuffer(bufferRow);
 
         if (card.type === 'SPELL' && lineCount === 4) {
             if (!smallerFirstLine && !forceSmallerFirstLine) {
@@ -759,7 +780,7 @@
 
         targetCtx.drawImage(bufferText, b.x, b.y - 2, b.w, b.h, (centerLeft - (b.w / 2)) * s, (centerTop - (b.h / 2)) * s, b.w * s, (b.h + 2) * s);
 
-        freeBuffer(bufferText);
+        sunwell.settings.platform.freeBuffer(bufferText);
 
         if (sunwell.settings.debug) {
             targetCtx.save();
@@ -804,7 +825,7 @@
      * @param title
      */
     function drawCardTitle(targetCtx, s, card) {
-        var buffer = getBuffer();
+        var buffer = sunwell.settings.platform.getBuffer();
         var title = card.title;
         buffer.width = 1024;
         buffer.height = 200;
@@ -862,7 +883,7 @@
 
         while (textWidth > maxWidth && fontSize > 10) {
             fontSize -= 1;
-            ctx.font = fontSize + 'px Belwe';
+            ctx.font = fontSize + 'px ' + sunwell.settings.titleFont;
             textWidth = 0;
             for (var i = 0; i < title.length; i++) {
                 textWidth += ctx.measureText(title[i]).width + 2;
@@ -941,7 +962,7 @@
             200 * s
         );
 
-        freeBuffer(buffer);
+        sunwell.settings.platform.freeBuffer(buffer);
     }
 
     function draw(cvs, ctx, card, s, cardObj, internalCB) {
@@ -953,8 +974,8 @@
             renderStart = Date.now();
 
         drawTimeout = setTimeout(function () {
-            log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
-            log(card);
+            console.log('Drawing timeout at point ' + drawProgress + ' in ' + card.title);
+            console.log(card);
             internalCB();
         }, 5000);
 
@@ -964,7 +985,7 @@
             if (card.texture instanceof Image) {
                 t = card.texture;
             } else {
-                t = getBuffer();
+                t = sunwell.settings.platform.getBuffer();
                 t.width = card.texture.crop.w;
                 t.height = card.texture.crop.h;
                 (function () {
@@ -1158,7 +1179,11 @@
         log('Rendertime: ' + (Date.now() - renderStart) + 'ms');
 
         internalCB();
-        cardObj.target.src = cvs.toDataURL();
+        if (typeof cardObj.target == "function") {
+			cardObj.target(cvs);
+		} else {
+			cardObj.target.src = cvs.toDataURL();
+		}
     }
 
     function queryRender(cardProps) {
@@ -1173,7 +1198,11 @@
             return;
         }
         render();
-        window.requestAnimationFrame(renderTick);
+		if (typeof window != 'undefined') {
+			window.requestAnimationFrame(renderTick);
+		} else {
+			setTimeout(renderTick, 16);
+		}
     }
 
     /**
@@ -1195,12 +1224,13 @@
         var renderInfo = renderQuery.shift();
 
         rendering++;
+        
 
         card = renderInfo[0];
         resolution = card.width;
         cardObj = renderInfo[1];
 
-        var cvs = getBuffer(resolution, Math.round(resolution * 1.4397905759), true),
+        var cvs = sunwell.settings.platform.getBuffer(resolution, Math.round(resolution * 1.4397905759), true),
             ctx = cvs.getContext('2d'),
             s = resolution / 764,
             loadList = ['silence-x', 'health'];
@@ -1209,7 +1239,7 @@
             draw(cvs, ctx, card, s, cardObj, function () {
                 rendering--;
                 log('Card rendered: ' + card.title);
-                freeBuffer(cvs);
+                sunwell.settings.platform.freeBuffer(cvs);
             });
             return;
         }
@@ -1290,7 +1320,7 @@
                 draw(cvs, ctx, card, s, cardObj, function () {
                     rendering--;
                     log('Card rendered: ' + card.title);
-                    freeBuffer(cvs);
+                    sunwell.settings.platform.freeBuffer(cvs);
                 });
             });
     };
@@ -1303,6 +1333,8 @@
     };
 
     sunwell.Card = function (props, width, renderTarget) {
+		var validRarity = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
+
         if (!props) {
             throw new Error('No card properties given');
         }
