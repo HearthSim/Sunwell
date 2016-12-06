@@ -2,8 +2,11 @@ var Canvas = require('canvas')
   , Image = Canvas.Image;
 var fs = require("fs");
 var path = require('path')
+var mkdirp = require('mkdirp');
+var http = require('http');
+const request = require('request');
 
-console.log("hello");
+var outputDirectory = process.cwd() + "/generated_images";
 
 function fontFile (name) {
   return path.join(process.cwd(), '/fonts/', name)
@@ -25,14 +28,14 @@ NodePlatform.prototype.freeBuffer  = function(buffer) {
 
 NodePlatform.prototype.loadAsset = function(img, url, loaded, error) {
 	var p = __dirname + "/" + url;
-	console.log('loading ' + p);
+	//console.log('loading ' + p);
 	fs.readFile(p, function(err, data){
 		if (err) {
-			console.log('error ' + url);
+			//console.log('error ' + url);
 			error();
 			return;
 		}
-		console.log('loaded ' + url);
+		//console.log('loaded ' + url);
 		img.src = data;
 		loaded();
 	});
@@ -40,7 +43,8 @@ NodePlatform.prototype.loadAsset = function(img, url, loaded, error) {
 
 sunwell = {
 	settings: {
-		bodyFont: 'Franklin-Gothic',
+		titleFont: 'Belwe-Medium',
+		bodyFont: 'ITC Franklin Gothic Std MedCd',
 		bodyFontSize: 42,
 		bodyLineHeight: 55,
 		bodyFontOffset: {x: 0, y: 30},
@@ -49,7 +53,8 @@ sunwell = {
 		smallTextureFolder: '/smallArtworks/',
 		autoInit: true,
 		idAsTexture: true,
-		debug: true,
+		debug: false,
+		parallel: 256,
 		platform: new NodePlatform()
 	}
 };
@@ -71,20 +76,75 @@ var leeroy = {
 	"playerClass": "NEUTRAL",
 };
 
-function drawCard(card) {
-	sunwell.init()
-	sunwell.createCard(leeroy, 512, function(canvas) {			
-		var out = fs.createWriteStream(__dirname + '/card' + card.gameId + '.png')
-		var stream = canvas.pngStream();
+function drawAllCards(json, dir) {
+	for (var i = 0; i < Math.min(json.length, 1000000); i++) {
+		var c = json[i];
+		c.gameId = c.id;
 		
-		stream.on('data', function(chunk){
-			out.write(chunk);
-		});
+		if (true) {
+			var fileName = dir + '/card_' + c.gameId + '.png';
+			if (!c.type || !c.playerClass) {
+				console.log("skip " + fileName);
+			} else if (!fs.existsSync(__dirname + "/" + sunwell.settings.textureFolder + "/" + c.gameId + '.jpg')) {
+				console.log("skip " + fileName);
+			} else if (!fs.existsSync(fileName)) {
+				console.log("queue " + fileName);
+				(function(c, i, fileName) {
+					sunwell.createCard(c, 512, function(canvas) {
+						var out = fs.createWriteStream(fileName)
+						var stream = canvas.pngStream();
+						
+						stream.on('error', function(chunk){
+						  console.log("ouille");
+						});
 
-		stream.on('end', function(){
-			console.log('saved png');
-		});
+						stream.on('data', function(chunk){
+							out.write(chunk);
+						});
+
+						stream.on('end', function(){
+							console.log("saved " + i + "/" + json.length + ": " + fileName);
+							out.end();
+							
+							if (i == json.length - 1) {
+								console.log("done");
+							}
+						});
+					});
+				})(c, i, fileName);
+			} else {
+				//console.log("skip existing" + fileName);
+			}
+		}
+	}
+}
+
+
+function generateLang(lang) {
+	var dir = outputDirectory + "/" + lang;
+	
+	function downloadJson(url) {
+		request(url, function(error, response, body) {
+			if (!error && response.statusCode === 200) {
+				const j = JSON.parse(body)				
+				drawAllCards(j, dir);
+			} else {
+				console.log("Got an error: ", error, ", status code: ", response.statusCode)
+			}
+		})
+	}
+	mkdirp(dir, function(err) {
+		downloadJson("https://api.hearthstonejson.com/v1/15590/" + lang + "/cards.json");
 	});	
 }
 
-drawCard(leeroy);
+sunwell.init()
+
+if (process.argv.length <3) {
+	console.log("node generate_images.js [lang1] [lang2] ...");	
+	process.exit();
+}
+
+for (var i = 2; i < process.argv.length; i++) {
+	generateLang(process.argv[i]);
+}
