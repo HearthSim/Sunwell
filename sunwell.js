@@ -5,12 +5,18 @@
  *
  * @author Christian Engel <hello@wearekiss.com>
  */
+if (typeof window == 'undefined') {
+	var Promise = require('promise');
+	var Canvas = require('canvas')
+	, Image = Canvas.Image;
+}
 
 (function () {
     'use strict';
 
     var sunwell,
         assets = {},
+        assetListeners = {},
         ready = false,
         renderQuery = [],
         maxRendering = 12,
@@ -72,6 +78,13 @@
 		this.buffers.push(buffer);
     }
     
+    WebPlatform.prototype.loadAsset = function(img, url, loaded, error) {
+        img.addEventListener('load', loaded);
+        img.addEventListener('error', error);
+
+		img.src = url;
+	}
+    
     var imgReplacement;
 
     function getMissingImg(assetId) {
@@ -103,7 +116,11 @@
         return assets[id] || getMissingImg(id);
     }
 
-    window.sunwell = sunwell = window.sunwell || {};
+	if (typeof window != 'undefined') {
+		sunwell = window.sunwell;
+	} else {
+		sunwell = global.sunwell;
+	}
 
     sunwell._renderQuery = renderQuery;
     sunwell._activeRenders = rendering;
@@ -217,7 +234,7 @@
     function fetchAssets(loadAssets) {
         return new Promise(function (resolve) {
             var loaded = 0,
-                loadingTotal = 1,
+                loadingTotal = 0,
                 result = {},
                 key,
                 isTexture,
@@ -246,76 +263,71 @@
                     }
                 }
 
-                if (key.substr(0, 2) === 'u:') {
-                    isUrl = true;
-                    key = key.substr(2);
-                }
-
+debugger;
                 if (assets[key] === undefined) {
                     assets[key] = new Image();
                     assets[key].crossOrigin = "Anonymous";
                     assets[key].loaded = false;
                     loadingTotal++;
-                    (function (key) {
-                        assets[key].addEventListener('load', function () {
-                            loaded++;
-                            assets[key].loaded = true;
-                            result[key] = assets[key];
-                            if (!assets[key].width || !assets[key].height) {
-                                assets[key].src = getMissingImg().src;
-                            }
-                            if (loaded >= loadingTotal) {
-                                resolve(result);
-                            }
-                        });
-                        assets[key].addEventListener('error', function () {
-                            loaded++;
 
-                            assets[key].src = getMissingImg().src;
-                            assets[key].loaded = true;
-                            result[key] = assets[key];
-                            if (loaded >= loadingTotal) {
-                                resolve(result);
-                            }
-                        });
-                    })(key);
-                    if (isUrl) {
-                        assets[key].src = key;
-                    } else {
-                        if (isTexture) {
-                            assets[key].isTexture = true;
-                            if (smallTexture) {
-                                srcURL = sunwell.settings.smallTextureFolder + key + '.jpg';
-                            } else {
-                                srcURL = sunwell.settings.textureFolder + key + '.jpg';
-                            }
-                        } else {
-                            srcURL = sunwell.settings.assetFolder + key + '.png';
-                            ;
-                        }
-                        log('Requesting ' + srcURL);
-                        assets[key].src = srcURL;
-                    }
+					if (isTexture) {
+						assets[key].isTexture = true;
+						if (smallTexture) {
+							srcURL = sunwell.settings.smallTextureFolder + key + '.jpg';
+						} else {
+							srcURL = sunwell.settings.textureFolder + key + '.jpg';
+						}
+					} else {
+						srcURL = sunwell.settings.assetFolder + key + '.png';
+					}
+					log('Requesting ' + srcURL);
+					
+					(function(key) {
+						function completeCB() {
+							loaded++;
+							assets[key].loaded = true;
+							if (loaded >= loadingTotal) {
+								resolve(result);
+							}
+							if (assetListeners[key]) {
+								for (listener in assetListeners[key]) {
+									listener(assets[key]);
+								}
+							}
+						}
+						function loadedCB() {
+							result[key] = assets[key];
+							if (!assets[key].width || !assets[key].height) {
+								assets[key].src = getMissingImg().src;
+							}
+							completeCB();
+						}
+						function errorCB() {
+							assets[key].src = getMissingImg().src;
+							completeCB();
+						}
+						sunwell.settings.platform.loadAsset(assets[key], srcURL, loadedCB, errorCB);
+					})(key);
+					 
+
                 } else {
                     loadingTotal++;
                     if (assets[key].loaded) {
                         loaded++;
                         result[key] = assets[key];
                     } else {
-                        (function (key) {
-                            assets[key].addEventListener('load', function () {
-                                loaded++;
-                                result[key] = assets[key];
-                                if (loaded >= loadingTotal) {
-                                    resolve(result);
-                                }
-                            });
-                        })(key);
+						assetListeners[key] = assetListeners[key] || []
+						assetListeners[key].push(function(a) {
+							loaded++;
+							result[key] = a;
+							if (loaded >= loadingTotal) {
+								resolve(result);
+							}
+						});
                     }
                 }
             }
 
-            loadingTotal--;
             if (loaded > 0 && loaded >= loadingTotal) {
                 resolve(result);
             }
@@ -1162,7 +1174,7 @@
 
         internalCB();
         if (typeof cardObj.target == "function") {
-			cardObj.target();
+			cardObj.target(cvs);
 		} else {
 			cardObj.target.src = cvs.toDataURL();
 		}
@@ -1180,7 +1192,11 @@
             return;
         }
         render();
-        window.requestAnimationFrame(renderTick);
+		if (typeof window != 'undefined') {
+			window.requestAnimationFrame(renderTick);
+		} else {
+			setTimeout(renderTick, 16);
+		}
     }
 
     /**
