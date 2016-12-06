@@ -84,11 +84,11 @@ function drawAllCards(json, dir) {
 		if (true) {
 			var fileName = dir + '/card_' + c.gameId + '.png';
 			if (!c.type || !c.playerClass) {
-				console.log("skip " + fileName);
+				//console.log("skip " + fileName);
 			} else if (!fs.existsSync(__dirname + "/" + sunwell.settings.textureFolder + "/" + c.gameId + '.jpg')) {
-				console.log("skip " + fileName);
+				//console.log("skip " + fileName);
 			} else if (!fs.existsSync(fileName)) {
-				console.log("queue " + fileName);
+				//console.log("queue " + fileName);
 				(function(c, i, fileName) {
 					sunwell.createCard(c, 512, function(canvas) {
 						var out = fs.createWriteStream(fileName)
