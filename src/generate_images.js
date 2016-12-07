@@ -1,10 +1,10 @@
-var Canvas = require('canvas')
+var Canvas = require("canvas")
   , Image = Canvas.Image;
 var fs = require("fs");
-var path = require('path')
-var mkdirp = require('mkdirp');
-var http = require('http');
-const request = require('request');
+var path = require("path")
+var mkdirp = require("mkdirp");
+var http = require("http");
+const request = require("request");
 
 var outputDirectory = process.cwd() + "/generated_images";
 var jsonurl = "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json";
@@ -14,7 +14,7 @@ function fontFile (name) {
 }
 
 function loadFont(name, config) {
-	var p = path.join(process.cwd(), '/fonts/', name);
+	var p = path.join(process.cwd(), "/fonts/", name);
 	if (!fs.existsSync(p)) {
 		console.log(p + " not found, skip font loading");
 	} else {
@@ -47,14 +47,14 @@ NodePlatform.prototype.loadAsset = function(img, url, loaded, error) {
 
 sunwell = {
 	settings: {
-		titleFont: 'Belwe-Medium',
-		bodyFont: 'ITC Franklin Gothic Std MedCd',
+		titleFont: "Belwe-Medium",
+		bodyFont: "ITC Franklin Gothic Std MedCd",
 		bodyFontSize: 42,
 		bodyLineHeight: 55,
 		bodyFontOffset: {x: 0, y: 30},
-		assetFolder: '/assets/',
-		textureFolder: '../512x/',
-		smallTextureFolder: '/smallArtworks/',
+		assetFolder: "/assets/",
+		textureFolder: "../512x/",
+		smallTextureFolder: "/smallArtworks/",
 		autoInit: true,
 		idAsTexture: true,
 		debug: false,
@@ -63,17 +63,17 @@ sunwell = {
 	}
 };
 
-require('./sunwell');
+require("./sunwell");
 
 function drawAllCards(json, dir) {
 	for (var i = 0; i < Math.min(json.length, 1000000); i++) {
 		var c = json[i];
 		c.gameId = c.id;
 
-		var fileName = dir + '/card_' + c.gameId + '.png';
+		var fileName = dir + "/card_" + c.gameId + ".png";
 		if (!c.type || !c.playerClass) {
 			// Skip
-		} else if (!fs.existsSync(__dirname + "/" + sunwell.settings.textureFolder + "/" + c.gameId + '.jpg')) {
+		} else if (!fs.existsSync(__dirname + "/" + sunwell.settings.textureFolder + "/" + c.gameId + ".jpg")) {
 			// Skip
 		} else if (!fs.existsSync(fileName)) {
 			(function(c, i, fileName) {
@@ -81,15 +81,15 @@ function drawAllCards(json, dir) {
 					var out = fs.createWriteStream(fileName)
 					var stream = canvas.pngStream();
 
-					stream.on('error', function(chunk) {
+					stream.on("error", function(chunk) {
 					  console.log("Error!");
 					});
 
-					stream.on('data', function(chunk) {
+					stream.on("data", function(chunk) {
 						out.write(chunk);
 					});
 
-					stream.on('end', function() {
+					stream.on("end", function() {
 						console.log("saved " + i + "/" + json.length + ": " + fileName);
 						out.end();
 
@@ -152,8 +152,8 @@ if (langs.length == 0) {
 	usage();
 }
 
-loadFont('belwe-medium.ttf', {family: 'Belwe-Medium'});
-loadFont('franklin-gothic.ttf', {family: 'Franklin-Gothic'})
+loadFont("belwe-medium.ttf", {family: "Belwe-Medium"});
+loadFont("franklin-gothic.ttf", {family: "Franklin-Gothic"})
 
 for (var i = 0; i < langs.length; i++) {
 	generateLang(langs[i]);

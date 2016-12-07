@@ -1,0 +1,17 @@
+@font-face {
+	font-family: "Belwe";
+	src: url("/fonts/belwe_bold-webfont.woff2");
+}
+
+@font-face {
+	font-family: "lolfont";
+	src: url("/fonts/lolfont-webfont.woff2");
+}
+
+.belwe {
+	font-family: "Belwe", sans-serif;
+}
+
+.lolfont {
+	font-family: "lolfont", sans-serif;
+}
