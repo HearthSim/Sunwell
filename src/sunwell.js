@@ -117,7 +117,7 @@ if (typeof window == "undefined") {
 	}
 
 	if (typeof window != "undefined") {
-		sunwell = window.sunwell;
+		sunwell = window.sunwell || {};
 	} else {
 		sunwell = global.sunwell;
 	}
