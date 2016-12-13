@@ -8,9 +8,12 @@ const request = require("request");
 
 var outputDirectory = process.cwd() + "/generated_images";
 var jsonurl = "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json";
-var textureFolder = "../../512x";
+var textureFolder = "../../512x/";
 var renderingWidth = 512;
 var ids = null;
+var debug = false;
+var overwrite = false;
+var renderSpecial = false;
 
 function usage() {
 	console.log("node generate_images.js [lang1] [lang2] ...");
@@ -19,10 +22,13 @@ function usage() {
 	console.log("        			The url must be a template that contains '{lang}' so we can replace it afterwards.");
 	console.log('        			Defaults to "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json"');
 	console.log("        --textureFolder path: specify where the texture are located, relative to the folder of the generate_images.js script");
-	console.log('        			Defaults to ../../512x');
-	console.log("        --width pixels: rendering width for the cards");
+	console.log('        			Defaults to ../../512x/');
+	console.log("        --renderingWidth pixels: rendering width for the cards");
 	console.log('        			Defaults to 512');
 	console.log("        --ids id1,id2: restrict rendering to the coma separated list of ids");
+	console.log("        --debug: display more debug info");
+	console.log("        --overwrite: overwrite existing files if they exist already");
+	console.log("        --renderSpecial: try to render enchantments/hero/hero power");
 	process.exit();
 }
 
@@ -41,18 +47,24 @@ for (var i = 2; i < process.argv.length; i++) {
 		}
 		i++;
 		textureFolder = process.argv[i];
-	} else if (process.argv[i] == "--width") {
+	} else if (process.argv[i] == "--renderingWidth") {
 		if (i == process.argv.length - 1) {
 			usage();
 		}
 		i++;
-		width = process.argv[i] >> 0;
+		renderingWidth = process.argv[i] >> 0;
 	} else if (process.argv[i] == "--ids") {
 		if (i == process.argv.length - 1) {
 			usage();
 		}
 		i++;
 		ids = process.argv[i].split(",");
+	} else if (process.argv[i] == "--debug") {
+		debug = true;
+	} else if (process.argv[i] == "--overwrite") {
+		overwrite = true;
+	} else if (process.argv[i] == "--renderSpecial") {
+		renderSpecial = true;
 	} else {
 		langs.push(process.argv[i]);
 	}
@@ -87,6 +99,7 @@ NodePlatform.prototype.loadAsset = function(img, url, loaded, error) {
 	fs.readFile(p, function(err, data){
 		if (err) {
 			error();
+			console.log("error loading: " + url);
 			return;
 		}
 		img.src = data;
@@ -106,7 +119,7 @@ sunwell = {
 		smallTextureFolder: "/smallArtworks/",
 		autoInit: true,
 		idAsTexture: true,
-		debug: false,
+		debug: debug,
 		parallel: 256,
 		platform: new NodePlatform()
 	}
@@ -123,12 +136,19 @@ function drawAllCards(json, dir) {
 			continue
 		}
 
+		if (!renderSpecial) {
+			if (c.type == "ENCHANTMENT"
+			|| c.type == "HERO"
+			|| c.type == "HERO_POWER")
+				continue;
+		}
+
 		var fileName = dir + "/card_" + c.gameId + ".png";
 		if (!c.type || !c.playerClass) {
 			// Skip
 		} else if (!fs.existsSync(__dirname + "/" + sunwell.settings.textureFolder + "/" + c.gameId + ".jpg")) {
 			// Skip
-		} else if (!fs.existsSync(fileName)) {
+		} else if (!fs.existsSync(fileName) || overwrite) {
 			(function(c, i, fileName) {
 				sunwell.createCard(c, renderingWidth, function(canvas) {
 					var out = fs.createWriteStream(fileName)
