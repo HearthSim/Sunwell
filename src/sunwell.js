@@ -259,7 +259,6 @@ if (typeof window == "undefined") {
 
 		s = s + o["gameId"];
 		s = s + o["playerClass"];
-		s = s + o["raceText"];
 		s = s + o["rarity"];
 		s = s + o["set"];
 		s = s + o["elite"];
@@ -269,6 +268,8 @@ if (typeof window == "undefined") {
 		s = s + o["texture"];
 		s = s + o["type"];
 		s = s + o["width"];
+		// Race text is rendered separately, we only need to know that it's displayed
+		s = s + !!o["raceText"];
 
 		for (i = 0; i < s.length; i++) {
 			chk += (s.charCodeAt(i) * (i + 1));
