@@ -50,6 +50,7 @@ if (typeof window == "undefined") {
 	var CardSet = {
 		INVALID: 0,
 		CORE: 2,
+		EXPERT1: 3,
 		NAXX: 12,
 		GVG: 13,
 		BRM: 14,
