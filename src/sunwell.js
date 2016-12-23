@@ -1211,9 +1211,9 @@ if (typeof window == "undefined") {
 
 		drawProgress = 14;
 
-		if (!card.silenced || card.type !== CardType.MINION) {
-			drawBodyText(ctx, s, card);
-		} else {
+		drawBodyText(ctx, s, card);
+
+		if (card.silenced && card.type === CardType.MINION) {
 			ctx.drawImage(getAsset("silence-x"), 0, 0, 410, 397, 200 * s, 660 * s, 410 * s, 397 * s);
 		}
 
