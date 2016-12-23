@@ -22,6 +22,76 @@ if (typeof window == "undefined") {
 		rendering = 0,
 		renderCache = {};
 
+	var CardClass = {
+		INVALID: 0,
+		DEATHKNIGHT: 1,
+		DRUID: 2,
+		HUNTER: 3,
+		MAGE: 4,
+		PALADIN: 5,
+		PRIEST: 6,
+		ROGUE: 7,
+		SHAMAN: 8,
+		WARLOCK: 9,
+		WARRIOR: 10,
+		DREAM: 11,
+		NEUTRAL: 12,
+	}
+
+	var CardType = {
+		INVALID: 0,
+		HERO: 3,
+		MINION: 4,
+		SPELL: 5,
+		WEAPON: 7,
+		HERO_POWER: 10,
+	}
+
+	var CardSet = {
+		INVALID: 0,
+		CORE: 2,
+		NAXX: 12,
+		GVG: 13,
+		BRM: 14,
+		TGT: 15,
+		LOE: 20,
+		KARA: 23,
+		OG: 21,
+		GANGS: 25,
+	}
+
+	var Race = {
+		INVALID: 0,
+		MURLOC: 14,
+		DEMON: 15,
+		MECHANICAL: 17,
+		PET: 20,
+		BEAST: 20,
+		TOTEM: 21,
+		PIRATE: 23,
+		DRAGON: 24,
+	}
+
+	var Rarity = {
+		INVALID: 0,
+		COMMON: 1,
+		FREE: 2,
+		RARE: 3,
+		EPIC: 4,
+		LEGENDARY: 5,
+	}
+
+	var MultiClassGroup = {
+		INVALID: 0,
+		GRIMY_GOONS: 1,
+		JADE_LOTUS: 2,
+		KABAL: 3,
+	}
+
+	function lookup(obj, value) {
+		return Object.keys(obj).find(key => obj[key] === value);
+	}
+
 	function log(msg) {
 		if (!sunwell.settings.debug) {
 			return;
@@ -618,7 +688,6 @@ if (typeof window == "undefined") {
 			pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g,
 			pBodyText;
 
-
 		pBodyText = bodyText;
 		while ((plurals = pluralRegex.exec(bodyText)) !== null) {
 			pBodyText = pBodyText.replace(plurals[0], plurals[1] + plurals[2] + (parseInt(plurals[1], 10) === 1 ? plurals[3] : plurals[4]));
@@ -636,14 +705,14 @@ if (typeof window == "undefined") {
 
 		bufferRow.width = 520;
 
-		if (card.type === "SPELL") {
+		if (card.type === CardType.SPELL) {
 			bufferText.width = 460;
 			bufferText.height = 290;
 
 			bufferRow.width = 460;
 		}
 
-		if (card.type === "WEAPON") {
+		if (card.type === CardType.WEAPON) {
 			bufferText.width = 470;
 			bufferText.height = 250;
 
@@ -668,7 +737,7 @@ if (typeof window == "undefined") {
 		bufferRow.height = lineHeight;
 
 
-		if (totalLength >= 75 && card.type === "SPELL") {
+		if (totalLength >= 75 && card.type === CardType.SPELL) {
 			smallerFirstLine = true;
 		}
 
@@ -676,7 +745,7 @@ if (typeof window == "undefined") {
 			smallerFirstLine = true;
 		}
 
-		if (card.type === "WEAPON") {
+		if (card.type === CardType.WEAPON) {
 			bufferRowCtx.fillStyle = "#fff";
 		} else {
 			bufferRowCtx.fillStyle = "#000";
@@ -767,7 +836,7 @@ if (typeof window == "undefined") {
 
 		sunwell.settings.platform.freeBuffer(bufferRow);
 
-		if (card.type === "SPELL" && lineCount === 4) {
+		if (card.type === CardType.SPELL && lineCount === 4) {
 			if (!smallerFirstLine && !forceSmallerFirstLine) {
 				drawBodyText(targetCtx, s, card, true);
 				return;
@@ -844,7 +913,7 @@ if (typeof window == "undefined") {
 			{x: 580, y: 100}
 		];
 
-		if (card.type === "SPELL") {
+		if (card.type === CardType.SPELL) {
 			pathMiddle = .52;
 			maxWidth = 580;
 			c = [
@@ -855,7 +924,7 @@ if (typeof window == "undefined") {
 			]
 		}
 
-		if (card.type === "WEAPON") {
+		if (card.type === CardType.WEAPON) {
 			pathMiddle = .58;
 			maxWidth = 580;
 			c = [
@@ -1011,7 +1080,7 @@ if (typeof window == "undefined") {
 			drawProgress = 3;
 
 			ctx.save();
-			if (card.type === "MINION") {
+			if (card.type === CardType.MINION) {
 				drawEllipse(ctx, 180 * s, 75 * s, 430 * s, 590 * s);
 				ctx.clip();
 				ctx.fillStyle = "grey";
@@ -1019,7 +1088,7 @@ if (typeof window == "undefined") {
 				ctx.drawImage(t, 0, 0, t.width, t.height, 100 * s, 75 * s, 590 * s, 590 * s);
 			}
 
-			if (card.type === "SPELL") {
+			if (card.type === CardType.SPELL) {
 				ctx.rect(125 * s, 165 * s, 529 * s, 434 * s);
 				ctx.clip();
 				ctx.fillStyle = "grey";
@@ -1027,7 +1096,7 @@ if (typeof window == "undefined") {
 				ctx.drawImage(t, 0, 0, t.width, t.height, 125 * s, 117 * s, 529 * s, 529 * s);
 			}
 
-			if (card.type === "WEAPON") {
+			if (card.type === CardType.WEAPON) {
 				drawEllipse(ctx, 150 * s, 135 * s, 476 * s, 468 * s);
 				ctx.clip();
 				ctx.fillStyle = "grey";
@@ -1042,7 +1111,7 @@ if (typeof window == "undefined") {
 
 			drawProgress = 5;
 
-			if (card.multiClassGroup && card.type === "MINION") {
+			if (card.multiClassGroup && card.type === CardType.MINION) {
 				ctx.drawImage(getAsset(sw.multiBanner), 0, 0, 184, 369, 17 * s, 88 * s, 184 * s, 369 * s);
 			}
 
@@ -1061,7 +1130,7 @@ if (typeof window == "undefined") {
 
 			drawProgress = 6;
 
-			if (card.type === "MINION") {
+			if (card.type === CardType.MINION) {
 				if (sw.rarity) {
 					ctx.drawImage(getAsset(sw.rarity), 0, 0, 146, 146, 326 * s, 607 * s, 146 * s, 146 * s);
 				}
@@ -1075,14 +1144,14 @@ if (typeof window == "undefined") {
 				ctx.drawImage(getAsset("attack"), 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
 				ctx.drawImage(getAsset("health"), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
 
-				if (card.rarity === "LEGENDARY") {
+				if (card.rarity === Rarity.LEGENDARY) {
 					ctx.drawImage(getAsset("dragon"), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
 				}
 			}
 
 			drawProgress = 7;
 
-			if (card.type === "SPELL") {
+			if (card.type === CardType.SPELL) {
 				if (sw.rarity) {
 					ctx.drawImage(getAsset(sw.rarity), 0, 0, 149, 149, 311 * s, 607 * s, 150 * s, 150 * s);
 				}
@@ -1090,7 +1159,7 @@ if (typeof window == "undefined") {
 				ctx.drawImage(getAsset("title-spell"), 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
 			}
 
-			if (card.type === "WEAPON") {
+			if (card.type === CardType.WEAPON) {
 				if (sw.rarity) {
 					ctx.drawImage(getAsset(sw.rarity), 0, 0, 146, 144, 315 * s, 592 * s, 146 * s, 144 * s);
 				}
@@ -1103,20 +1172,19 @@ if (typeof window == "undefined") {
 
 			drawProgress = 8;
 
-
-			if (card.set !== "CORE") {
+			if (card.set !== CardSet.CORE) {
 				(function () {
 					ctx.globalCompositeOperation = "color-burn";
-					if (card.type === "MINION") {
+					if (card.type === CardType.MINION) {
 						if (card.race) {
 							ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 270 * s, 723 * s, 256 * s, 256 * s);
 						} else {
 							ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 270 * s, 735 * s, 256 * s, 256 * s);
 						}
-					} else if (card.type === "SPELL") {
+					} else if (card.type === CardType.SPELL) {
 						ctx.globalAlpha = 0.7;
 						ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 264 * s, 726 * s, 256 * s, 256 * s);
-					} else if (card.type === "WEAPON") {
+					} else if (card.type === CardType.WEAPON) {
 						ctx.globalCompositeOperation = "lighten";
 						ctx.globalAlpha = 0.07;
 						ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 264 * s, 735 * s, 256 * s, 256 * s);
@@ -1147,7 +1215,7 @@ if (typeof window == "undefined") {
 
 		drawProgress = 12;
 
-		if (card.type === "MINION") {
+		if (card.type === CardType.MINION) {
 			if (card.race) {
 				renderRaceText(ctx, s, card);
 			}
@@ -1158,14 +1226,14 @@ if (typeof window == "undefined") {
 
 		drawProgress = 13;
 
-		if (card.type === "WEAPON") {
+		if (card.type === CardType.WEAPON) {
 			drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card.attackStyle);
 			drawNumber(ctx, 668, 994, s, card.durability || 0, 150, card.durabilityStyle);
 		}
 
 		drawProgress = 14;
 
-		if (!card.silenced || card.type !== "MINION") {
+		if (!card.silenced || card.type !== CardType.MINION) {
 			drawBodyText(ctx, s, card);
 		} else {
 			ctx.drawImage(getAsset("silence-x"), 0, 0, 410, 397, 200 * s, 660 * s, 410 * s, 397 * s);
@@ -1245,46 +1313,64 @@ if (typeof window == "undefined") {
 
 		card.sunwell = card.sunwell || {};
 
-		card.sunwell.cardBack = "frame-" + card.type.toLowerCase() + "-" + card.playerClass.toLowerCase();
+		function cleanEnum(val, e) {
+			if (typeof val === "string") {
+				if (val in e) {
+					return e[val];
+				} else {
+					return e["INVALID"];
+				}
+			}
+			return val;
+		}
+		card.multiClassGroup = cleanEnum(card.multiClassGroup, MultiClassGroup);
+		card.playerClass = cleanEnum(card.playerClass, CardClass);
+		card.race = cleanEnum(card.race, Race);
+		card.type = cleanEnum(card.type, CardType)
+
+		var sclass = lookup(CardClass, card.playerClass);
+		var srarity = lookup(Rarity, card.rarity);
+		var stype = lookup(CardType, card.type);
+
+		card.sunwell.cardBack = "frame-" + stype.toLowerCase() + "-" + sclass.toLowerCase();
 		loadList.push(card.sunwell.cardBack);
 		loadList.push("gem");
 
-		if (card.type === "MINION") {
+		if (card.type === CardType.MINION) {
 			loadList.push("attack", "title");
 
-			if (card.rarity === "LEGENDARY") {
+			if (card.rarity === Rarity.LEGENDARY) {
 				loadList.push("dragon");
 			}
 
-			if (card.rarity !== "FREE" && !(card.rarity === "COMMON" && card.set === "CORE")) {
-				card.sunwell.rarity = "rarity-" + card.rarity.toLowerCase();
+			if (card.rarity !== Rarity.FREE && !(card.rarity === Rarity.COMMON && card.set === CardSet.CORE)) {
+				card.sunwell.rarity = "rarity-" + srarity.toLowerCase();
 				loadList.push(card.sunwell.rarity);
 			}
 		}
 
-		if (card.type === "SPELL") {
+		if (card.type === CardType.SPELL) {
 			loadList.push("attack", "title-spell");
 
-			if (card.rarity !== "FREE" && !(card.rarity === "COMMON" && card.set === "CORE")) {
-				card.sunwell.rarity = "spell-rarity-" + card.rarity.toLowerCase();
+			if (card.rarity !== Rarity.FREE && !(card.rarity === Rarity.COMMON && card.set === CardSet.CORE)) {
+				card.sunwell.rarity = "spell-rarity-" + srarity.toLowerCase();
 				loadList.push(card.sunwell.rarity);
 			}
 		}
 
-		if (card.type === "WEAPON") {
+		if (card.type === CardType.WEAPON) {
 			loadList.push("swords", "shield", "title-weapon");
 
-			if (card.rarity !== "FREE" && !(card.rarity === "COMMON" && card.set === "CORE")) {
-				card.sunwell.rarity = "weapon-rarity-" + card.rarity.toLowerCase();
+			if (card.rarity !== Rarity.FREE && !(card.rarity === Rarity.COMMON && card.set === CardSet.CORE)) {
+				card.sunwell.rarity = "weapon-rarity-" + srarity.toLowerCase();
 				loadList.push(card.sunwell.rarity);
 			}
 		}
 
-
-		if (["BRM", "GVG", "KARA", "LOE", "NAXX", "TGT", "OG", "GANGS"].indexOf(card.set) === -1) {
-			card.sunwell.bgLogo = "set-classic";
+		if (card.set in CardSet) {
+			card.sunwell.bgLogo = "set-" + scardset.toLowerCase();
 		} else {
-			card.sunwell.bgLogo = "set-" + card.set.toLowerCase();
+			card.sunwell.bgLogo = "set-classic";
 		}
 
 		loadList.push(card.sunwell.bgLogo);
@@ -1293,12 +1379,12 @@ if (typeof window == "undefined") {
 			loadList.push("race");
 		}
 
-		if (["GRIMY_GOONS", "JADE_LOTUS", "KABAL"].indexOf(card.multiClassGroup) !== -1) {
-			card.sunwell.multiBanner = "multi-" + card.multiClassGroup.toLowerCase();
+		if (card.multiClassGroup) {
+			card.sunwell.multiBanner = "multi-" + lookup(MultiClassGroup, card.multiClassGroup).toLowerCase();
 			loadList.push(card.sunwell.multiBanner);
 		}
 
-		if (typeof card.texture === "string" && card.set !== "CHEAT") {
+		if (typeof card.texture === "string" && card.set !== CardSet.CHEAT) {
 			if (s <= .5) {
 				loadList.push("h:" + card.texture);
 			} else {
@@ -1328,7 +1414,7 @@ if (typeof window == "undefined") {
 	};
 
 	sunwell.Card = function (props, width, renderTarget) {
-		var validRarity = ["COMMON", "RARE", "EPIC", "LEGENDARY"];
+		var validRarity = [Rarity.COMMON, Rarity.RARE, Rarity.EPIC, Rarity.LEGENDARY];
 
 		if (!props) {
 			throw new Error("No card properties given");
@@ -1341,7 +1427,7 @@ if (typeof window == "undefined") {
 
 		//Make compatible to tech cards
 		if (validRarity.indexOf(props.rarity) === -1) {
-			props.rarity = "FREE";
+			props.rarity = Rarity.FREE;
 		}
 
 		//Make compatible to hearthstoneJSON format.
