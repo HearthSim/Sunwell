@@ -1001,12 +1001,14 @@ if (typeof window == "undefined") {
 		sunwell.settings.platform.freeBuffer(buffer);
 	}
 
-	function draw(cvs, ctx, card, s, cardObj, internalCB) {
+	function draw(ctx, card, s, cardObj, internalCB) {
 		var sw = card.sunwell,
 			t,
 			drawTimeout,
 			drawProgress = 0,
 			renderStart = Date.now();
+
+		var cvs = cardObj.canvas;
 
 		drawTimeout = setTimeout(function () {
 			log("Drawing timeout at point " + drawProgress + " in " + card.name);
@@ -1223,10 +1225,12 @@ if (typeof window == "undefined") {
 
 		internalCB();
 
-		if (typeof cardObj.target == "function") {
-			cardObj.target(cvs);
-		} else {
-			cardObj.target.src = cvs.toDataURL();
+		if (cardObj.target) {
+			if (typeof cardObj.target == "function") {
+				cardObj.target(cvs);
+			} else {
+				cardObj.target.src = cvs.toDataURL();
+			}
 		}
 	}
 
@@ -1266,16 +1270,15 @@ if (typeof window == "undefined") {
 		card = renderInfo[0];
 		cardObj = renderInfo[1];
 
-		var cvs = cardObj._canvas;
+		var cvs = cardObj.canvas;
 		var ctx = cvs.getContext("2d");
 		var s = card.width / 764;
 		var loadList = ["silence-x", "health"];
 
 		if (card._assetsLoaded === card.width) {
-			draw(cvs, ctx, card, s, cardObj, function () {
+			draw(ctx, card, s, cardObj, function () {
 				rendering--;
 				log("Card rendered: " + card.name);
-				sunwell.settings.platform.freeBuffer(cvs);
 			});
 			return;
 		}
@@ -1377,10 +1380,9 @@ if (typeof window == "undefined") {
 		fetchAssets(loadList).then(function () {
 			log("Assets loaded for: " + card.name);
 			card._assetsLoaded = card.width;
-			draw(cvs, ctx, card, s, cardObj, function () {
+			draw(ctx, card, s, cardObj, function () {
 				rendering--;
 				log("Card rendered: " + card.name);
-				sunwell.settings.platform.freeBuffer(cvs);
 			});
 		});
 	};
@@ -1394,18 +1396,27 @@ if (typeof window == "undefined") {
 
 	sunwell.Card = function (props, width, renderTarget) {
 		var validRarity = [Rarity.COMMON, Rarity.RARE, Rarity.EPIC, Rarity.LEGENDARY];
+		var height = Math.round(width * 1.4397905759);
 
 		if (!props) {
 			throw new Error("No card properties given");
 		}
 
-		if (!renderTarget) {
-			renderTarget = new Image();
+		if (renderTarget) {
+			if (renderTarget instanceof HTMLImageElement) {
+				this.target = renderTarget;
+			} else if (renderTarget instanceof HTMLCanvasElement) {
+				this.canvas = renderTarget;
+				this.canvas.width = width;
+				this.canvas.height = height;
+			}
+		} else {
+			this.target = new Image();
 		}
-		this.target = renderTarget;
 
-		var height = Math.round(width * 1.4397905759);
-		this._canvas = sunwell.settings.platform.getBuffer(width, height, true);
+		if (!this.canvas) {
+			this.canvas = sunwell.settings.platform.getBuffer(width, height, true)
+		}
 
 		//Make compatible to tech cards
 		if (validRarity.indexOf(props.rarity) === -1) {
