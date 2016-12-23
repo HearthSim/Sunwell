@@ -119,6 +119,7 @@ Some properties are purely optional, since they are not used by sunwell, but the
 	"cost": 1,
 	"name": "Blessing of Might",
 	"playerClass": "PALADIN",
+	"elite": false,
 	"text": "Give a minion +3 Attack.",
 	"texture": "W16_a053_D"
 }

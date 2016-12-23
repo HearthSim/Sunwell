@@ -264,6 +264,7 @@ if (typeof window == "undefined") {
 		s = s + o["texture"];
 		s = s + o["type"];
 		s = s + o["width"];
+		s = s + o["elite"];
 
 		for (i = 0; i < s.length; i++) {
 			chk += (s.charCodeAt(i) * (i + 1));
@@ -736,7 +737,6 @@ if (typeof window == "undefined") {
 
 		bufferRow.height = lineHeight;
 
-
 		if (totalLength >= 75 && card.type === CardType.SPELL) {
 			smallerFirstLine = true;
 		}
@@ -1144,7 +1144,7 @@ if (typeof window == "undefined") {
 				ctx.drawImage(getAsset("attack"), 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
 				ctx.drawImage(getAsset("health"), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
 
-				if (card.rarity === Rarity.LEGENDARY) {
+				if (card.elite) {
 					ctx.drawImage(getAsset("elite"), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
 				}
 			}
@@ -1339,7 +1339,7 @@ if (typeof window == "undefined") {
 		if (card.type === CardType.MINION) {
 			loadList.push("attack", "title");
 
-			if (card.rarity === Rarity.LEGENDARY) {
+			if (card.elite) {
 				loadList.push("elite");
 			}
 
