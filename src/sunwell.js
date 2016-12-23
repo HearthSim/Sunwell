@@ -220,10 +220,7 @@ if (typeof window == "undefined") {
 	sunwell.settings.bodyFontOffset = sunwell.settings.bodyFontOffset || {x: 0, y: 0};
 	sunwell.settings.bodyLineHeight = sunwell.settings.bodyLineHeight || 50;
 	sunwell.settings.assetFolder = sunwell.settings.assetFolder || "/assets/";
-	sunwell.settings.textureFolder = sunwell.settings.textureFolder || "/artwork/";
-	sunwell.settings.smallTextureFolder = sunwell.settings.smallTextureFolder || null;
 	sunwell.settings.autoInit = sunwell.settings.autoInit || true;
-	sunwell.settings.idAsTexture = sunwell.settings.idAsTexture || false;
 	sunwell.settings.platform = sunwell.settings.platform || new WebPlatform();
 	var maxRendering = sunwell.settings.maxRendering || 12;
 
@@ -316,18 +313,15 @@ if (typeof window == "undefined") {
 				result = {},
 				key,
 				isTexture,
-				smallTexture,
 				isUrl,
 				srcURL;
 
 			for (var i = 0; i < loadAssets.length; i++) {
 				key = loadAssets[i];
 				isTexture = false;
-				smallTexture = false;
 
 				if (key.substr(0, 2) === "h:") {
 					isTexture = true;
-					smallTexture = !!(sunwell.settings.smallTextureFolder && true);
 					key = key.substr(2);
 				}
 
@@ -349,11 +343,7 @@ if (typeof window == "undefined") {
 
 					if (isTexture) {
 						assets[key].isTexture = true;
-						if (smallTexture) {
-							srcURL = sunwell.settings.smallTextureFolder + key + ".jpg";
-						} else {
-							srcURL = sunwell.settings.textureFolder + key + ".jpg";
-						}
+						srcURL = key;
 					} else {
 						srcURL = sunwell.settings.assetFolder + key + ".png";
 					}
@@ -1444,10 +1434,6 @@ if (typeof window == "undefined") {
 		}
 		if (props.gameId === undefined) {
 			props.gameId = props.id;
-		}
-
-		if (sunwell.settings.idAsTexture) {
-			props.texture = props.gameId;
 		}
 
 		props.costStyle = props.costStyle || "0";

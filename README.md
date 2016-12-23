@@ -54,8 +54,6 @@ Set up sunwell with your own settings before loading the library itself:
 			bodyBaseline: 'middle',
 			bodyFontOffset: {x: 0, y: 0},
 			assetFolder: '/assets/',
-			textureFolder: '/artworks/',
-			smallTextureFolder: '/smallArtworks/',
 			autoInit: false,
 			debug: false
 		}
@@ -104,7 +102,7 @@ The object you pass as `cardData` can be obtained for example through [Hearthsto
 	"howToEarnGolden": "Unlocked at Level 45.",
 	"howToEarn": "Unlocked at Level 1.",
 	"text": "Give a minion +3 Attack.",
-	"texture": "W16_a053_D"
+	"texture": "https://art.hearthstonejson.com/v1/512x/CS2_087.jpg"
 }
 ```
 
@@ -121,7 +119,7 @@ Some properties are purely optional, since they are not used by sunwell, but the
 	"playerClass": "PALADIN",
 	"elite": false,
 	"text": "Give a minion +3 Attack.",
-	"texture": "W16_a053_D"
+	"texture": "https://art.hearthstonejson.com/v1/512x/CS2_087.jpg"
 }
 ```
 
