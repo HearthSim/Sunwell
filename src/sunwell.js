@@ -886,12 +886,11 @@ if (typeof window == "undefined") {
 	}
 
 	/**
-	 * Prints the title of a card.
-	 * @param title
+	 * Draw the Card name
 	 */
-	function drawCardTitle(targetCtx, s, card) {
+	function drawCardName(targetCtx, s, card) {
 		var buffer = sunwell.settings.platform.getBuffer();
-		var title = card.title;
+		var name = card.name;
 		buffer.width = 1024;
 		buffer.height = 200;
 		var ctx = buffer.getContext("2d");
@@ -901,7 +900,7 @@ if (typeof window == "undefined") {
 		var pathMiddle = .58;
 		var maxWidth = 580;
 
-		//Path midpoint at t = 0.56
+		// Path midpoint at t = 0.56
 		var c = [
 			{x: 0, y: 110},
 			{x: 102, y: 137},
@@ -950,8 +949,8 @@ if (typeof window == "undefined") {
 			fontSize -= 1;
 			ctx.font = fontSize + "px " + sunwell.settings.titleFont;
 			textWidth = 0;
-			for (var i = 0; i < title.length; i++) {
-				textWidth += ctx.measureText(title[i]).width + 2;
+			for (var i = 0; i < name.length; i++) {
+				textWidth += ctx.measureText(name[i]).width + 2;
 			}
 
 			textWidth *= 1.25;
@@ -959,7 +958,7 @@ if (typeof window == "undefined") {
 
 		textWidth = textWidth / maxWidth;
 		begin = pathMiddle - (textWidth / 2);
-		steps = textWidth / title.length;
+		steps = textWidth / name.length;
 
 		if (sunwell.settings.debug) {
 			ctx.save();
@@ -973,7 +972,7 @@ if (typeof window == "undefined") {
 		}
 
 		var p, t, leftPos = 0, m;
-		for (i = 0; i < title.length; i++) {
+		for (i = 0; i < name.length; i++) {
 			if (leftPos === 0) {
 				t = begin + (steps * i);
 				p = getPointOnCurve(c, t);
@@ -997,19 +996,19 @@ if (typeof window == "undefined") {
 			ctx.lineWidth = 10 * (fontSize / 50);
 			ctx.strokeStyle = "black";
 			ctx.fillStyle = "black";
-			ctx.fillText(title[i], 0, 0);
-			ctx.strokeText(title[i], 0, 0);
-			m = ctx.measureText(title[i]).width * 1.25;
+			ctx.fillText(name[i], 0, 0);
+			ctx.strokeText(name[i], 0, 0);
+			m = ctx.measureText(name[i]).width * 1.25;
 			leftPos += m;
 
-			if (["i", "f"].indexOf(title[i]) !== -1) {
+			if (["i", "f"].indexOf(name[i]) !== -1) {
 				leftPos += m * 0.1;
 			}
 
 			ctx.fillStyle = "white";
 			ctx.strokeStyle = "white";
 			ctx.lineWidth = 2.5 * (fontSize / 50);
-			ctx.fillText(title[i], 0, 0);
+			ctx.fillText(name[i], 0, 0);
 
 			ctx.restore();
 		}
@@ -1038,7 +1037,7 @@ if (typeof window == "undefined") {
 			renderStart = Date.now();
 
 		drawTimeout = setTimeout(function () {
-			log("Drawing timeout at point " + drawProgress + " in " + card.title);
+			log("Drawing timeout at point " + drawProgress + " in " + card.name);
 			log(card);
 			internalCB();
 		}, 5000);
@@ -1214,7 +1213,7 @@ if (typeof window == "undefined") {
 
 		drawProgress = 11;
 
-		drawCardTitle(ctx, s, card);
+		drawCardName(ctx, s, card);
 
 		drawProgress = 12;
 
@@ -1251,6 +1250,7 @@ if (typeof window == "undefined") {
 		log("Rendertime: " + (Date.now() - renderStart) + "ms");
 
 		internalCB();
+
 		if (typeof cardObj.target == "function") {
 			cardObj.target(cvs);
 		} else {
@@ -1302,13 +1302,13 @@ if (typeof window == "undefined") {
 		if (card._assetsLoaded === card.width) {
 			draw(cvs, ctx, card, s, cardObj, function () {
 				rendering--;
-				log("Card rendered: " + card.title);
+				log("Card rendered: " + card.name);
 				sunwell.settings.platform.freeBuffer(cvs);
 			});
 			return;
 		}
 
-		log("Preparing assets for: " + card.title);
+		log("Preparing assets for: " + card.name);
 
 		card.sunwell = card.sunwell || {};
 
@@ -1403,11 +1403,11 @@ if (typeof window == "undefined") {
 		log("Assets prepared, now loading");
 
 		fetchAssets(loadList).then(function () {
-			log("Assets loaded for: " + card.title);
+			log("Assets loaded for: " + card.name);
 			card._assetsLoaded = card.width;
 			draw(cvs, ctx, card, s, cardObj, function () {
 				rendering--;
-				log("Card rendered: " + card.title);
+				log("Card rendered: " + card.name);
 				sunwell.settings.platform.freeBuffer(cvs);
 			});
 		});
@@ -1440,10 +1440,6 @@ if (typeof window == "undefined") {
 			props.rarity = Rarity.FREE;
 		}
 
-		//Make compatible to hearthstoneJSON format.
-		if (props.title === undefined) {
-			props.title = props.name;
-		}
 		if (props.gameId === undefined) {
 			props.gameId = props.id;
 		}
@@ -1462,7 +1458,7 @@ if (typeof window == "undefined") {
 
 		this._props = props;
 
-		log("Queried render: " + props.title);
+		log("Queried render: " + props.name);
 
 		this._render = queryRender.bind(this);
 
