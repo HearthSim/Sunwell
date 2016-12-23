@@ -1245,10 +1245,8 @@ if (typeof window == "undefined") {
 
 		card.sunwell = card.sunwell || {};
 
-		card.sunwell.cardBack = card.type.substr(0, 1).toLowerCase() + card.playerClass.substr(0, 1) + card.playerClass.substr(1).toLowerCase();
-
+		card.sunwell.cardBack = "frame-" + card.type.toLowerCase() + "-" + card.playerClass.toLowerCase();
 		loadList.push(card.sunwell.cardBack);
-
 		loadList.push("gem");
 
 		if (card.type === "MINION") {
