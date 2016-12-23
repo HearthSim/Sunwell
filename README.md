@@ -157,6 +157,11 @@ Introduced by [Cho'gall](http://hearthstonelabs.com/cards#lang=enUS;detail=OG_12
 You can switch any cards cost icon by setting `costHealth: true` either when creating the card, or through the update function.
 
 
+### Hide a card's stats
+
+If you specify `"hideStats": true`, the mana cost and the attack/health/durability gems will not be rendered.
+
+
 ## Community
 
 Sunwell is a [HearthSim](http://hearthsim.info) project. All development

@@ -261,12 +261,13 @@ if (typeof window == "undefined") {
 		s = s + o["raceText"];
 		s = s + o["rarity"];
 		s = s + o["set"];
+		s = s + o["elite"];
 		s = s + o["silenced"];
 		s = s + o["costHealth"];
+		s = s + o["hideStats"];
 		s = s + o["texture"];
 		s = s + o["type"];
 		s = s + o["width"];
-		s = s + o["elite"];
 
 		for (i = 0; i < s.length; i++) {
 			chk += (s.charCodeAt(i) * (i + 1));
@@ -376,8 +377,6 @@ if (typeof window == "undefined") {
 						}
 						sunwell.settings.platform.loadAsset(assets[key], srcURL, loadedCB, errorCB);
 					})(key);
-
-
 				} else {
 					loadingTotal++;
 					if (assets[key].loaded) {
@@ -1130,8 +1129,10 @@ if (typeof window == "undefined") {
 					ctx.drawImage(getAsset("race"), 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
 				}
 
-				ctx.drawImage(getAsset("attack"), 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
-				ctx.drawImage(getAsset("health"), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
+				if (!card.hideStats) {
+					ctx.drawImage(getAsset("attack"), 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
+					ctx.drawImage(getAsset("health"), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
+				}
 
 				if (card.elite) {
 					ctx.drawImage(getAsset("elite"), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
@@ -1155,8 +1156,10 @@ if (typeof window == "undefined") {
 
 				ctx.drawImage(getAsset("title-weapon"), 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
 
-				ctx.drawImage(getAsset("swords"), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
-				ctx.drawImage(getAsset("shield"), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
+				if (!card.hideStats) {
+					ctx.drawImage(getAsset("swords"), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
+					ctx.drawImage(getAsset("shield"), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
+				}
 			}
 
 			drawProgress = 8;
@@ -1196,7 +1199,9 @@ if (typeof window == "undefined") {
 
 		drawProgress = 10;
 
-		drawNumber(ctx, 116, 170, s, card.cost || 0, 170, card.costStyle);
+		if (!card.hideStats) {
+			drawNumber(ctx, 116, 170, s, card.cost || 0, 170, card.costStyle);
+		}
 
 		drawProgress = 11;
 
@@ -1209,13 +1214,15 @@ if (typeof window == "undefined") {
 				renderRaceText(ctx, s, card);
 			}
 
-			drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card.attackStyle);
-			drawNumber(ctx, 668, 994, s, card.health || 0, 150, card.healthStyle);
+			if (!card.hideStats) {
+				drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card.attackStyle);
+				drawNumber(ctx, 668, 994, s, card.health || 0, 150, card.healthStyle);
+			}
 		}
 
 		drawProgress = 13;
 
-		if (card.type === CardType.WEAPON) {
+		if (card.type === CardType.WEAPON && !card.hideStats) {
 			drawNumber(ctx, 128, 994, s, card.attack || 0, 150, card.attackStyle);
 			drawNumber(ctx, 668, 994, s, card.durability || 0, 150, card.durabilityStyle);
 		}
