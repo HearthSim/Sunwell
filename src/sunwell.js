@@ -186,6 +186,23 @@ if (typeof window == "undefined") {
 		return assets[id] || missingImage;
 	}
 
+	function getWatermarkAsset(set) {
+		var watermarks = {}
+		watermarks[CardSet.EXPERT1] = "set-classic"
+		watermarks[CardSet.NAXX] = "set-naxx"
+		watermarks[CardSet.GVG] = "set-gvg"
+		watermarks[CardSet.BRM] = "set-brm"
+		watermarks[CardSet.TGT] = "set-tgt"
+		watermarks[CardSet.LOE] = "set-loe"
+		watermarks[CardSet.OG] = "set-og"
+		watermarks[CardSet.KARA] = "set-kara"
+		watermarks[CardSet.GANGS] = "set-gangs"
+
+		if (set in watermarks) {
+			return watermarks[set]
+		}
+	}
+
 	if (typeof window != "undefined") {
 		sunwell = window.sunwell || {};
 	} else {
@@ -1172,7 +1189,7 @@ if (typeof window == "undefined") {
 
 			drawProgress = 8;
 
-			if (card.set !== CardSet.CORE) {
+			if (card.set !== CardSet.CORE && sw.bgLogo) {
 				(function () {
 					ctx.globalCompositeOperation = "color-burn";
 					if (card.type === CardType.MINION) {
@@ -1325,12 +1342,15 @@ if (typeof window == "undefined") {
 		}
 		card.multiClassGroup = cleanEnum(card.multiClassGroup, MultiClassGroup);
 		card.playerClass = cleanEnum(card.playerClass, CardClass);
-		card.race = cleanEnum(card.race, Race);
+		card.set = cleanEnum(card.set, CardSet);
 		card.type = cleanEnum(card.type, CardType)
+		card.race = cleanEnum(card.race, Race);
 
 		var sclass = lookup(CardClass, card.playerClass);
-		var srarity = lookup(Rarity, card.rarity);
+		var scardset = lookup(CardSet, card.set);
 		var stype = lookup(CardType, card.type);
+		var srarity = lookup(Rarity, card.rarity);
+		var smulti = lookup(MultiClassGroup, card.multiClassGroup);
 
 		card.sunwell.cardBack = "frame-" + stype.toLowerCase() + "-" + sclass.toLowerCase();
 		loadList.push(card.sunwell.cardBack);
@@ -1367,20 +1387,18 @@ if (typeof window == "undefined") {
 			}
 		}
 
-		if (card.set in CardSet) {
-			card.sunwell.bgLogo = "set-" + scardset.toLowerCase();
-		} else {
-			card.sunwell.bgLogo = "set-classic";
+		var watermark = getWatermarkAsset(card.set);
+		if (watermark) {
+			card.sunwell.bgLogo = watermark;
+			loadList.push(watermark);
 		}
-
-		loadList.push(card.sunwell.bgLogo);
 
 		if (card.race) {
 			loadList.push("race");
 		}
 
 		if (card.multiClassGroup) {
-			card.sunwell.multiBanner = "multi-" + lookup(MultiClassGroup, card.multiClassGroup).toLowerCase();
+			card.sunwell.multiBanner = "multi-" + smulti.toLowerCase();
 			loadList.push(card.sunwell.multiBanner);
 		}
 
