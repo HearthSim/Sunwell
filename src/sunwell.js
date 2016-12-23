@@ -745,6 +745,10 @@ if (typeof window == "undefined") {
 
 		spaceWidth = 3;
 
+		var getFontMaterial = function() {
+			return (isBold > 0 ? "bold " : "") + (isItalic > 0 ? "italic " : "") + fontSize + "px" + bodyFontSizeExtra + " '" + sunwell.settings.bodyFont + "', sans-serif";
+		}
+
 		for (i = 0; i < words.length; i++) {
 			word = words[i];
 
@@ -767,9 +771,7 @@ if (typeof window == "undefined") {
 			for (j = 0; j < chars.length; j++) {
 				char = chars[j];
 
-				log(char + " " + char.charCodeAt(0));
-
-				if (char.charCodeAt(0) === 10) {
+				if (char === "\n") {
 					if (justLineBreak) {
 						justLineBreak = false;
 						continue;
@@ -784,30 +786,35 @@ if (typeof window == "undefined") {
 
 				justLineBreak = false;
 
-				if (char === "<") {
-					if (chars[j + 1] === "/") {
-						if (chars[j + 2] === "b") {
-							isBold--;
-							j += 3;
-						}
+				// <b>
+				if (char === "<" && chars[j + 1] === "b" && chars[j + 2] === ">") {
+					isBold++;
+					j += 2;
+					bufferRowCtx.font = getFontMaterial();
+					continue;
+				}
 
-						if (chars[j + 2] === "i") {
-							isItalic--;
-							j += 3;
-						}
-					} else {
-						if (chars[j + 1] === "b") {
-							isBold++;
-							j += 2;
-						}
+				// </b>
+				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "b" && chars[j + 3] === ">") {
+					isBold--;
+					j += 3;
+					bufferRowCtx.font = getFontMaterial();
+					continue;
+				}
 
-						if (chars[j + 1] === "i") {
-							isItalic++;
-							j += 2;
-						}
-					}
+				// <i>
+				if (char === "<" && chars[j + 1] === "i" && chars[j + 2] === ">") {
+					isItalic++;
+					j += 2;
+					bufferRowCtx.font = getFontMaterial();
+					continue;
+				}
 
-					bufferRowCtx.font = (isBold > 0 ? "bold " : "") + (isItalic > 0 ? "italic" : "") + " " + fontSize + "px" + bodyFontSizeExtra + " '" + sunwell.settings.bodyFont + "', sans-serif";
+				// </i>
+				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "i" && chars[j + 3] === ">") {
+					isItalic--;
+					j += 3;
+					bufferRowCtx.font = getFontMaterial();
 					continue;
 				}
 
