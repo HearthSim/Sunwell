@@ -1087,6 +1087,7 @@ if (typeof window == "undefined") {
 			}
 
 			if (card.type === CardType.SPELL) {
+				ctx.beginPath();
 				ctx.rect(125 * s, 165 * s, 529 * s, 434 * s);
 				ctx.clip();
 				ctx.fillStyle = "grey";
