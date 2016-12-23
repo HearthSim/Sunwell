@@ -241,26 +241,14 @@ if (typeof window == "undefined") {
 		sunwell.init();
 	}
 
-	sunwell.races = {
-		"enUS": {
-			"MURLOC": "Murloc",
-			"MECHANICAL": "Mech",
-			"BEAST": "Beast",
-			"DEMON": "Demon",
-			"PIRATE": "Pirate",
-			"DRAGON": "Dragon",
-			"TOTEM": "Totem"
-		},
-		"deDE": {
-			"MURLOC": "Murloc",
-			"MECHANICAL": "Mech",
-			"BEAST": "Wildtier",
-			"DEMON": "Dämon",
-			"PIRATE": "Pirat",
-			"DRAGON": "Drache",
-			"TOTEM": "Totem"
-		}
-	};
+	sunwell.races = {}
+	sunwell.races[Race.MURLOC] = {"enUS": "Murloc"};
+	sunwell.races[Race.MECHANICAL] = {"enUS": "Mech"};
+	sunwell.races[Race.BEAST] = {"enUS": "Beast"};
+	sunwell.races[Race.DEMON] = {"enUS": "Demon"};
+	sunwell.races[Race.PIRATE] = {"enUS": "Pirate"};
+	sunwell.races[Race.DRAGON] = {"enUS": "Dragon"};
+	sunwell.races[Race.TOTEM] = {"enUS": "Totem"};
 
 	/**
 	 * Calculate the checksum for an object.
@@ -273,7 +261,7 @@ if (typeof window == "undefined") {
 
 		s = s + o["gameId"];
 		s = s + o["playerClass"];
-		s = s + o["race"];
+		s = s + o["raceText"];
 		s = s + o["rarity"];
 		s = s + o["set"];
 		s = s + o["silenced"];
@@ -487,22 +475,15 @@ if (typeof window == "undefined") {
 		return {x: minX, y: minY, maxX: maxX, maxY: maxY, w: maxX - minX, h: maxY - minY};
 	}
 
-	function renderRaceText(targetCtx, s, card) {
-		var text, x;
-
-		if (sunwell.races[card.language]) {
-			if (sunwell.races[card.language][card.race]) {
-				text = sunwell.races[card.language][card.race];
-			} else {
-				text = card.race;
-			}
-		} else {
-			if (sunwell.races["enUS"][card.race]) {
-				text = sunwell.races["enUS"][card.race];
-			} else {
-				text = card.race;
-			}
+	function getRaceText(race, lang) {
+		if (race in sunwell.races) {
+			return sunwell.races[race]["enUS"];
 		}
+		return "";
+	}
+
+	function renderRaceText(targetCtx, s, card) {
+		var x;
 
 		var buffer = sunwell.settings.platform.getBuffer();
 		var bufferCtx = buffer.getContext("2d");
@@ -518,7 +499,7 @@ if (typeof window == "undefined") {
 
 		bufferCtx.textAlign = "left";
 
-		text = text.split("");
+		var text = card.raceText.split("");
 
 		x = 10;
 
@@ -1154,7 +1135,7 @@ if (typeof window == "undefined") {
 
 				ctx.drawImage(getAsset("title"), 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
 
-				if (card.race) {
+				if (card.raceText) {
 					ctx.drawImage(getAsset("race"), 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
 				}
 
@@ -1193,7 +1174,7 @@ if (typeof window == "undefined") {
 				(function () {
 					ctx.globalCompositeOperation = "color-burn";
 					if (card.type === CardType.MINION) {
-						if (card.race) {
+						if (card.raceText) {
 							ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 270 * s, 723 * s, 256 * s, 256 * s);
 						} else {
 							ctx.drawImage(getAsset(sw.bgLogo), 0, 0, 128, 128, 270 * s, 735 * s, 256 * s, 256 * s);
@@ -1233,7 +1214,7 @@ if (typeof window == "undefined") {
 		drawProgress = 12;
 
 		if (card.type === CardType.MINION) {
-			if (card.race) {
+			if (card.raceText) {
 				renderRaceText(ctx, s, card);
 			}
 
@@ -1330,6 +1311,10 @@ if (typeof window == "undefined") {
 
 		card.sunwell = card.sunwell || {};
 
+		if (!card.language) {
+			card.language = "enUS";
+		}
+
 		function cleanEnum(val, e) {
 			if (typeof val === "string") {
 				if (val in e) {
@@ -1351,6 +1336,10 @@ if (typeof window == "undefined") {
 		var stype = lookup(CardType, card.type);
 		var srarity = lookup(Rarity, card.rarity);
 		var smulti = lookup(MultiClassGroup, card.multiClassGroup);
+
+		if (card.type == CardType.MINION && card.race && !card.raceText) {
+			card.raceText = getRaceText(card.race, card.language);
+		}
 
 		card.sunwell.cardBack = "frame-" + stype.toLowerCase() + "-" + sclass.toLowerCase();
 		loadList.push(card.sunwell.cardBack);
@@ -1393,7 +1382,7 @@ if (typeof window == "undefined") {
 			loadList.push(watermark);
 		}
 
-		if (card.race) {
+		if (card.raceText) {
 			loadList.push("race");
 		}
 
