@@ -161,30 +161,8 @@ if (typeof window == "undefined") {
 		img.src = url;
 	}
 
-	var missingImageDataUrl, missingImage;
-
-	function generateMissingImage() {
-		var buffer = sunwell.settings.platform.getBuffer(),
-			bufferctx = buffer.getContext("2d");
-		buffer.width = buffer.height = 512;
-		bufferctx.save();
-		bufferctx.fillStyle = "grey";
-		bufferctx.fillRect(0, 0, 512, 512);
-		bufferctx.fill();
-		bufferctx.fillStyle = "red";
-		bufferctx.textAlign = "center";
-		bufferctx.textBaseline = "middle";
-		bufferctx.font = "50px " + sunwell.settings.titleFont;
-		bufferctx.fillText("missing artwork", 256, 256);
-		bufferctx.restore();
-		missingImageDataUrl = buffer.toDataURL();
-		missingImage = new Image();
-		missingImage.src = missingImageDataUrl;
-	}
-
 	function getAsset(id) {
-		// fallback to missingImage for the case where we request the "~" texture
-		return assets[id] || missingImage;
+		return assets[id];
 	}
 
 	function getWatermarkAsset(set) {
@@ -224,8 +202,6 @@ if (typeof window == "undefined") {
 	sunwell.settings.autoInit = sunwell.settings.autoInit || true;
 	sunwell.settings.platform = sunwell.settings.platform || new WebPlatform();
 	var maxRendering = sunwell.settings.maxRendering || 12;
-
-	generateMissingImage();
 
 	sunwell.settings.debug = sunwell.settings.debug || false;
 
@@ -368,13 +344,9 @@ if (typeof window == "undefined") {
 						}
 						function loadedCB() {
 							result[key] = assets[key];
-							if (!assets[key].width || !assets[key].height) {
-								assets[key].src = missingImageDataUrl;
-							}
 							completeCB();
 						}
 						function errorCB() {
-							assets[key].src = missingImageDataUrl;
 							completeCB();
 						}
 						sunwell.settings.platform.loadAsset(assets[key], srcURL, loadedCB, errorCB);
