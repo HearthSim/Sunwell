@@ -1145,7 +1145,7 @@ if (typeof window == "undefined") {
 				ctx.drawImage(getAsset("health"), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
 
 				if (card.rarity === Rarity.LEGENDARY) {
-					ctx.drawImage(getAsset("dragon"), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
+					ctx.drawImage(getAsset("elite"), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
 				}
 			}
 
@@ -1340,7 +1340,7 @@ if (typeof window == "undefined") {
 			loadList.push("attack", "title");
 
 			if (card.rarity === Rarity.LEGENDARY) {
-				loadList.push("dragon");
+				loadList.push("elite");
 			}
 
 			if (card.rarity !== Rarity.FREE && !(card.rarity === Rarity.COMMON && card.set === CardSet.CORE)) {
