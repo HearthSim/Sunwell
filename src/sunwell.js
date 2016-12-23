@@ -1277,17 +1277,12 @@ if (typeof window == "undefined") {
 		}
 	}
 
-	/**
-	 * Renders the HS-API object, you pass to this function.
-	 * @param conf
-	 * @param [resolution=512] The desired width of the rendered card.
-	 */
 	function render() {
 		if (rendering > maxRendering) {
 			return;
 		}
 
-		var card, resolution, cardObj;
+		var card, cardObj;
 
 		if (!renderQuery.length) {
 			return;
@@ -1297,15 +1292,14 @@ if (typeof window == "undefined") {
 		rendering++;
 
 		card = renderInfo[0];
-		resolution = card.width;
 		cardObj = renderInfo[1];
 
-		var cvs = sunwell.settings.platform.getBuffer(resolution, Math.round(resolution * 1.4397905759), true),
-			ctx = cvs.getContext("2d"),
-			s = resolution / 764,
-			loadList = ["silence-x", "health"];
+		var cvs = cardObj._canvas;
+		var ctx = cvs.getContext("2d");
+		var s = card.width / 764;
+		var loadList = ["silence-x", "health"];
 
-		if (card._assetsLoaded === resolution) {
+		if (card._assetsLoaded === card.width) {
 			draw(cvs, ctx, card, s, cardObj, function () {
 				rendering--;
 				log("Card rendered: " + card.title);
@@ -1408,16 +1402,15 @@ if (typeof window == "undefined") {
 
 		log("Assets prepared, now loading");
 
-		fetchAssets(loadList)
-			.then(function () {
-				log("Assets loaded for: " + card.title);
-				card._assetsLoaded = resolution;
-				draw(cvs, ctx, card, s, cardObj, function () {
-					rendering--;
-					log("Card rendered: " + card.title);
-					sunwell.settings.platform.freeBuffer(cvs);
-				});
+		fetchAssets(loadList).then(function () {
+			log("Assets loaded for: " + card.title);
+			card._assetsLoaded = card.width;
+			draw(cvs, ctx, card, s, cardObj, function () {
+				rendering--;
+				log("Card rendered: " + card.title);
+				sunwell.settings.platform.freeBuffer(cvs);
 			});
+		});
 	};
 
 	/**
@@ -1438,6 +1431,9 @@ if (typeof window == "undefined") {
 			renderTarget = new Image();
 		}
 		this.target = renderTarget;
+
+		var height = Math.round(width * 1.4397905759);
+		this._canvas = sunwell.settings.platform.getBuffer(width, height, true);
 
 		//Make compatible to tech cards
 		if (validRarity.indexOf(props.rarity) === -1) {
