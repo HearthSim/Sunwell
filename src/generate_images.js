@@ -8,9 +8,70 @@ const request = require("request");
 
 var outputDirectory = process.cwd() + "/generated_images";
 var jsonurl = "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json";
+var textureFolder = "../../512x/";
+var renderingWidth = 512;
+var ids = null;
+var debug = false;
+var overwrite = false;
+var renderSpecial = false;
 
-function fontFile (name) {
-  return
+function usage() {
+	console.log("node generate_images.js [lang1] [lang2] ...");
+	console.log("options: ");
+	console.log("        --jsonurl url: override the url where we fetch the json from.");
+	console.log("        			The url must be a template that contains '{lang}' so we can replace it afterwards.");
+	console.log('        			Defaults to "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json"');
+	console.log("        --textureFolder path: specify where the texture are located, relative to the folder of the generate_images.js script");
+	console.log('        			Defaults to ../../512x/');
+	console.log("        --renderingWidth pixels: rendering width for the cards");
+	console.log('        			Defaults to 512');
+	console.log("        --ids id1,id2: restrict rendering to the coma separated list of ids");
+	console.log("        --debug: display more debug info");
+	console.log("        --overwrite: overwrite existing files if they exist already");
+	console.log("        --renderSpecial: try to render enchantments/hero/hero power");
+	process.exit();
+}
+
+langs = [];
+
+for (var i = 2; i < process.argv.length; i++) {
+	if (process.argv[i] == "--jsonurl") {
+		if (i == process.argv.length - 1) {
+			usage();
+		}
+		i++;
+		jsonurl = process.argv[i];
+	} else if (process.argv[i] == "--textureFolder") {
+		if (i == process.argv.length - 1) {
+			usage();
+		}
+		i++;
+		textureFolder = process.argv[i];
+	} else if (process.argv[i] == "--renderingWidth") {
+		if (i == process.argv.length - 1) {
+			usage();
+		}
+		i++;
+		renderingWidth = process.argv[i] >> 0;
+	} else if (process.argv[i] == "--ids") {
+		if (i == process.argv.length - 1) {
+			usage();
+		}
+		i++;
+		ids = process.argv[i].split(",");
+	} else if (process.argv[i] == "--debug") {
+		debug = true;
+	} else if (process.argv[i] == "--overwrite") {
+		overwrite = true;
+	} else if (process.argv[i] == "--renderSpecial") {
+		renderSpecial = true;
+	} else {
+		langs.push(process.argv[i]);
+	}
+}
+
+if (langs.length == 0) {
+	usage();
 }
 
 function loadFont(name, config) {
@@ -38,6 +99,7 @@ NodePlatform.prototype.loadAsset = function(img, url, loaded, error) {
 	fs.readFile(p, function(err, data){
 		if (err) {
 			error();
+			console.log("error loading: " + url);
 			return;
 		}
 		img.src = data;
@@ -53,11 +115,11 @@ sunwell = {
 		bodyLineHeight: 55,
 		bodyFontOffset: {x: 0, y: 30},
 		assetFolder: "/assets/",
-		textureFolder: "../512x/",
+		textureFolder: textureFolder,
 		smallTextureFolder: "/smallArtworks/",
 		autoInit: true,
 		idAsTexture: true,
-		debug: false,
+		debug: debug,
 		parallel: 256,
 		platform: new NodePlatform()
 	}
@@ -66,18 +128,29 @@ sunwell = {
 require("./sunwell");
 
 function drawAllCards(json, dir) {
-	for (var i = 0; i < Math.min(json.length, 1000000); i++) {
+	for (var i = 0; i < json.length; i++) {
 		var c = json[i];
 		c.gameId = c.id;
+
+		if (ids != null && ids.indexOf(c.id) == -1) {
+			continue
+		}
+
+		if (!renderSpecial) {
+			if (c.type == "ENCHANTMENT"
+			|| c.type == "HERO"
+			|| c.type == "HERO_POWER")
+				continue;
+		}
 
 		var fileName = dir + "/card_" + c.gameId + ".png";
 		if (!c.type || !c.playerClass) {
 			// Skip
 		} else if (!fs.existsSync(__dirname + "/" + sunwell.settings.textureFolder + "/" + c.gameId + ".jpg")) {
 			// Skip
-		} else if (!fs.existsSync(fileName)) {
+		} else if (!fs.existsSync(fileName) || overwrite) {
 			(function(c, i, fileName) {
-				sunwell.createCard(c, 512, function(canvas) {
+				sunwell.createCard(c, renderingWidth, function(canvas) {
 					var out = fs.createWriteStream(fileName)
 					var stream = canvas.pngStream();
 
@@ -113,7 +186,7 @@ function generateLang(lang) {
 				const j = JSON.parse(body)
 				drawAllCards(j, dir);
 			} else {
-				console.log("Got an error while downloading json: ", error, ", status code: ", response.statusCode)
+				console.log("Got an error while downloading json: ", url, ", status code: ", response.statusCode)
 			}
 		})
 	}
@@ -124,33 +197,6 @@ function generateLang(lang) {
 }
 
 sunwell.init()
-
-function usage() {
-	console.log("node generate_images.js [lang1] [lang2] ...");
-	console.log("options: ");
-	console.log("        --jsonurl url: override the url where we fetch the json from.");
-	console.log("        			The url must be a template that contains '{lang}' so we can replace it afterwards.");
-	console.log('        			Defaults to "https://api.hearthstonejson.com/v1/latest/{lang}/cards.json"');
-	process.exit();
-}
-
-langs = [];
-
-for (var i = 2; i < process.argv.length; i++) {
-	if (process.argv[i] == "--jsonurl") {
-		if (i == process.argv.length - 1) {
-			usage();
-		}
-		i++;
-		jsonurl = process.argv[i];
-	} else {
-		langs.push(process.argv[i]);
-	}
-}
-
-if (langs.length == 0) {
-	usage();
-}
 
 loadFont("belwe-medium.ttf", {family: "Belwe-Medium"});
 loadFont("franklin-gothic.ttf", {family: "Franklin-Gothic"})
