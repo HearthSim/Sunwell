@@ -201,6 +201,7 @@ if (typeof window == "undefined") {
 	sunwell.settings.assetFolder = sunwell.settings.assetFolder || "/assets/";
 	sunwell.settings.autoInit = sunwell.settings.autoInit || true;
 	sunwell.settings.platform = sunwell.settings.platform || new WebPlatform();
+	sunwell.settings.drawTimeout = sunwell.settings.drawTimeout || 5000;
 	var maxRendering = sunwell.settings.maxRendering || 12;
 
 	sunwell.settings.debug = sunwell.settings.debug || false;
@@ -1014,7 +1015,7 @@ if (typeof window == "undefined") {
 			log("Drawing timeout at point " + drawProgress + " in " + card.name);
 			log(card);
 			internalCB();
-		}, 5000);
+		}, sunwell.settings.drawTimeout);
 
 		if (typeof card.texture === "string") {
 			t = getAsset(card.texture);
