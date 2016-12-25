@@ -93,7 +93,7 @@ if (PLATFORM_NODE) {
 	}
 
 	function lookup(obj, value) {
-		return Object.keys(obj).find(key => obj[key] === value);
+		return Object.keys(obj).find(function(k) { return obj[k] === value; });
 	}
 
 	function log(msg) {
