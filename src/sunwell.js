@@ -237,7 +237,7 @@ if (PLATFORM_NODE) {
 		var i, key, s = "";
 		var chk = 0x12345678;
 
-		s = s + o["gameId"];
+		s = s + o["id"];
 		s = s + o["playerClass"];
 		s = s + o["rarity"];
 		s = s + o["set"];
@@ -1425,10 +1425,6 @@ if (PLATFORM_NODE) {
 		//Make compatible to tech cards
 		if (validRarity.indexOf(props.rarity) === -1) {
 			props.rarity = Rarity.FREE;
-		}
-
-		if (props.gameId === undefined) {
-			props.gameId = props.id;
 		}
 
 		props.costStyle = props.costStyle || "0";
