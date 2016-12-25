@@ -205,6 +205,7 @@ if (PLATFORM_NODE) {
 	sunwell.settings.autoInit = sunwell.settings.autoInit || true;
 	sunwell.settings.platform = sunwell.settings.platform || new WebPlatform();
 	sunwell.settings.drawTimeout = sunwell.settings.drawTimeout || 5000;
+	sunwell.settings.cacheSkeleton = sunwell.settings.cacheSkeleton || false;
 	var maxRendering = sunwell.settings.maxRendering || 12;
 
 	sunwell.settings.debug = sunwell.settings.debug || false;
@@ -1174,11 +1175,11 @@ if (PLATFORM_NODE) {
 
 			drawProgress = 9;
 
-			(function () {
+			if (sunwell.settings.cacheSkeleton) {
 				var cacheImage = new Image();
 				cacheImage.src = cvs.toDataURL();
 				renderCache[card._cacheKey] = cacheImage;
-			})();
+			}
 		}
 
 		// <<<<<<<< Finished Skeleton drawing

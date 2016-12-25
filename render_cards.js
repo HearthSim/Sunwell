@@ -37,6 +37,7 @@ sunwell = {
 		autoInit: true,
 		debug: false,
 		platform: new NodePlatform(),
+		cacheSkeleton: false,
 	}
 };
 
