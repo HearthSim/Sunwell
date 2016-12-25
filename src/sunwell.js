@@ -919,8 +919,6 @@ if (PLATFORM_NODE) {
 		ctx.textBaseline = "middle";
 
 		var textWidth = maxWidth + 1;
-		var steps,
-			begin;
 
 		while (textWidth > maxWidth && fontSize > 10) {
 			fontSize -= 1;
@@ -934,8 +932,8 @@ if (PLATFORM_NODE) {
 		}
 
 		textWidth = textWidth / maxWidth;
-		begin = pathMiddle - (textWidth / 2);
-		steps = textWidth / name.length;
+		var begin = pathMiddle - (textWidth / 2);
+		var steps = textWidth / name.length;
 
 		if (sunwell.settings.debug) {
 			ctx.save();
@@ -1082,7 +1080,7 @@ if (PLATFORM_NODE) {
 
 			drawProgress = 4;
 
-			ctx.drawImage(getAsset(sw.cardBack), 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
+			ctx.drawImage(getAsset(sw.cardFrame), 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
 
 			drawProgress = 5;
 
@@ -1216,7 +1214,7 @@ if (PLATFORM_NODE) {
 
 		drawProgress = 14;
 
-		drawBodyText(ctx, s, card);
+		drawBodyText(ctx, s, card, false);
 
 		if (card.silenced && card.type === CardType.MINION) {
 			ctx.drawImage(getAsset("silence-x"), 0, 0, 410, 397, 200 * s, 660 * s, 410 * s, 397 * s);
@@ -1313,7 +1311,6 @@ if (PLATFORM_NODE) {
 		card.race = cleanEnum(card.race, Race);
 
 		var sclass = lookup(CardClass, card.playerClass);
-		var scardset = lookup(CardSet, card.set);
 		var stype = lookup(CardType, card.type);
 		var srarity = lookup(Rarity, card.rarity);
 		var smulti = lookup(MultiClassGroup, card.multiClassGroup);
@@ -1322,8 +1319,8 @@ if (PLATFORM_NODE) {
 			card.raceText = getRaceText(card.race, card.language);
 		}
 
-		card.sunwell.cardBack = "frame-" + stype.toLowerCase() + "-" + sclass.toLowerCase();
-		loadList.push(card.sunwell.cardBack);
+		card.sunwell.cardFrame = "frame-" + stype.toLowerCase() + "-" + sclass.toLowerCase();
+		loadList.push(card.sunwell.cardFrame);
 		loadList.push("gem");
 
 		if (card.type === CardType.MINION) {
@@ -1372,7 +1369,7 @@ if (PLATFORM_NODE) {
 			loadList.push(card.sunwell.multiBanner);
 		}
 
-		if (typeof card.texture === "string" && card.set !== CardSet.CHEAT) {
+		if (typeof card.texture === "string") {
 			if (s <= .5) {
 				loadList.push("h:" + card.texture);
 			} else {
@@ -1392,15 +1389,7 @@ if (PLATFORM_NODE) {
 		});
 	};
 
-	/**
-	 * This will flush sunwell"s render caches.
-	 */
-	sunwell.clearCache = function () {
-		renderCache = {};
-	};
-
 	sunwell.Card = function (props, width, renderTarget) {
-		var validRarity = [Rarity.COMMON, Rarity.RARE, Rarity.EPIC, Rarity.LEGENDARY];
 		var height = Math.round(width * 1.4397905759);
 
 		if (!props) {
@@ -1421,11 +1410,6 @@ if (PLATFORM_NODE) {
 
 		if (!this.canvas) {
 			this.canvas = sunwell.settings.platform.getBuffer(width, height, true)
-		}
-
-		//Make compatible to tech cards
-		if (validRarity.indexOf(props.rarity) === -1) {
-			props.rarity = Rarity.FREE;
 		}
 
 		props.costStyle = props.costStyle || "0";
