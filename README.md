@@ -33,9 +33,7 @@ You will need a few node dependencies and node-canvas compiled from the source f
 sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
 npm install -g node-gyp
 npm install github:automattic/node-canvas
-npm install mkdirp
-npm install promise
-npm install request
+npm install argparse promise
 ```
 
 ## Usage
