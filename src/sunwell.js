@@ -5,11 +5,14 @@
  *
  * @author Christian Engel <hello@wearekiss.com>
  */
-if (typeof window == "undefined") {
+
+var PLATFORM_NODE = (typeof window == "undefined");
+if (PLATFORM_NODE) {
 	var Promise = require("promise");
 	var Canvas = require("canvas")
 	, Image = Canvas.Image;
 }
+
 
 (function () {
 	"use strict";
@@ -100,10 +103,10 @@ if (typeof window == "undefined") {
 		console.log(msg);
 	}
 
-	var bodyFontSizeExtra = "/1em";
-	if (typeof window == "undefined") {
+	var bodyFontSizeExtra = "";
+	if (!PLATFORM_NODE) {
 		// we run in node-canvas and we dont support ctx.font="16px/1em" notation
-		bodyFontSizeExtra = "";
+		bodyFontSizeExtra = "/1em";
 	}
 
 	function WebPlatform() {
@@ -182,10 +185,10 @@ if (typeof window == "undefined") {
 		}
 	}
 
-	if (typeof window != "undefined") {
-		sunwell = window.sunwell || {};
-	} else {
+	if (PLATFORM_NODE) {
 		sunwell = global.sunwell;
+	} else {
+		sunwell = window.sunwell || {};
 	}
 
 	sunwell._renderQuery = renderQuery;
@@ -1247,10 +1250,10 @@ if (typeof window == "undefined") {
 			return;
 		}
 		render();
-		if (typeof window != "undefined") {
-			window.requestAnimationFrame(renderTick);
-		} else {
+		if (PLATFORM_NODE) {
 			setTimeout(renderTick, 16);
+		} else {
+			window.requestAnimationFrame(renderTick);
 		}
 	}
 
@@ -1404,7 +1407,7 @@ if (typeof window == "undefined") {
 		}
 
 		if (renderTarget) {
-			if (renderTarget instanceof HTMLImageElement) {
+			if (PLATFORM_NODE || renderTarget instanceof HTMLImageElement) {
 				this.target = renderTarget;
 			} else if (renderTarget instanceof HTMLCanvasElement) {
 				this.canvas = renderTarget;
