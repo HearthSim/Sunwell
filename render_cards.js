@@ -4,6 +4,7 @@ const request = require("request");
 const path = require("path");
 const ArgumentParser = require("argparse").ArgumentParser;
 const Canvas = require("canvas");
+const Sunwell = require("./src/sunwell");
 
 
 function NodePlatform() {}
@@ -26,8 +27,7 @@ NodePlatform.prototype.loadAsset = function(img, path, loaded, error) {
 	});
 }
 
-sunwell = {
-	settings: {
+sw = new Sunwell({
 		titleFont: "Belwe",
 		bodyFont: "Franklin Gothic",
 		bodyFontSize: 42,
@@ -35,13 +35,10 @@ sunwell = {
 		bodyFontOffset: {x: 0, y: 30},
 		assetFolder: path.join(__dirname, "./src/assets/"),
 		autoInit: true,
-		debug: false,
+		debug: true,
 		platform: new NodePlatform(),
 		cacheSkeleton: false,
-	}
-};
-
-require("./src/sunwell");
+});
 
 function renderCard(card, renderPath, renderWidth, resolution) {
 	if (!card.type || !card.playerClass) {
@@ -60,7 +57,7 @@ function renderCard(card, renderPath, renderWidth, resolution) {
 		card.texture = new Canvas.Image;
 		card.texture.src = data;
 
-		sunwell.createCard(card, renderWidth, function(canvas) {
+		sw.createCard(card, renderWidth, function(canvas) {
 			var out = fs.createWriteStream(renderPath);
 			var stream = canvas.pngStream();
 
@@ -123,8 +120,6 @@ for (var i in fonts) {
 	}
 }
 
-
-sunwell.init()
 
 for (var i in args.file) {
 	var file = args.file[i];
