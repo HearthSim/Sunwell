@@ -389,7 +389,7 @@ export default class Card {
 
 		switch (this.type) {
 			case CardType.MINION:
-				assetsToLoad.push("title");
+				assetsToLoad.push("name-banner-minion");
 				if (!this.hideStats) {
 					assetsToLoad.push("attack", "health");
 				}
@@ -401,10 +401,10 @@ export default class Card {
 				}
 
 			case CardType.SPELL:
-				assetsToLoad.push("title-spell");
+				assetsToLoad.push("name-banner-spell");
 
 			case CardType.WEAPON:
-				assetsToLoad.push("title-weapon", "swords", "shield");
+				assetsToLoad.push("name-banner-weapon", "swords", "shield");
 		}
 
 		if (this.watermarkAsset) {
@@ -412,7 +412,7 @@ export default class Card {
 		}
 
 		if (this.raceText) {
-			assetsToLoad.push("race");
+			assetsToLoad.push("race-banner");
 		}
 
 		return assetsToLoad;
@@ -453,9 +453,9 @@ export default class Card {
 
 		let srarity = Rarity[this.rarity].toLowerCase();
 		switch (this.type) {
-			case CardType.MINION: return "rarity-" + srarity;
-			case CardType.SPELL: return "spell-rarity-" + srarity;
-			case CardType.WEAPON: return "weapon-rarity-" + srarity;
+			case CardType.MINION: return "rarity-minion-" + srarity;
+			case CardType.SPELL: return "rarity-spell-" + srarity;
+			case CardType.WEAPON: return "rarity-weapon-" + srarity;
 		}
 		return "";
 	}
@@ -557,10 +557,10 @@ export default class Card {
 			}
 
 			if (this.type === CardType.MINION) {
-				ctx.drawImage(this.sunwell.getAsset("title"), 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
+				ctx.drawImage(this.sunwell.getAsset("name-banner-minion"), 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
 
 				if (this.raceText) {
-					ctx.drawImage(this.sunwell.getAsset("race"), 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
+					ctx.drawImage(this.sunwell.getAsset("race-banner"), 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
 				}
 
 				if (!this.hideStats) {
@@ -576,11 +576,11 @@ export default class Card {
 			drawProgress = 7;
 
 			if (this.type === CardType.SPELL) {
-				ctx.drawImage(this.sunwell.getAsset("title-spell"), 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
+				ctx.drawImage(this.sunwell.getAsset("name-banner-spell"), 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
 			}
 
 			if (this.type === CardType.WEAPON) {
-				ctx.drawImage(this.sunwell.getAsset("title-weapon"), 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
+				ctx.drawImage(this.sunwell.getAsset("name-banner-weapon"), 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
 
 				if (!this.hideStats) {
 					ctx.drawImage(this.sunwell.getAsset("swords"), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
