@@ -287,7 +287,7 @@ export default class Card {
 				this.canvas.height = height;
 			}
 		} else {
-			this.target = new Image();
+			this.target = new this.sunwell.platform.Image();
 		}
 
 		if (!this.canvas) {
@@ -420,7 +420,7 @@ export default class Card {
 		if (!this.texture) {
 			this.sunwell.log("No card texture specified. Creating empty texture.");
 			return this.sunwell.getBuffer(1024, 1024);
-		} else if (this.texture instanceof Image) {
+		} else if (this.texture instanceof this.sunwell.platform.Image) {
 			return this.texture;
 		} else if (typeof this.texture === "string") {
 			return this.sunwell.assets[this.texture];

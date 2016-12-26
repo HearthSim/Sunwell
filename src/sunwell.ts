@@ -1,16 +1,16 @@
 import Card from "./Card";
 
-var PLATFORM_NODE = (typeof window == "undefined");
-if (PLATFORM_NODE) {
-	Promise = require("promise");
-	var Canvas = require("canvas");
-	Image = Canvas.Image;
-}
-
 
 var WebPlatform = function() {
+	this.name = "WEB";
 	this.buffers = [];
+	this.Image = Image;
+	this.Promise = Promise;
+	// The notation "16px/1em" is not supported by node-canvas
+	this.bodyFontSizeExtra = "/1em";
+	this.requestAnimationFrame = () => { window.requestAnimationFrame };
 }
+
 
 WebPlatform.prototype.getBuffer = function(width: number, height: number, clear: boolean) {
 	var cvs;
@@ -88,12 +88,7 @@ export default class Sunwell {
 		this.renderQuery = [];
 		this.activeRenders = 0;
 		this.renderCache = {};
-		this.bodyFontSizeExtra = "";
-
-		if (!PLATFORM_NODE) {
-			// we run in node-canvas and we dont support ctx.font="16px/1em" notation
-			this.bodyFontSizeExtra = "/1em";
-		}
+		this.bodyFontSizeExtra = this.options.platform.bodyFontSizeExtra;
 	}
 
 	public log(...args: any[]): void {
@@ -106,12 +101,12 @@ export default class Sunwell {
 		console.log.apply("[ERROR]", arguments);
 	}
 
-	public fetchAsset(path: string): Promise<any> {
+	public fetchAsset(path: string) {
 		var assets = this.assets;
 		var assetListeners = this.assetListeners;
 		var _this = this;
 
-		return new Promise((resolve) => {
+		return new this.options.platform.Promise((resolve) => {
 			if (assets[path] === undefined) {
 				assets[path] = new Image();
 				assets[path].crossOrigin = "Anonymous";
@@ -196,7 +191,7 @@ export default class Sunwell {
 			fetches.push(this.fetchAsset(texturesToLoad[i]));
 		}
 
-		Promise.all(fetches).then(() => {
+		this.options.platform.Promise.all(fetches).then(() => {
 			card.draw(ctx, s);
 		}).catch((e) => { this.error("Error while drawing card:", e) });
 	};
@@ -221,12 +216,7 @@ export default class Sunwell {
 	public renderTick(): void {
 		this.render();
 		let callback = this.renderTick.bind(this);
-
-		if (PLATFORM_NODE) {
-			setTimeout(callback, 16);
-		} else {
-			window.requestAnimationFrame(callback);
-		}
+		this.options.platform.requestAnimationFrame(callback);
 	}
 
 	public createCard(props, width: number, renderTarget): Card {

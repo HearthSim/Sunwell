@@ -4,10 +4,18 @@ const request = require("request");
 const path = require("path");
 const ArgumentParser = require("argparse").ArgumentParser;
 const Canvas = require("canvas");
+const Promise = require("promise");
 const Sunwell = require("./sunwell");
 
 
-function NodePlatform() {}
+function NodePlatform() {
+	this.name = "NODE";
+	this.Image = Canvas.Image;
+	this.Promise = Promise;
+	// The notation "16px/1em" is not supported by node-canvas
+	this.bodyFontSizeExtra = "";
+	this.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+}
 
 NodePlatform.prototype.getBuffer = function(width, height, clear) {
 	return new Canvas(width, height);
@@ -28,16 +36,15 @@ NodePlatform.prototype.loadAsset = function(img, path, loaded, error) {
 }
 
 sw = new Sunwell({
-		titleFont: "Belwe",
-		bodyFont: "Franklin Gothic",
-		bodyFontSize: 42,
-		bodyLineHeight: 55,
-		bodyFontOffset: {x: 0, y: 30},
-		assetFolder: path.join(__dirname, "./src/assets/"),
-		autoInit: true,
-		debug: true,
-		platform: new NodePlatform(),
-		cacheSkeleton: false,
+	titleFont: "Belwe",
+	bodyFont: "Franklin Gothic",
+	bodyFontSize: 42,
+	bodyLineHeight: 55,
+	bodyFontOffset: {x: 0, y: 30},
+	assetFolder: path.join(__dirname, "./src/assets/"),
+	debug: true,
+	platform: new NodePlatform(),
+	cacheSkeleton: false,
 });
 
 function renderCard(card, renderPath, renderWidth, resolution) {
