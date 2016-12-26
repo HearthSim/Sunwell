@@ -195,6 +195,9 @@ export default class Sunwell {
 
 		this.options.platform.Promise.all(fetches).then(() => {
 			card.draw(ctx, s);
+			if (Object.keys(this.renderQuery).length) {
+				this.renderTick();
+			}
 		}).catch((e) => { this.error("Error while drawing card:", e) });
 	};
 
