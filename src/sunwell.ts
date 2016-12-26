@@ -6,11 +6,6 @@ if (PLATFORM_NODE) {
 }
 
 
-var lookup = function(obj, value) {
-	return Object.keys(obj).find(function(k) { return obj[k] === value; });
-}
-
-
 var cleanEnum = function(val, e) {
 	if (typeof val === "string") {
 		if (val in e) {
@@ -794,10 +789,10 @@ class Sunwell {
 		card.race = cleanEnum(card.race, Race);
 		card.rarity = cleanEnum(card.rarity, Rarity);
 
-		var sclass = lookup(CardClass, card.playerClass);
-		var stype = lookup(CardType, card.type);
-		var srarity = lookup(Rarity, card.rarity);
-		var smulti = lookup(MultiClassGroup, card.multiClassGroup);
+		var sclass = CardClass[card.playerClass];
+		var stype = CardType[card.type];
+		var srarity = Rarity[card.rarity];
+		var smulti = MultiClassGroup[card.multiClassGroup];
 
 		if (card.type == CardType.MINION && card.race && !card.raceText) {
 			card.raceText = this.getRaceText(card.race, card.language);
