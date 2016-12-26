@@ -304,7 +304,6 @@ export default class Card {
 		this.healthColor = getNumberStyle(props.healthStyle);
 		this.costsHealth = props.costHealth || false;
 		this.elite = props.elite || false;
-		this.cacheKey = this.checksum();
 		this.hideStats = props.hideStats;
 		this.silenced = props.silenced || false;
 		this.language = props.language || "enUS";
@@ -348,6 +347,7 @@ export default class Card {
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
 
+		this.cacheKey = this.checksum();
 		sunwell.prepareRenderingCard(this);
 	}
 
