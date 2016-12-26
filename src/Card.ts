@@ -607,12 +607,6 @@ export default class Card {
 
 		drawProgress = 10;
 
-		if (!this.hideStats) {
-			this.drawNumber(ctx, 116, 170, s, this.cost, 170, this.costColor);
-		}
-
-		drawProgress = 11;
-
 		this.drawName(ctx, s, this.name);
 
 		drawProgress = 12;
@@ -1063,9 +1057,13 @@ export default class Card {
 	}
 
 	public drawStats(ctx, s: number): void {
-		if ((this.type === CardType.MINION || this.type === CardType.WEAPON) && !this.hideStats) {
-			this.drawNumber(ctx, 128, 994, s, this.attack, 150, this.attackColor);
-			this.drawNumber(ctx, 668, 994, s, this.health, 150, this.healthColor);
+		if (!this.hideStats) {
+			this.drawNumber(ctx, 116, 170, s, this.cost, 170, this.costColor);
+
+			if (this.type === CardType.MINION || this.type === CardType.WEAPON) {
+				this.drawNumber(ctx, 128, 994, s, this.attack, 150, this.attackColor);
+				this.drawNumber(ctx, 668, 994, s, this.health, 150, this.healthColor);
+			}
 		}
 	}
 
