@@ -6,7 +6,7 @@ var PROD = process.env.NODE_ENV === "production";
 
 module.exports = {
 	entry: {
-		sunwell: [path.join(__dirname, "src/sunwell.ts")],
+		sunwell: path.join(__dirname, "src/Sunwell.ts"),
 	},
 	output: {
 		path: path.resolve(__dirname, "dist"),
