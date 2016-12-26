@@ -1,3 +1,5 @@
+import Card from "./Card";
+
 var PLATFORM_NODE = (typeof window == "undefined");
 if (PLATFORM_NODE) {
 	Promise = require("promise");
@@ -17,31 +19,6 @@ function cleanEnum(val: string | number, e) {
 	return val;
 }
 
-
-function checksum(o: Object): number {
-	var s = "";
-	var chk = 0x12345678;
-
-	s = s + o["id"];
-	s = s + o["playerClass"];
-	s = s + o["rarity"];
-	s = s + o["set"];
-	s = s + o["elite"];
-	s = s + o["silenced"];
-	s = s + o["costHealth"];
-	s = s + o["hideStats"];
-	s = s + o["texture"];
-	s = s + o["type"];
-	s = s + o["width"];
-	// Race text is rendered separately, we only need to know that it's displayed
-	s = s + !!o["raceText"];
-
-	for (var i = 0; i < s.length; i++) {
-		chk += (s.charCodeAt(i) * (i + 1));
-	}
-
-	return chk;
-}
 
 /**
  * Get the bounding box of a canvas content.
@@ -291,7 +268,7 @@ enum MultiClassGroup {
 }
 
 
-class Sunwell {
+export default class Sunwell {
 	public options;
 	public assets;
 	public bodyFontSizeExtra;
@@ -749,6 +726,14 @@ class Sunwell {
 				resolve();
 			}
 		});
+	}
+
+	public prepareRenderingCard(card: Card, props): void {
+		this.log("Queried render:", props.name);
+		this.renderQuery.push([props, card]);
+		if (!this.activeRenders) {
+			this.renderTick();
+		}
 	}
 
 	public render(): void {
@@ -1214,51 +1199,8 @@ class Sunwell {
 		}
 	}
 
-	public Card(props, width: number, renderTarget): void {
-		var height = Math.round(width * 1.4397905759);
-
-		if (!props) {
-			throw new Error("No card properties given");
-		}
-
-		if (renderTarget) {
-			if (PLATFORM_NODE || renderTarget instanceof HTMLImageElement) {
-				this.target = renderTarget;
-			} else if (renderTarget instanceof HTMLCanvasElement) {
-				this.canvas = renderTarget;
-				this.canvas.width = width;
-				this.canvas.height = height;
-			}
-		} else {
-			this.target = new Image();
-		}
-
-		if (!this.canvas) {
-			this.canvas = this.options.platform.getBuffer(width, height, true)
-		}
-
-		props.costStyle = props.costStyle || "0";
-		props.healthStyle = props.healthStyle || "0";
-		props.attackStyle = props.attackStyle || "0";
-		props.durabilityStyle = props.durabilityStyle || "0";
-
-		props.silenced = props.silenced || false;
-		props.costHealth = props.costHealth || false;
-
-		props.width = width;
-
-		props._cacheKey = checksum(props);
-
-		this.log("Queried render:", props.name);
-
-		this.renderQuery.push([props, this]);
-		if (!this.activeRenders) {
-			this.renderTick();
-		}
-	}
-
-	public createCard(props, width: number, renderTarget): void {
-		return this.Card(props, width, renderTarget);
+	public createCard(props, width: number, renderTarget): Card {
+		return new Card(this, props, width, renderTarget);
 	}
 }
 
