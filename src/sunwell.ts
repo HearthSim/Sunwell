@@ -512,21 +512,21 @@ class Sunwell {
 
 			drawProgress = 8;
 
-			if (card.set !== CardSet.CORE && sw.bgLogo) {
+			if (card.set !== CardSet.CORE && sw.watermark) {
 				ctx.globalCompositeOperation = "color-burn";
 				if (card.type === CardType.MINION) {
 					if (card.raceText) {
-						ctx.drawImage(this.getAsset(sw.bgLogo), 0, 0, 128, 128, 270 * s, 723 * s, 256 * s, 256 * s);
+						ctx.drawImage(this.getAsset(sw.watermark), 0, 0, 128, 128, 270 * s, 723 * s, 256 * s, 256 * s);
 					} else {
-						ctx.drawImage(this.getAsset(sw.bgLogo), 0, 0, 128, 128, 270 * s, 735 * s, 256 * s, 256 * s);
+						ctx.drawImage(this.getAsset(sw.watermark), 0, 0, 128, 128, 270 * s, 735 * s, 256 * s, 256 * s);
 					}
 				} else if (card.type === CardType.SPELL) {
 					ctx.globalAlpha = 0.7;
-					ctx.drawImage(this.getAsset(sw.bgLogo), 0, 0, 128, 128, 264 * s, 726 * s, 256 * s, 256 * s);
+					ctx.drawImage(this.getAsset(sw.watermark), 0, 0, 128, 128, 264 * s, 726 * s, 256 * s, 256 * s);
 				} else if (card.type === CardType.WEAPON) {
 					ctx.globalCompositeOperation = "lighten";
 					ctx.globalAlpha = 0.07;
-					ctx.drawImage(this.getAsset(sw.bgLogo), 0, 0, 128, 128, 264 * s, 735 * s, 256 * s, 256 * s);
+					ctx.drawImage(this.getAsset(sw.watermark), 0, 0, 128, 128, 264 * s, 735 * s, 256 * s, 256 * s);
 				}
 				ctx.globalCompositeOperation = "source-over";
 				ctx.globalAlpha = 1;
@@ -840,7 +840,7 @@ class Sunwell {
 
 		var watermark = this.getWatermarkAsset(card.set);
 		if (watermark) {
-			card.sunwell.bgLogo = watermark;
+			card.sunwell.watermark = watermark;
 			assetsToLoad.push(watermark);
 		}
 
@@ -934,21 +934,19 @@ class Sunwell {
 		return "";
 	}
 
-	public getWatermarkAsset(set) {
-		var watermarks = {}
-		watermarks[CardSet.EXPERT1] = "set-classic"
-		watermarks[CardSet.NAXX] = "set-naxx"
-		watermarks[CardSet.GVG] = "set-gvg"
-		watermarks[CardSet.BRM] = "set-brm"
-		watermarks[CardSet.TGT] = "set-tgt"
-		watermarks[CardSet.LOE] = "set-loe"
-		watermarks[CardSet.OG] = "set-og"
-		watermarks[CardSet.KARA] = "set-kara"
-		watermarks[CardSet.GANGS] = "set-gangs"
-
-		if (set in watermarks) {
-			return watermarks[set]
+	public getWatermarkAsset(set: CardSet): string {
+		switch(set) {
+			case CardSet.EXPERT1: return "set-classic";
+			case CardSet.NAXX: return "set-naxx";
+			case CardSet.GVG: return "set-gvg";
+			case CardSet.BRM: return "set-brm";
+			case CardSet.TGT: return "set-tgt";
+			case CardSet.LOE: return "set-loe";
+			case CardSet.OG: return "set-og";
+			case CardSet.KARA: return "set-kara";
+			case CardSet.GANGS: return "set-gangs";
 		}
+		return "";
 	}
 
 	public drawBodyText(targetCtx, s, card, forceSmallerFirstLine) {
