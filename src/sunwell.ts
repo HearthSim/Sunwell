@@ -557,7 +557,7 @@ class Sunwell {
 
 		if (card.type === CardType.MINION) {
 			if (card.raceText) {
-				this.renderRaceText(ctx, s, card);
+				this.renderRaceText(ctx, s, card.raceText);
 			}
 
 			if (!card.hideStats) {
@@ -879,23 +879,17 @@ class Sunwell {
 		);
 	};
 
-	public renderRaceText(targetCtx, s, card) {
-		var x;
-
+	public renderRaceText(targetCtx, s: number, raceText: string) {
 		var buffer = this.options.platform.getBuffer(300, 60);
 		var bufferCtx = buffer.getContext("2d");
+		var x = 10;
+		var text = raceText.split("");
 
 		bufferCtx.font = "45px " + this.options.titleFont;
-
 		bufferCtx.lineCap = "round";
 		bufferCtx.lineJoin = "round";
 		bufferCtx.textBaseline = "hanging";
-
 		bufferCtx.textAlign = "left";
-
-		var text = card.raceText.split("");
-
-		x = 10;
 
 		for (var i = 0; i < text.length; i++) {
 			bufferCtx.lineWidth = 8;
@@ -933,7 +927,7 @@ class Sunwell {
 		return asset;
 	}
 
-	public getRaceText(race, lang) {
+	public getRaceText(race: Race, lang: string): string {
 		if (race in this.races) {
 			return this.races[race]["enUS"];
 		}
