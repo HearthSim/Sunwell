@@ -6,7 +6,7 @@ if (PLATFORM_NODE) {
 }
 
 
-var cleanEnum = function(val, e) {
+function cleanEnum(val: string | number, e) {
 	if (typeof val === "string") {
 		if (val in e) {
 			return e[val];
@@ -18,7 +18,7 @@ var cleanEnum = function(val, e) {
 }
 
 
-var checksum = function(o) {
+function checksum(o: Object): number {
 	var s = "";
 	var chk = 0x12345678;
 
@@ -108,7 +108,7 @@ function contextBoundingBox(ctx) {
 /**
  * Helper function to draw the oval mask for the cards artwork.
  */
-var drawEllipse = function(ctx, x, y, w, h) {
+function drawEllipse(ctx, x: number, y: number, w: number, h: number): void {
 	var kappa = .5522848,
 		ox = (w / 2) * kappa, // control point offset horizontal
 		oy = (h / 2) * kappa, // control point offset vertical
@@ -130,7 +130,7 @@ var drawEllipse = function(ctx, x, y, w, h) {
 /**
  * Finishes a text line and starts a new one.
  */
-var finishLine = function(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, totalWidth) {
+function finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos: number, yPos: number, totalWidth: number): [number, number] {
 	var xCalc = (totalWidth / 2) - (xPos / 2);
 
 	if (xCalc < 0) {
@@ -163,8 +163,7 @@ var finishLine = function(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, to
  * r is the rotation of the point in radians.
  * @returns {{x: (number|*), y: (number|*), r: number}}
  */
-var getPointOnCurve = function(curve, t) {
-
+function getPointOnCurve(curve, t) {
 	var rX, rY, x, y;
 
 	rX = 3 * Math.pow(1 - t, 2) * (curve[1].x - curve[0].x) + 6 * (1 - t) * t * (curve[2].x - curve[1].x) + 3 * Math.pow(t, 2) * (curve[3].x - curve[2].x);
@@ -348,24 +347,24 @@ class Sunwell {
 		}
 	}
 
-	public init() {
+	public init(): void {
 		this.ready = true;
 		if (this.renderQuery.length) {
 			this.renderTick();
 		}
 	}
 
-	public log(...args) {
+	public log(...args: any[]): void {
 		if (this.options.debug) {
 			console.log("[INFO]", arguments);
 		}
 	}
 
-	public error(...args) {
+	public error(...args: any[]): void {
 		console.log("[ERROR]", arguments);
 	}
 
-	public draw(ctx, card, s, cardObj, internalCB) {
+	public draw(ctx, card, s: number, cardObj, internalCB: Function): void {
 		var sw = card.sunwell,
 			t,
 			drawTimeout,
@@ -592,7 +591,7 @@ class Sunwell {
 		}
 	}
 
-	public drawCardName(targetCtx, s, card) {
+	public drawCardName(targetCtx, s: number, card): void {
 		var buffer = this.options.platform.getBuffer(1024, 200);
 		var name = card.name;
 		var ctx = buffer.getContext("2d");
@@ -717,12 +716,12 @@ class Sunwell {
 		this.options.platform.freeBuffer(buffer);
 	}
 
-	public fetchAsset(path) {
+	public fetchAsset(path: string): Promise<any> {
 		var assets = this.assets;
 		var assetListeners = this.assetListeners;
 		var _this = this;
 
-		return new Promise(function(resolve) {
+		return new Promise((resolve) => {
 			if (assets[path] === undefined) {
 				assets[path] = new Image();
 				assets[path].crossOrigin = "Anonymous";
@@ -752,7 +751,7 @@ class Sunwell {
 		});
 	}
 
-	public render() {
+	public render(): void {
 		if (this.activeRenders > this.options.maxActiveRenders) {
 			return;
 		}
@@ -782,12 +781,12 @@ class Sunwell {
 			card.language = "enUS";
 		}
 
-		card.multiClassGroup = cleanEnum(card.multiClassGroup, MultiClassGroup);
-		card.playerClass = cleanEnum(card.playerClass, CardClass);
-		card.set = cleanEnum(card.set, CardSet);
-		card.type = cleanEnum(card.type, CardType);
-		card.race = cleanEnum(card.race, Race);
-		card.rarity = cleanEnum(card.rarity, Rarity);
+		card.multiClassGroup = cleanEnum(card.multiClassGroup, MultiClassGroup) as MultiClassGroup;
+		card.playerClass = cleanEnum(card.playerClass, CardClass) as CardClass;
+		card.set = cleanEnum(card.set, CardSet) as CardSet;
+		card.type = cleanEnum(card.type, CardType) as CardType;
+		card.race = cleanEnum(card.race, Race) as Race;
+		card.rarity = cleanEnum(card.rarity, Rarity) as Rarity;
 
 		var sclass = CardClass[card.playerClass];
 		var stype = CardType[card.type];
@@ -874,7 +873,7 @@ class Sunwell {
 		);
 	};
 
-	public renderRaceText(targetCtx, s: number, raceText: string) {
+	public renderRaceText(targetCtx, s: number, raceText: string): void {
 		var buffer = this.options.platform.getBuffer(300, 60);
 		var bufferCtx = buffer.getContext("2d");
 		var x = 10;
@@ -909,11 +908,11 @@ class Sunwell {
 		this.options.platform.freeBuffer(buffer);
 	}
 
-	public getAssetPath(key) {
+	public getAssetPath(key: string): string {
 		return this.options.assetFolder + key + ".png";
 	}
 
-	public getAsset(key) {
+	public getAsset(key: string) {
 		var asset = this.assets[this.getAssetPath(key)];
 		if (!asset.loaded) {
 			this.error("Attempting to getAsset not loaded", asset);
@@ -944,7 +943,7 @@ class Sunwell {
 		return "";
 	}
 
-	public drawBodyText(targetCtx, s, card, forceSmallerFirstLine) {
+	public drawBodyText(targetCtx, s: number, card, forceSmallerFirstLine: boolean): void {
 		var cardText = card.text;
 
 		if (!card.text) {
@@ -1143,7 +1142,7 @@ class Sunwell {
 	 * Renders a given number to the defined position.
 	 * The x/y position should be the position on an unscaled card.
 	 */
-	public drawNumber(targetCtx, x, y, s, number, size, drawStyle) {
+	public drawNumber(targetCtx, x: number, y: number, s: number, number, size, drawStyle): void {
 		var buffer = this.options.platform.getBuffer();
 		var bufferCtx = buffer.getContext("2d");
 
@@ -1201,7 +1200,7 @@ class Sunwell {
 		this.options.platform.freeBuffer(buffer);
 	}
 
-	public renderTick() {
+	public renderTick(): void {
 		if (!this.ready) {
 			return;
 		}
@@ -1215,7 +1214,7 @@ class Sunwell {
 		}
 	}
 
-	public Card(props, width, renderTarget) {
+	public Card(props, width: number, renderTarget): void {
 		var height = Math.round(width * 1.4397905759);
 
 		if (!props) {
@@ -1258,7 +1257,7 @@ class Sunwell {
 		}
 	}
 
-	public createCard(props, width, renderTarget) {
+	public createCard(props, width: number, renderTarget): void {
 		return this.Card(props, width, renderTarget);
 	}
 }
