@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"lib": ["es6", "dom"],
+		"target": "es5",
+		"moduleResolution": "node",
+		"noLib": false,
+		"noUnusedLocals": true
+	}
+}
