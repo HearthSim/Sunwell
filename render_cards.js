@@ -4,7 +4,7 @@ const request = require("request");
 const path = require("path");
 const ArgumentParser = require("argparse").ArgumentParser;
 const Canvas = require("canvas");
-const Sunwell = require("./src/sunwell");
+const Sunwell = require("./sunwell");
 
 
 function NodePlatform() {}
