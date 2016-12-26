@@ -1,0 +1,17 @@
+{
+  "name": "sunwell",
+  "version": "0.1.0",
+  "description": "Canvas-based high quality Hearthstone card renderer",
+  "main": "src/Sunwell.ts",
+  "repository": "git@github.com:HearthSim/sunwell.git",
+  "author": "Jerome Leclanche <jerome@leclan.ch>",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^2.2.0-rc.2"
+  },
+  "dependencies": {
+    "require": "^2.4.20",
+    "ts-loader": "^1.3.3",
+    "typescript": "^2.1.4"
+  }
+}

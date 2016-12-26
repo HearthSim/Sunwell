@@ -2,8 +2,14 @@
 	"compilerOptions": {
 		"lib": ["es6", "dom"],
 		"target": "es5",
+		"module": "commonjs",
 		"moduleResolution": "node",
 		"noLib": false,
+		"isolatedModules": false,
+		"alwaysStrict": true,
 		"noUnusedLocals": true
-	}
+	},
+	"include": [
+		"./src/**/*"
+	]
 }

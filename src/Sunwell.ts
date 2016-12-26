@@ -224,4 +224,5 @@ export default class Sunwell {
 	}
 }
 
+declare var module: any;
 module.exports = Sunwell;

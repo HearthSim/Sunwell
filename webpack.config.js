@@ -14,14 +14,8 @@ module.exports = {
 		library: "Sunwell",
 		libraryTarget: "var",
 	},
-	node: {
-		canvas: "empty",
-		fs: "empty",
-		promise: "empty",
-	},
 	resolve: {
-		extensions: ["", ".webpack.js", ".web.js", ".ts", ".js"],
-		exclude: [path.resolve(__dirname, "node_modules")],
+		extensions: [".webpack.js", ".web.js", ".ts", ".js"],
 	},
 	module: {
 		loaders: [
@@ -32,7 +26,6 @@ module.exports = {
 				],
 			},
 		],
-		noParse: [path.join(__dirname, "node_modules", "canvas")],
 	},
 	target: "web",
 	plugins: PROD ? [
