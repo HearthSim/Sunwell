@@ -85,7 +85,7 @@ export default class Sunwell {
 		this.options = options;
 		this.assets = {};
 		this.assetListeners = {};
-		this.renderQuery = [];
+		this.renderQuery = {};
 		this.activeRenders = 0;
 		this.renderCache = {};
 		this.bodyFontSizeExtra = this.options.platform.bodyFontSizeExtra;
@@ -138,7 +138,7 @@ export default class Sunwell {
 
 	public prepareRenderingCard(card: Card): void {
 		this.log("Queried render:", card.name);
-		this.renderQuery.push(card);
+		this.renderQuery[card.key] = card;
 		if (!this.activeRenders) {
 			this.renderTick();
 		}
@@ -156,12 +156,14 @@ export default class Sunwell {
 		if (this.activeRenders > this.options.maxActiveRenders) {
 			return;
 		}
-
-		if (!this.renderQuery.length) {
+		let keys = Object.keys(this.renderQuery);
+		if (!keys.length) {
 			return;
 		}
 
-		let card: Card = this.renderQuery.shift();
+		let first = keys[0];
+		let card: Card = this.renderQuery[first];
+		delete this.renderQuery[first];
 		this.activeRenders++;
 
 		var cvs = card.canvas;

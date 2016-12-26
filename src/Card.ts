@@ -263,6 +263,7 @@ export default class Card {
 	public attackColor: string;
 	public healthColor: string;
 	public width: number;
+	public key: number;
 
 	private cacheKey: number;
 	private cardFrameAsset: string;
@@ -348,6 +349,7 @@ export default class Card {
 		this.texture = props.texture;
 
 		this.cacheKey = this.checksum();
+		this.key = props.key || this.cacheKey;
 		sunwell.prepareRenderingCard(this);
 	}
 
