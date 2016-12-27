@@ -389,20 +389,30 @@ export default class Card {
 
 	public getAssetsToLoad(): Array<string> {
 		var assetsToLoad: Array<string> = [this.cardFrameAsset];
-		assetsToLoad.push("gem");
+
+		if (this.costsHealth) {
+			assetsToLoad.push("health");
+		} else {
+			assetsToLoad.push("cost-mana");
+		}
+
+		if (!this.hideStats) {
+			if (this.type === CardType.MINION) {
+				assetsToLoad.push("attack", "health");
+			} else if (this.type === CardType.WEAPON) {
+				assetsToLoad.push("attack-weapon", "health-weapon");
+			}
+		}
 
 		switch (this.type) {
 			case CardType.MINION:
 				assetsToLoad.push("name-banner-minion");
-				if (!this.hideStats) {
-					assetsToLoad.push("attack", "health");
-				}
 
 			case CardType.SPELL:
 				assetsToLoad.push("name-banner-spell");
 
 			case CardType.WEAPON:
-				assetsToLoad.push("name-banner-weapon", "swords", "shield");
+				assetsToLoad.push("name-banner-weapon");
 		}
 
 		if (this.elite) assetsToLoad.push("elite");
@@ -557,7 +567,7 @@ export default class Card {
 				ctx.restore();
 			} else {
 				this.drawImage(
-					ctx, "gem",
+					ctx, "cost-mana",
 					{sWidth: 182, sHeight: 180, dx: 24, dy: 82, dWidth: 182, dHeight: 180, ratio: s}
 				);
 			}
@@ -601,8 +611,8 @@ export default class Card {
 				ctx.drawImage(this.sunwell.getAsset("name-banner-weapon"), 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
 
 				if (!this.hideStats) {
-					ctx.drawImage(this.sunwell.getAsset("swords"), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
-					ctx.drawImage(this.sunwell.getAsset("shield"), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
+					ctx.drawImage(this.sunwell.getAsset("attack-weapon"), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
+					ctx.drawImage(this.sunwell.getAsset("health-weapon"), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
 				}
 			}
 
