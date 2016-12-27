@@ -272,6 +272,7 @@ export default class Card {
 	public silenced: boolean;
 	public language: string;
 	public titleFont: string;
+	public bodyTextColor: string;
 	public costColor: string;
 	public attackColor: string;
 	public healthColor: string;
@@ -349,6 +350,7 @@ export default class Card {
 		this.attackColor = getNumberStyle(props.costStyle);
 		this.healthColor = getNumberStyle(props.healthStyle);
 		this.bodyText = props.collectionText || props.text;
+		this.bodyTextColor = (this.type === CardType.WEAPON ? "white" : "black");
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
 
@@ -737,12 +739,7 @@ export default class Card {
 			smallerFirstLine = true;
 		}
 
-		if (this.type === CardType.WEAPON) {
-			bufferRowCtx.fillStyle = "#fff";
-		} else {
-			bufferRowCtx.fillStyle = "#000";
-		}
-
+		bufferRowCtx.fillStyle = this.bodyTextColor;
 		bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
 
 		var spaceWidth = 3;
