@@ -1114,7 +1114,7 @@ export default class Card {
 			dx = 264;
 		}
 
-		let coords = {sWidth: 128, sHeight: 128, dx: dx, dy: dy, dWidth: 256, dHeight: 256, s: s};
+		let coords: Coords = {sWidth: 128, sHeight: 128, dx: dx, dy: dy, dWidth: 256, dHeight: 256, ratio: s};
 		this.drawImage(ctx, this.watermarkAsset, coords);
 
 		ctx.globalCompositeOperation = "source-over";
