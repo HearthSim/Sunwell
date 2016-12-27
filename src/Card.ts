@@ -332,15 +332,11 @@ export default class Card {
 
 		this.cardFrameAsset = this.getCardFrameAsset();
 		this.rarityGemAsset = this.getRarityGemAsset();
+		this.watermarkAsset = this.getWatermarkAsset();
 
 		if (this.multiClassGroup) {
 			let smulti = MultiClassGroup[this.multiClassGroup];
 			this.multiBannerAsset = "multi-" + smulti.toLowerCase();
-		}
-
-		let watermark = this.getWatermarkAsset();
-		if (watermark) {
-			this.watermarkAsset = watermark;
 		}
 
 		if (this.type === CardType.MINION) {
@@ -489,19 +485,16 @@ export default class Card {
 	}
 
 	public draw(ctx, s: number): void {
-		var drawProgress = 0;
 		var renderStart = Date.now();
 
 		var cvs = this.canvas;
 
 		var drawTimeout = setTimeout(() => {
-			this.sunwell.error("Drawing", this.name, "timed out at point", drawProgress);
+			this.sunwell.error("Drawing timed out", this.name);
 			this.sunwell.activeRenders--;
 		}, this.sunwell.options.drawTimeout);
 
 		let t = this.getCardArtTexture();
-
-		drawProgress = 2;
 
 		ctx.save();
 		ctx.clearRect(0, 0, cvs.width, cvs.height);
@@ -511,8 +504,6 @@ export default class Card {
 			this.sunwell.log("Skipping skeleton draw");
 			ctx.drawImage(this.sunwell.renderCache[this.cacheKey], 0, 0);
 		} else {
-			drawProgress = 3;
-
 			ctx.save();
 			if (this.type === CardType.MINION) {
 				drawEllipse(ctx, 180 * s, 75 * s, 430 * s, 590 * s);
@@ -540,14 +531,10 @@ export default class Card {
 			}
 			ctx.restore();
 
-			drawProgress = 4;
-
 			this.drawImage(
 				ctx, this.cardFrameAsset,
 				{sWidth: 764, sHeight: 1100, dx: 0, dy: 0, dWidth: cvs.width, dHeight: cvs.height, ratio: 1}
 			);
-
-			drawProgress = 5;
 
 			if (this.multiBannerAsset) {
 				this.drawImage(
@@ -571,8 +558,6 @@ export default class Card {
 					{sWidth: 182, sHeight: 180, dx: 24, dy: 82, dWidth: 182, dHeight: 180, ratio: s}
 				);
 			}
-
-			drawProgress = 6;
 
 			if (this.rarityGemAsset) {
 				this.drawRarityGem(ctx, s);
@@ -601,8 +586,6 @@ export default class Card {
 				}
 			}
 
-			drawProgress = 7;
-
 			if (this.type === CardType.SPELL) {
 				ctx.drawImage(this.sunwell.getAsset("name-banner-spell"), 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
 			}
@@ -616,13 +599,9 @@ export default class Card {
 				}
 			}
 
-			drawProgress = 8;
-
 			if (this.watermarkAsset) {
 				this.drawWatermark(ctx, s);
 			}
-
-			drawProgress = 9;
 
 			if (this.sunwell.options.cacheSkeleton) {
 				var cacheImage = new Image();
@@ -633,21 +612,13 @@ export default class Card {
 
 		// <<<<<<<< Finished Skeleton drawing
 
-		drawProgress = 10;
-
 		this.drawName(ctx, s, this.name);
 
-		drawProgress = 12;
-
 		this.drawStats(ctx, s);
-
-		drawProgress = 13;
 
 		if (this.raceText) {
 			this.drawRaceText(ctx, s, this.raceText);
 		}
-
-		drawProgress = 14;
 
 		this.drawBodyText(ctx, s, false, this.bodyText);
 
