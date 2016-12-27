@@ -492,8 +492,6 @@ export default class Card {
 			this.sunwell.activeRenders--;
 		}, this.sunwell.options.drawTimeout);
 
-		let t = this.getCardArtTexture();
-
 		ctx.save();
 		ctx.clearRect(0, 0, cvs.width, cvs.height);
 
@@ -502,32 +500,7 @@ export default class Card {
 			this.sunwell.log("Skipping skeleton draw");
 			ctx.drawImage(this.sunwell.renderCache[this.cacheKey], 0, 0);
 		} else {
-			ctx.save();
-			if (this.type === CardType.MINION) {
-				drawEllipse(ctx, 180 * s, 75 * s, 430 * s, 590 * s);
-				ctx.clip();
-				ctx.fillStyle = "grey";
-				ctx.fillRect(0, 0, 765 * s, 1100 * s);
-				ctx.drawImage(t, 0, 0, t.width, t.height, 100 * s, 75 * s, 590 * s, 590 * s);
-			}
-
-			if (this.type === CardType.SPELL) {
-				ctx.beginPath();
-				ctx.rect(125 * s, 165 * s, 529 * s, 434 * s);
-				ctx.clip();
-				ctx.fillStyle = "grey";
-				ctx.fillRect(0, 0, 765 * s, 1100 * s);
-				ctx.drawImage(t, 0, 0, t.width, t.height, 125 * s, 117 * s, 529 * s, 529 * s);
-			}
-
-			if (this.type === CardType.WEAPON) {
-				drawEllipse(ctx, 150 * s, 135 * s, 476 * s, 468 * s);
-				ctx.clip();
-				ctx.fillStyle = "grey";
-				ctx.fillRect(0, 0, 765 * s, 1100 * s);
-				ctx.drawImage(t, 0, 0, t.width, t.height, 150 * s, 135 * s, 476 * s, 476 * s);
-			}
-			ctx.restore();
+			this.drawCardArt(ctx, s);
 
 			this.drawImage(ctx, this.cardFrameAsset, {dx: 0, dy: 0, dWidth: cvs.width, dHeight: cvs.height});
 
@@ -621,6 +594,33 @@ export default class Card {
 			coords.dx * ratio, coords.dy * ratio,
 			(coords.dWidth || width) * ratio, (coords.dHeight || height) * ratio
 		);
+	}
+
+	public drawCardArt(ctx, ratio: number) {
+		let dx: number, dy: number, dWidth: number, dHeight: number;
+		let t = this.getCardArtTexture();
+
+		ctx.save();
+		switch (this.type) {
+			case CardType.MINION:
+				dx = 100, dy = 75, dWidth = 590, dHeight = 590;
+				drawEllipse(ctx, 180 * ratio, dy * ratio, 430 * ratio, dHeight * ratio);
+				break;
+			case CardType.SPELL:
+				dx = 125, dy = 117, dWidth = 529, dHeight = 529;
+				ctx.beginPath();
+				ctx.rect(dx * ratio, 165 * ratio, dWidth * ratio, 434 * ratio);
+				break;
+			case CardType.WEAPON:
+				dx = 150, dy = 135, dWidth = 476, dHeight = 476;
+				drawEllipse(ctx, dx * ratio, dy * ratio, dWidth * ratio, 468 * ratio);
+				break;
+		}
+		ctx.clip();
+		ctx.fillStyle = "grey";
+		ctx.fillRect(0, 0, 765 * ratio, 1100 * ratio);
+		ctx.drawImage(t, 0, 0, t.width, t.height, dx * ratio, dy * ratio, dWidth * ratio, dHeight * ratio);
+		ctx.restore();
 	}
 
 	public drawBodyText(targetCtx, s: number, forceSmallerFirstLine: boolean, text: string): void {
