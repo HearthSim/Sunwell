@@ -281,6 +281,7 @@ export default class Card {
 
 	private cacheKey: number;
 	private cardFrameAsset: string;
+	private nameBannerAsset: string;
 	private rarityGemAsset: string;
 	private multiBannerAsset: string;
 	private watermarkAsset: string;
@@ -332,6 +333,7 @@ export default class Card {
 		this.rarity = cleanEnum(props.rarity, Rarity) as Rarity;
 
 		this.cardFrameAsset = this.getCardFrameAsset();
+		this.nameBannerAsset = this.getNameBannerAsset();
 		this.rarityGemAsset = this.getRarityGemAsset();
 		this.watermarkAsset = this.getWatermarkAsset();
 
@@ -386,7 +388,9 @@ export default class Card {
 	}
 
 	public getAssetsToLoad(): Array<string> {
-		var assetsToLoad: Array<string> = [this.cardFrameAsset];
+		var assetsToLoad: Array<string> = [
+			this.cardFrameAsset, this.nameBannerAsset
+		];
 
 		if (this.costsHealth) {
 			assetsToLoad.push("health");
@@ -400,17 +404,6 @@ export default class Card {
 			} else if (this.type === CardType.WEAPON) {
 				assetsToLoad.push("attack-weapon", "health-weapon");
 			}
-		}
-
-		switch (this.type) {
-			case CardType.MINION:
-				assetsToLoad.push("name-banner-minion");
-
-			case CardType.SPELL:
-				assetsToLoad.push("name-banner-spell");
-
-			case CardType.WEAPON:
-				assetsToLoad.push("name-banner-weapon");
 		}
 
 		if (this.elite) assetsToLoad.push("elite");
@@ -451,13 +444,18 @@ export default class Card {
 		return "";
 	}
 
-	public getCardFrameAsset(): string {
-		var sclass = CardClass[this.cardClass].toLowerCase();
-		var stype = CardType[this.type].toLowerCase();
+	private getCardFrameAsset(): string {
+		let sclass = CardClass[this.cardClass].toLowerCase();
+		let stype = CardType[this.type].toLowerCase();
 		return "frame-" + stype + "-" + sclass;
 	}
 
-	public getRarityGemAsset(): string {
+	private getNameBannerAsset(): string {
+		let stype = CardType[this.type].toLowerCase();
+		return "name-banner-" + stype;
+	}
+
+	private getRarityGemAsset(): string {
 		if (this.rarity == Rarity.FREE || (this.rarity == Rarity.COMMON && this.set == CardSet.CORE)) {
 			return "";
 		}
@@ -471,7 +469,7 @@ export default class Card {
 		return "";
 	}
 
-	public getWatermarkAsset(): string {
+	private getWatermarkAsset(): string {
 		switch(this.set) {
 			case CardSet.EXPERT1: return "set-classic";
 			case CardSet.NAXX: return "set-naxx";
@@ -563,12 +561,9 @@ export default class Card {
 				this.drawRarityGem(ctx, s);
 			}
 
-			if (this.type === CardType.MINION) {
-				this.drawImage(
-					ctx, "name-banner-minion",
-					{sWidth: 608, sHeight: 144, dx: 94, dy: 546, dWidth: 608, dHeight: 144, ratio: s}
-				);
+			this.drawNameBanner(ctx, s);
 
+			if (this.type === CardType.MINION) {
 				if (this.raceText) {
 					this.drawImage(
 						ctx, "race-banner",
@@ -586,13 +581,7 @@ export default class Card {
 				}
 			}
 
-			if (this.type === CardType.SPELL) {
-				ctx.drawImage(this.sunwell.getAsset("name-banner-spell"), 0, 0, 646, 199, 66 * s, 530 * s, 646 * s, 199 * s);
-			}
-
 			if (this.type === CardType.WEAPON) {
-				ctx.drawImage(this.sunwell.getAsset("name-banner-weapon"), 0, 0, 660, 140, 56 * s, 551 * s, 660 * s, 140 * s);
-
 				if (!this.hideStats) {
 					ctx.drawImage(this.sunwell.getAsset("attack-weapon"), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
 					ctx.drawImage(this.sunwell.getAsset("health-weapon"), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
@@ -959,6 +948,24 @@ export default class Card {
 		}
 		targetCtx.drawImage(buffer, coords.sx, coords.sy, coords.sWidth, coords.sHeight, coords.dx, coords.dy, coords.dWidth, coords.dHeight);
 		this.sunwell.freeBuffer(buffer);
+	}
+
+	public drawNameBanner(ctx, ratio: number) {
+		let coords : Coords;
+		switch (this.type) {
+			case CardType.MINION:
+				coords = {sWidth: 608, sHeight: 144, dx: 94, dy: 546, dWidth: 608, dHeight: 144};
+				break
+			case CardType.SPELL:
+				coords = {sWidth: 646, sHeight: 199, dx: 66, dy: 530, dWidth: 646, dHeight: 199};
+				break
+			case CardType.WEAPON:
+				coords = {sWidth: 660, sHeight: 140, dx: 56, dy: 551, dWidth: 660, dHeight: 140};
+				break;
+		}
+
+		coords.ratio = ratio;
+		this.drawImage(ctx, this.nameBannerAsset, coords);
 	}
 
 	/**
