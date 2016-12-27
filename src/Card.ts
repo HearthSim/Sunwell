@@ -235,6 +235,19 @@ RaceNames[Race.DRAGON] = {"enUS": "Dragon"};
 RaceNames[Race.TOTEM] = {"enUS": "Totem"};
 
 
+interface Coords {
+	sx?: number,
+	sy?: number,
+	sWidth: number,
+	sHeight: number,
+	dx: number,
+	dy: number,
+	dWidth: number,
+	dHeight: number,
+	ratio?: number,
+}
+
+
 export default class Card {
 	public canvas;
 	public target;
@@ -533,12 +546,18 @@ export default class Card {
 
 			drawProgress = 4;
 
-			ctx.drawImage(this.sunwell.getAsset(this.cardFrameAsset), 0, 0, 764, 1100, 0, 0, cvs.width, cvs.height);
+			this.drawImage(
+				ctx, this.cardFrameAsset,
+				{sWidth: 764, sHeight: 1100, dx: 0, dy: 0, dWidth: cvs.width, dHeight: cvs.height, ratio: 1}
+			);
 
 			drawProgress = 5;
 
 			if (this.multiBannerAsset) {
-				ctx.drawImage(this.sunwell.getAsset(this.multiBannerAsset), 0, 0, 184, 369, 17 * s, 88 * s, 184 * s, 369 * s);
+				this.drawImage(
+					ctx, this.multiBannerAsset,
+					{sWidth: 184, sHeight: 369, dx: 17, dy: 88, dWidth: 184, dHeight: 369, ratio: s}
+				)
 			}
 
 			if (this.costsHealth) {
@@ -551,20 +570,29 @@ export default class Card {
 				ctx.drawImage(this.sunwell.getAsset("health"), 0, 0, 167, 218, (24 * s) - 1000, 62 * s, 167 * s, 218 * s);
 				ctx.restore();
 			} else {
-				ctx.drawImage(this.sunwell.getAsset("gem"), 0, 0, 182, 180, 24 * s, 82 * s, 182 * s, 180 * s);
+				this.drawImage(
+					ctx, "gem",
+					{sWidth: 182, sHeight: 180, dx: 24, dy: 82, dWidth: 182, dHeight: 180, ratio: s}
+				);
 			}
 
 			drawProgress = 6;
 
 			if (this.rarityGemAsset) {
-				this.drawRarityGem(ctx, s, this.sunwell.getAsset(this.rarityGemAsset));
+				this.drawRarityGem(ctx, s);
 			}
 
 			if (this.type === CardType.MINION) {
-				ctx.drawImage(this.sunwell.getAsset("name-banner-minion"), 0, 0, 608, 144, 94 * s, 546 * s, 608 * s, 144 * s);
+				this.drawImage(
+					ctx, "name-banner-minion",
+					{sWidth: 608, sHeight: 144, dx: 94, dy: 546, dWidth: 608, dHeight: 144, ratio: s}
+				);
 
 				if (this.raceText) {
-					ctx.drawImage(this.sunwell.getAsset("race-banner"), 0, 0, 529, 106, 125 * s, 937 * s, 529 * s, 106 * s);
+					this.drawImage(
+						ctx, "race-banner",
+						{sWidth: 529, sHeight: 106, dx: 125, dy: 937, dWidth: 529, dHeight: 106, ratio: s}
+					);
 				}
 
 				if (!this.hideStats) {
@@ -595,7 +623,7 @@ export default class Card {
 			drawProgress = 8;
 
 			if (this.watermarkAsset) {
-				this.drawWatermarkAsset(ctx, s, this.sunwell.getAsset(this.watermarkAsset));
+				this.drawWatermark(ctx, s);
 			}
 
 			drawProgress = 9;
@@ -628,7 +656,8 @@ export default class Card {
 		this.drawBodyText(ctx, s, false, this.bodyText);
 
 		if (this.silenced && this.type === CardType.MINION) {
-			ctx.drawImage(this.sunwell.getAsset("silence-x"), 0, 0, 410, 397, 200 * s, 660 * s, 410 * s, 397 * s);
+			let coords = {sWidth: 410, sHeight: 397, dx: 200, dy: 660, dWidth: 410, dHeight: 397, ratio: s};
+			this.drawImage(ctx, "silence-x", coords);
 		}
 
 		ctx.restore();
@@ -646,6 +675,22 @@ export default class Card {
 
 		this.sunwell.log("Finished drawing", this.name);
 		this.sunwell.activeRenders--;
+	}
+
+	private drawImage(ctx, assetKey: string, coords: Coords): void {
+		let asset = this.sunwell.getAsset(assetKey);
+		if (!asset) {
+			this.sunwell.error("Not drawing asset", assetKey);
+			return;
+		}
+		let ratio = coords.ratio || 1;
+		ctx.drawImage(
+			asset,
+			coords.sx || 0, coords.sy || 0,
+			coords.sWidth, coords.sHeight,
+			coords.dx * ratio, coords.dy * ratio,
+			coords.dWidth * ratio, coords.dHeight * ratio
+		);
 	}
 
 	public drawBodyText(targetCtx, s: number, forceSmallerFirstLine: boolean, text: string): void {
@@ -946,19 +991,14 @@ export default class Card {
 			ctx.restore();
 		}
 
-		targetCtx.drawImage(
-			buffer,
-			0,
-			0,
-			580,
-			200,
-
-			(395 - (580 / 2)) * s,
-			(725 - 200) * s,
-			580 * s,
-			200 * s
-		);
-
+		let coords: Coords = {
+			sx: 0, sy: 0,
+			sWidth: 580, sHeight: 200,
+			dx: (395 - (580 / 2)) * s,
+			dy: (725 - 200) * s,
+			dWidth: 580 * s, dHeight: 200 * s
+		}
+		targetCtx.drawImage(buffer, coords.sx, coords.sy, coords.sWidth, coords.sHeight, coords.dx, coords.dy, coords.dWidth, coords.dHeight);
 		this.sunwell.freeBuffer(buffer);
 	}
 
@@ -1043,21 +1083,22 @@ export default class Card {
 		this.sunwell.freeBuffer(buffer);
 	}
 
-	public drawRarityGem(ctx, s: number, asset: string): void {
-		let coords = [];
+	public drawRarityGem(ctx, ratio: number): void {
+		let coords: Coords;
 
 		switch(this.type) {
 			case CardType.MINION:
-				coords = [146, 146, 326, 607, 146, 146];
+				coords = {sWidth: 146, sHeight: 146, dx: 326, dy: 607, dWidth: 146, dHeight: 146};
 				break;
 			case CardType.SPELL:
-				coords = [149, 149, 311, 607, 150, 150];
+				coords = {sWidth: 149, sHeight: 149, dx: 311, dy: 607, dWidth: 150, dHeight: 150};
 				break;
 			case CardType.WEAPON:
-				coords = [149, 149, 311, 607, 150, 150];
+				coords = {sWidth: 149, sHeight: 149, dx: 311, dy: 607, dWidth: 150, dHeight: 150};
 				break;
 		}
-		ctx.drawImage(asset, 0, 0, coords[0], coords[1], coords[2] * s, coords[3] * s, coords[4] * s, coords[5] * s);
+		coords.ratio = ratio;
+		this.drawImage(ctx, this.rarityGemAsset, coords);
 	}
 
 	public drawStats(ctx, s: number): void {
@@ -1071,25 +1112,27 @@ export default class Card {
 		}
 	}
 
-	public drawWatermarkAsset(ctx, s, asset: string): void {
+	public drawWatermark(ctx, s: number): void {
+		let dx = 270;
+		let dy = 735;
+
 		ctx.globalCompositeOperation = "color-burn"; //?
 
-		let a = 270;
-		let b = 735;
-
 		if (this.type === CardType.MINION && this.raceText) {
-			a -= 12; // Shift up
+			dx -= 12; // Shift up
 		} else if (this.type === CardType.SPELL) {
 			ctx.globalAlpha = 0.7;
-			a = 264;
-			b = 726;
+			dx = 264;
+			dy = 726;
 		} else if (this.type === CardType.WEAPON) {
 			ctx.globalCompositeOperation = "lighten";
 			ctx.globalAlpha = 0.07;
-			a = 264;
+			dx = 264;
 		}
 
-		ctx.drawImage(asset, 0, 0, 128, 128, a * s, b * s, 256 * s, 256 * s);
+		let coords = {sWidth: 128, sHeight: 128, dx: dx, dy: dy, dWidth: 256, dHeight: 256, s: s};
+		this.drawImage(ctx, this.watermarkAsset, coords);
+
 		ctx.globalCompositeOperation = "source-over";
 		ctx.globalAlpha = 1;
 	}

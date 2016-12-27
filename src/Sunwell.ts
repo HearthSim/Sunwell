@@ -206,10 +206,11 @@ export default class Sunwell {
 	}
 
 	public getAsset(key: string) {
-		var asset = this.assets[this.getAssetPath(key)];
+		let path = this.getAssetPath(key);
+		let asset = this.assets[path];
 		if (!asset) {
-			this.error("Missing asset", key);
-			return
+			this.error("Missing asset", key, "at", path);
+			return;
 		}
 		if (!asset.loaded) {
 			this.error("Attempting to getAsset not loaded", asset);
