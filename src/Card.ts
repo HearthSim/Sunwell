@@ -313,13 +313,8 @@ export default class Card {
 		this.cost = props.cost || 0;
 		this.attack = props.attack || 0;
 		this.health = props.health || 0;
-		this.costColor = getNumberStyle(props.costStyle);
-		this.attackColor = getNumberStyle(props.costStyle);
-		this.healthColor = getNumberStyle(props.healthStyle);
 		this.costsHealth = props.costHealth || false;
-		this.elite = props.elite || false;
 		this.hideStats = props.hideStats;
-		this.silenced = props.silenced || false;
 		this.language = props.language || "enUS";
 		this.name = props.name || "";
 
@@ -335,10 +330,7 @@ export default class Card {
 		this.race = cleanEnum(props.race, Race) as Race;
 		this.rarity = cleanEnum(props.rarity, Rarity) as Rarity;
 
-		let rarityGem = this.getRarityGemAsset();
-		if (rarityGem) {
-			this.rarityGemAsset = rarityGem;
-		}
+		this.rarityGemAsset = this.getRarityGemAsset();
 
 		var sclass = CardClass[this.cardClass].toLowerCase();
 		var stype = CardType[this.type].toLowerCase();
@@ -355,8 +347,14 @@ export default class Card {
 		}
 
 		if (this.type === CardType.MINION) {
+			this.elite = props.elite || false;
 			this.raceText = props.raceText || this.getRaceText();
+			this.silenced = props.silenced || false;
 		}
+
+		this.costColor = getNumberStyle(props.costStyle);
+		this.attackColor = getNumberStyle(props.costStyle);
+		this.healthColor = getNumberStyle(props.healthStyle);
 		this.bodyText = props.collectionText || props.text;
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
@@ -396,21 +394,11 @@ export default class Card {
 		var assetsToLoad: Array<string> = [this.cardFrameAsset];
 		assetsToLoad.push("gem");
 
-		if (this.rarityGemAsset) {
-			assetsToLoad.push(this.rarityGemAsset);
-		}
-
 		switch (this.type) {
 			case CardType.MINION:
 				assetsToLoad.push("name-banner-minion");
 				if (!this.hideStats) {
 					assetsToLoad.push("attack", "health");
-				}
-				if (this.silenced) {
-					assetsToLoad.push("silence-x");
-				}
-				if (this.elite) {
-					assetsToLoad.push("elite");
 				}
 
 			case CardType.SPELL:
@@ -420,17 +408,12 @@ export default class Card {
 				assetsToLoad.push("name-banner-weapon", "swords", "shield");
 		}
 
-		if (this.watermarkAsset) {
-			assetsToLoad.push(this.watermarkAsset);
-		}
-
-		if (this.raceText) {
-			assetsToLoad.push("race-banner");
-		}
-
-		if (this.multiBannerAsset) {
-			assetsToLoad.push(this.multiBannerAsset);
-		}
+		if (this.elite) assetsToLoad.push("elite");
+		if (this.raceText) assetsToLoad.push("race-banner");
+		if (this.silenced) assetsToLoad.push("silence-x");
+		if (this.multiBannerAsset) assetsToLoad.push(this.multiBannerAsset);
+		if (this.rarityGemAsset) assetsToLoad.push(this.rarityGemAsset);
+		if (this.watermarkAsset) assetsToLoad.push(this.watermarkAsset);
 
 		return assetsToLoad;
 	}
@@ -655,7 +638,7 @@ export default class Card {
 
 		this.drawBodyText(ctx, s, false, this.bodyText);
 
-		if (this.silenced && this.type === CardType.MINION) {
+		if (this.silenced) {
 			let coords = {sWidth: 410, sHeight: 397, dx: 200, dy: 660, dWidth: 410, dHeight: 397, ratio: s};
 			this.drawImage(ctx, "silence-x", coords);
 		}
