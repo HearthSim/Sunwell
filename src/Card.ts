@@ -415,6 +415,10 @@ export default class Card {
 			assetsToLoad.push("race-banner");
 		}
 
+		if (this.multiBannerAsset) {
+			assetsToLoad.push(this.multiBannerAsset);
+		}
+
 		return assetsToLoad;
 	}
 
