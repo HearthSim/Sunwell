@@ -333,7 +333,7 @@ export default class Card {
 		this.cardFrameAsset = this.getCardFrameAsset();
 		this.rarityGemAsset = this.getRarityGemAsset();
 
-		if (this.multiClassGroup && this.type === CardType.MINION) {
+		if (this.multiClassGroup) {
 			let smulti = MultiClassGroup[this.multiClassGroup];
 			this.multiBannerAsset = "multi-" + smulti.toLowerCase();
 		}
