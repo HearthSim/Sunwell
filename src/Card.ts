@@ -563,29 +563,20 @@ export default class Card {
 
 			this.drawNameBanner(ctx, s);
 
-			if (this.type === CardType.MINION) {
-				if (this.raceText) {
-					this.drawImage(
-						ctx, "race-banner",
-						{sWidth: 529, sHeight: 106, dx: 125, dy: 937, dWidth: 529, dHeight: 106, ratio: s}
-					);
-				}
-
-				if (!this.hideStats) {
-					ctx.drawImage(this.sunwell.getAsset("attack"), 0, 0, 214, 238, 0, 862 * s, 214 * s, 238 * s);
-					ctx.drawImage(this.sunwell.getAsset("health"), 0, 0, 167, 218, 575 * s, 876 * s, 167 * s, 218 * s);
-				}
-
-				if (this.elite) {
-					ctx.drawImage(this.sunwell.getAsset("elite"), 0, 0, 569, 417, 196 * s, 0, 569 * s, 417 * s);
-				}
+			if (this.raceText) {
+				this.drawImage(
+					ctx, "race-banner",
+					{sWidth: 529, sHeight: 106, dx: 125, dy: 937, dWidth: 529, dHeight: 106, ratio: s}
+				);
 			}
 
-			if (this.type === CardType.WEAPON) {
-				if (!this.hideStats) {
-					ctx.drawImage(this.sunwell.getAsset("attack-weapon"), 0, 0, 312, 306, 32 * s, 906 * s, 187 * s, 183 * s);
-					ctx.drawImage(this.sunwell.getAsset("health-weapon"), 0, 0, 301, 333, 584 * s, 890 * s, 186 * s, 205 * s);
-				}
+			this.drawStatsTextures(ctx, s);
+
+			if (this.elite) {
+				this.drawImage(
+					ctx, "elite",
+					{sWidth: 569, sHeight: 417, dx: 196, dy: 0, dWidth: 529, dHeight: 417, ratio: s}
+				)
 			}
 
 			if (this.watermarkAsset) {
@@ -1074,6 +1065,33 @@ export default class Card {
 			if (this.type === CardType.MINION || this.type === CardType.WEAPON) {
 				this.drawNumber(ctx, 128, 994, s, this.attack, 150, this.attackColor);
 				this.drawNumber(ctx, 668, 994, s, this.health, 150, this.healthColor);
+			}
+		}
+	}
+
+	public drawStatsTextures(ctx, s: number): void {
+		if (!this.hideStats) {
+			switch (this.type) {
+				case CardType.MINION:
+					this.drawImage(
+						ctx, "attack",
+						{sWidth: 214, sHeight: 238, dx: 0, dy: 862, dWidth: 214, dHeight: 238, ratio: s}
+					)
+					this.drawImage(
+						ctx, "health",
+						{sWidth: 167, sHeight: 218, dx: 575, dy: 876, dWidth: 167, dHeight: 218, ratio: s}
+					)
+					break;
+				case CardType.WEAPON:
+					this.drawImage(
+						ctx, "attack-weapon",
+						{sWidth: 312, sHeight: 306, dx: 32, dy: 906, dWidth: 187, dHeight: 183, ratio: s}
+					)
+					this.drawImage(
+						ctx, "health-weapon",
+						{sWidth: 301, sHeight: 333, dx: 584, dy: 890, dWidth: 186, dHeight: 205, ratio: s}
+					)
+					break;
 			}
 		}
 	}
