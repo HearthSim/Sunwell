@@ -487,8 +487,6 @@ export default class Card {
 	}
 
 	public draw(ctx, s: number): void {
-		var renderStart = Date.now();
-
 		var cvs = this.canvas;
 
 		var drawTimeout = setTimeout(() => {
@@ -632,8 +630,6 @@ export default class Card {
 		ctx.restore();
 		clearTimeout(drawTimeout);
 
-		this.sunwell.log("Rendertime:", (Date.now() - renderStart), "milliseconds");
-
 		if (this.target) {
 			if (typeof this.target == "function") {
 				this.target(cvs);
@@ -642,7 +638,6 @@ export default class Card {
 			}
 		}
 
-		this.sunwell.log("Finished drawing", this.name);
 		this.sunwell.activeRenders--;
 	}
 

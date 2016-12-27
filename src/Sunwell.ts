@@ -194,7 +194,9 @@ export default class Sunwell {
 		}
 
 		this.options.platform.Promise.all(fetches).then(() => {
+			let start = Date.now();
 			card.draw(ctx, s);
+			this.log(card, "finished drawing in " + (Date.now() - start) + "ms");
 			if (Object.keys(this.renderQuery).length) {
 				this.renderTick();
 			}
