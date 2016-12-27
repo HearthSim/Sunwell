@@ -1,11 +1,10 @@
-#!/usr/bin/env node
 const fs = require("fs");
-const request = require("request");
 const path = require("path");
+const request = require("request");
 const ArgumentParser = require("argparse").ArgumentParser;
 const Canvas = require("canvas");
 const Promise = require("promise");
-const Sunwell = require("./sunwell");
+const Sunwell = require("../dist/node-sunwell");
 
 
 function NodePlatform() {
@@ -41,7 +40,7 @@ sw = new Sunwell({
 	bodyFontSize: 42,
 	bodyLineHeight: 55,
 	bodyFontOffset: {x: 0, y: 30},
-	assetFolder: path.join(__dirname, "./src/assets/"),
+	assetFolder: path.join(__dirname, "..", "src", "assets/"),
 	debug: true,
 	platform: new NodePlatform(),
 	cacheSkeleton: false,
