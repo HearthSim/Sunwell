@@ -330,12 +330,9 @@ export default class Card {
 		this.race = cleanEnum(props.race, Race) as Race;
 		this.rarity = cleanEnum(props.rarity, Rarity) as Rarity;
 
+		this.cardFrameAsset = this.getCardFrameAsset();
 		this.rarityGemAsset = this.getRarityGemAsset();
 
-		var sclass = CardClass[this.cardClass].toLowerCase();
-		var stype = CardType[this.type].toLowerCase();
-
-		this.cardFrameAsset = "frame-" + stype + "-" + sclass;
 		if (this.multiClassGroup && this.type === CardType.MINION) {
 			let smulti = MultiClassGroup[this.multiClassGroup];
 			this.multiBannerAsset = "multi-" + smulti.toLowerCase();
@@ -444,6 +441,12 @@ export default class Card {
 			return RaceNames[this.race][this.language];
 		}
 		return "";
+	}
+
+	public getCardFrameAsset(): string {
+		var sclass = CardClass[this.cardClass].toLowerCase();
+		var stype = CardType[this.type].toLowerCase();
+		return "frame-" + stype + "-" + sclass;
 	}
 
 	public getRarityGemAsset(): string {
