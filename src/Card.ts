@@ -238,12 +238,12 @@ RaceNames[Race.TOTEM] = {"enUS": "Totem"};
 interface Coords {
 	sx?: number,
 	sy?: number,
-	sWidth: number,
-	sHeight: number,
+	sWidth?: number,
+	sHeight?: number,
 	dx: number,
 	dy: number,
-	dWidth: number,
-	dHeight: number,
+	dWidth?: number,
+	dHeight?: number,
 	ratio?: number,
 }
 
@@ -529,16 +529,10 @@ export default class Card {
 			}
 			ctx.restore();
 
-			this.drawImage(
-				ctx, this.cardFrameAsset,
-				{sWidth: 764, sHeight: 1100, dx: 0, dy: 0, dWidth: cvs.width, dHeight: cvs.height, ratio: 1}
-			);
+			this.drawImage(ctx, this.cardFrameAsset, {dx: 0, dy: 0, dWidth: cvs.width, dHeight: cvs.height});
 
 			if (this.multiBannerAsset) {
-				this.drawImage(
-					ctx, this.multiBannerAsset,
-					{sWidth: 184, sHeight: 369, dx: 17, dy: 88, dWidth: 184, dHeight: 369, ratio: s}
-				)
+				this.drawImage(ctx, this.multiBannerAsset, {dx: 17, dy: 88, ratio: s});
 			}
 
 			if (this.costsHealth) {
@@ -551,10 +545,7 @@ export default class Card {
 				ctx.drawImage(this.sunwell.getAsset("health"), 0, 0, 167, 218, (24 * s) - 1000, 62 * s, 167 * s, 218 * s);
 				ctx.restore();
 			} else {
-				this.drawImage(
-					ctx, "cost-mana",
-					{sWidth: 182, sHeight: 180, dx: 24, dy: 82, dWidth: 182, dHeight: 180, ratio: s}
-				);
+				this.drawImage(ctx, "cost-mana", {dx: 24, dy: 82, ratio: s});
 			}
 
 			if (this.rarityGemAsset) {
@@ -564,19 +555,13 @@ export default class Card {
 			this.drawNameBanner(ctx, s);
 
 			if (this.raceText) {
-				this.drawImage(
-					ctx, "race-banner",
-					{sWidth: 529, sHeight: 106, dx: 125, dy: 937, dWidth: 529, dHeight: 106, ratio: s}
-				);
+				this.drawImage(ctx, "race-banner", {dx: 125, dy: 937, ratio: s});
 			}
 
 			this.drawStatsTextures(ctx, s);
 
 			if (this.elite) {
-				this.drawImage(
-					ctx, "elite",
-					{sWidth: 569, sHeight: 417, dx: 196, dy: 0, dWidth: 529, dHeight: 417, ratio: s}
-				)
+				this.drawImage(ctx, "elite", {dx: 196, dy: 0, dWidth: 529, ratio: s});
 			}
 
 			if (this.watermarkAsset) {
@@ -603,8 +588,7 @@ export default class Card {
 		this.drawBodyText(ctx, s, false, this.bodyText);
 
 		if (this.silenced) {
-			let coords = {sWidth: 410, sHeight: 397, dx: 200, dy: 660, dWidth: 410, dHeight: 397, ratio: s};
-			this.drawImage(ctx, "silence-x", coords);
+			this.drawImage(ctx, "silence-x", {dx: 200, dy: 660, ratio: s});
 		}
 
 		ctx.restore();
@@ -628,12 +612,14 @@ export default class Card {
 			return;
 		}
 		let ratio = coords.ratio || 1;
+		let width = coords.sWidth || asset.width;
+		let height = coords.sHeight || asset.height;
 		ctx.drawImage(
 			asset,
 			coords.sx || 0, coords.sy || 0,
-			coords.sWidth, coords.sHeight,
+			width, height,
 			coords.dx * ratio, coords.dy * ratio,
-			coords.dWidth * ratio, coords.dHeight * ratio
+			(coords.dWidth || width) * ratio, (coords.dHeight || height) * ratio
 		);
 	}
 
@@ -1041,21 +1027,20 @@ export default class Card {
 	}
 
 	public drawRarityGem(ctx, ratio: number): void {
-		let coords: Coords;
+		let dx: number, dy: number;
 
 		switch(this.type) {
 			case CardType.MINION:
-				coords = {sWidth: 146, sHeight: 146, dx: 326, dy: 607, dWidth: 146, dHeight: 146};
+				dx = 326, dy = 607;
 				break;
 			case CardType.SPELL:
-				coords = {sWidth: 149, sHeight: 149, dx: 311, dy: 607, dWidth: 150, dHeight: 150};
+				dx = 311, dy = 607;
 				break;
 			case CardType.WEAPON:
-				coords = {sWidth: 149, sHeight: 149, dx: 311, dy: 607, dWidth: 150, dHeight: 150};
+				dx = 311, dy = 607;
 				break;
 		}
-		coords.ratio = ratio;
-		this.drawImage(ctx, this.rarityGemAsset, coords);
+		this.drawImage(ctx, this.rarityGemAsset, {dx: dx, dy: dy, ratio: ratio});
 	}
 
 	public drawStats(ctx, s: number): void {
@@ -1114,8 +1099,7 @@ export default class Card {
 			dx = 264;
 		}
 
-		let coords: Coords = {sWidth: 128, sHeight: 128, dx: dx, dy: dy, dWidth: 256, dHeight: 256, ratio: s};
-		this.drawImage(ctx, this.watermarkAsset, coords);
+		this.drawImage(ctx, this.watermarkAsset, {dx: dx, dy: dy, dWidth: 256, dHeight: 256, ratio: s});
 
 		ctx.globalCompositeOperation = "source-over";
 		ctx.globalAlpha = 1;
