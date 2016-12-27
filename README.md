@@ -1,9 +1,9 @@
 # Sunwell
 
-A HTML5 canvas based renderer for hearthstone cards.
+A high quality Hearthstone card renderer in TypeScript.
 
-* Works in your browser through javascript and the &lt;canvas&gt; element.
-* Works from the command line with node and [node-canvas](https://github.com/Automattic/node-canvas).
+* Use it as a Javascript library in the browser to render to a `<canvas>` element.
+* Or in NodeJS using [node-canvas](https://github.com/Automattic/node-canvas)
 
 
 ## Download
@@ -15,159 +15,117 @@ https://sunwell.hearthsim.net/branches/master/sunwell.js
 
 ## Requirements
 
-Obviously, you need a couple of graphical assets to make this renderer work.
+The following dependencies are required to build Sunwell:
 
-I prepared a couple of skeleton assets for the cards via Photoshop, but the main card artworks are not
-included in this repository. In order to render cards, you need to obtain the card artworks and place
-them in the `/artwork` folder.
+- [Yarn](https://github.com/yarnpkg/yarn)
+- [Webpack](https://github.com/webpack/webpack)
 
-You also need to obtain a copy of the Belwe and ITC Franklin Gothic font, as its being used to render the cards title, body
-and number values. You can place the web font files in the `/font` directory. A substitute for the card body text
-font will be loaded from google fonts.
+Run `yarn install` to install the dependencies. Then, run `webpack` to build
+the project into `dist/sunwell.js`.
 
-## Running in node
+If you run `NODE_ENV=production webpack`, it will instead build a minified
+version into `dist/sunwell.min.js`.
 
-You will need a few node dependencies and node-canvas compiled from the source for `Canvas.registerFont` to be available:
+The assets in the `assets/` folder can be copied as-is.
 
-```sh
-sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
-npm install -g node-gyp
-npm install github:automattic/node-canvas
-npm install argparse promise
-```
+Sunwell currently has no runtime dependencies outside of Webpack.
+
+
+### Fonts
+
+To create faithful renders, the Belwe and Franklin Gothic proprietary fonts are required.
+Make sure to obtain a license if you wish to distribute cards rendered with them.
+
+Sunwell should work with any fallback font you give it.
+
 
 ## Usage
-Load the web fonts, used on your rendered cards through CSS, or even better: [google font loader](https://github.com/typekit/webfontloader).
 
-Set up sunwell with your own settings before loading the library itself:
-
-```javascript
-<script>
-	window.sunwell = {
-		settings: {
-			titleFont: 'Belwe',
-			bodyFont: 'ITC Franklin Condensed',
-			bodyFontSize: 24,
-			bodyLineHeight: 55,
-			bodyBaseline: 'middle',
-			bodyFontOffset: {x: 0, y: 0},
-			assetFolder: '/assets/',
-			autoInit: false,
-			debug: false
-		}
-	};
-</script>
-<script src="sunwell.js">
-```
-
-If you set `autoInit` to `false` - which I recommend; sunwell will wait with the rendering of any cards until you call
-`sunwell.init()`. Call this methods when your web fonts have been loaded.
-
-After being loaded, sunwell will provide the methods to the global object `sunwell` for you to interact with and
-generate cards from.
-
-
-### Rendering a card
-To render a specific card, you can call the method `createCard()` of the global `sunwell` object.
+Instanciate a new `Sunwell` object as such:
 
 ```js
-var cardObj = sunwell.createCard(cardData, width, [renderTarget]);
+var sunwell = new Sunwell(options);
 ```
 
-The `cardData` parameter is an object containing information about the card to be rendered. `width`
-defines the width of the card to be rendered. Sunwell provides a "native" resolution up to 764x1100
-pixels. While you can set a higher value than 764 for the desired render, it will only result in blurry
-results. The max supported resolution of sunwell is already by far greater than in the game itself.
+The `options` object is defined further down.
 
-The `renderTarget` parameter is the only one thats optional. Pass a previously created Image object
-here, to have the rendered result in there. If you don't provide such an object, sunwell will create one.
+To render a card, you can use `Sunwell.createCard(card)`.
+Sunwell aims to be compatible with [HearthstoneJSON](https://hearthstonejson.com).
+You can pass a `card` object from the HearthstoneJSON API as-is and get a usable card in return.
 
-The object you pass as `cardData` can be obtained for example through [HearthstoneJSON](https://hearthstonejson.com/).
 
-```json
-{
-	"id": "CS2_087",
-	"artist": "Zoltan Boros",
-	"set": "CORE",
-	"type": "SPELL",
-	"rarity": "FREE",
-	"cost": 1,
-	"name": "Blessing of Might",
-	"flavor": "\"As in, you MIGHT want to get out of my way.\" - Toad Mackle, recently buffed.",
-	"playRequirements": {"REQ_TARGET_TO_PLAY": 0,"REQ_MINION_TARGET": 0},
-	"collectible": true,
-	"playerClass": "PALADIN",
-	"howToEarnGolden": "Unlocked at Level 45.",
-	"howToEarn": "Unlocked at Level 1.",
-	"text": "Give a minion +3 Attack.",
-	"texture": "https://art.hearthstonejson.com/v1/512x/CS2_087.jpg"
-}
+```js
+var card = sunwell.createCard(card, width, target);
 ```
 
-Some properties are purely optional, since they are not used by sunwell, but these ones are required:
+`width` is the size of the render (height is determined automatically).
+The `target` argument should be a Canvas or Image object the render will be applied to.
 
-```json
-{
-	"id": "CS2_087",
-	"set": "CORE",
-	"type": "SPELL",
-	"rarity": "FREE",
-	"cost": 1,
-	"name": "Blessing of Might",
-	"playerClass": "PALADIN",
-	"elite": false,
-	"text": "Give a minion +3 Attack.",
-	"texture": "https://art.hearthstonejson.com/v1/512x/CS2_087.jpg"
-}
-```
-
-In case of a minion or weapon card, you also need to pass `health` (or `durability`, but health is fine for weapons, too) and/or `attack`.
-
-The method will return an object that provides an interface to manipulate the card after its creation.
-
-You can also access the image object that contains the cards image data through `cardObj.target`.
-
-If you want to update certain properties on the original `cardData`, simply call `cardObj.update()` and
-pass an object with the properties you want to overwrite.
-
-### Changing the number colors
-
-If you want to make the numbers appear green/red, you can also pass in the following properties on your card object to both
-`createCard()` and/or `cardObj.update()`:
-
-```javascript
-{
-	"costStyle": "0",
-	"attackStyle": "+",
-	"healthStyle": "-",
-	"durabilityStyle": "-"
-}
-```
-
-All the style default to "0". Setting the style to "+" makes the number appear green, setting it to "-" makes it appear red.
+Internally, Sunwell renders to a Canvas already. If you target an image, the conversion
+to PNG and compression will result in performance loss with frequent updates.
+Rendering to a Canvas is more direct, however will likely result in performance degradation
+with large amounts of cards on screen. Pick your poison.
 
 
-### Silence a minion
-To silence a minion, set `silenced: true` either when creating the card, or with the update function.
+### Sunwell options
 
-### Let a card cost health instead of mana
-Introduced by [Cho'gall](http://hearthstonelabs.com/cards#lang=enUS;detail=OG_121), cards may cost health instead of mana.
-You can switch any cards cost icon by setting `costHealth: true` either when creating the card, or through the update function.
+The following options can be forwarded to the Sunwell instance:
+
+- `debug` (boolean: `false`): If `true`, extra output will be logged.
+- `titleFont` (string: `"Belwe"`): The font to use for the card's name.
+- `bodyFont` (string: `"Franklin Gothic"`): The font to use for the card's body.
+- `assetFolder` (string: `"/assets/"`): The path to the assets folder.
+- `cacheSkeleton` (boolean: `false`): Whether to cache the card's frame render (slow).
+- `drawTimeout` (number: `5000`): The maximum amount of milliseconds Sunwell will spend
+  rendering any single card before giving up.
+- `maxActiveRenders` (number: `12`): How many concurrent renders Sunwell will perform.
 
 
-### Hide a card's stats
+### Card properties
 
-If you specify `"hideStats": true`, the mana cost and the attack/health/durability gems will not be rendered.
+The following card properties are supported:
+
+- `name` (string): The card's name
+- `text` (string): The card's body text
+- `collectionText` (string): The card's body text. Has precedence over `text`.
+- `raceText` (string): The card's race as a string. Has precedence over `race`.
+- `cost` (number): The card's cost.
+- `attack` (number): The card's attack value (has no effect for spells).
+- `health` (number): The card's health value (has no effect for spells).
+- `costsHealth` (boolean): Set to true to render the card's cost as health.
+- `hideStats` (boolean): Set to true to hide the attack/health textures and the cost value.
+- `silenced` (boolean): Set to true to show the card as silenced (card text crossed out).
+- `language` (string): The language of the card. Only used to determine the race text for enums.
+
+
+Enums are standard Hearthstone enums. They can be passed as an int (preferred) or as their
+string variant:
+
+- `type` (enum CardType): The card's type (only MINION, SPELL and WEAPON are supported).
+- `playerClass` (enum CardClass): The card's class. This determines the card frame to use.
+- `set` (enum CardSet): Determines the body text background watermark.
+- `rarity` (enum Rarity): Determines the card's rarity gem. Note that COMMON cards from the
+  CORE set will not show a rarity gem, despite not being FREE.
+- `multiClassGroup` (enum MultiClassGroup): Determines the card's multiclass banner.
+- `race` (enum Race): The card's race.
+
+Finally, a `texture` property should be passed as well, for the card art. The texture may be
+a string, in which case it's treated as a URL, or it may be an Image. If null, an empty grey
+texture will be created in its place.
+
+NOTE: Some properties only affect certain card types unless explicitly set on the card
+itself. For example, a spell or weapon will not render a race text even if given one.
 
 
 ## Community
 
-Sunwell is a [HearthSim](http://hearthsim.info) project. All development
+Sunwell is a [HearthSim](https://hearthsim.info) project. All development
 happens on our IRC channel `#hearthsim` on [Freenode](https://freenode.net).
 
 
 # License
 
-Sunwell is licensed
-[MIT](http://choosealicense.com/licenses/mit/). The full license text is
-available in the `LICENSE` file in the respective implementations' folder.
+This project is licensed under the MIT license. The full license text is
+available in the LICENSE file.
+
+The assets directory includes files that are copyright © Blizzard Entertainment.
