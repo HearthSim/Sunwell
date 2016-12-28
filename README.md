@@ -81,6 +81,7 @@ The following options can be forwarded to the Sunwell instance:
 - `drawTimeout` (number: `5000`): The maximum amount of milliseconds Sunwell will spend
   rendering any single card before giving up.
 - `maxActiveRenders` (number: `12`): How many concurrent renders Sunwell will perform.
+- `preloadedAssets` (Array<string>): A list of assets to always preload.
 
 
 ### Card properties

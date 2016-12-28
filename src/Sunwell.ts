@@ -81,6 +81,7 @@ export default class Sunwell {
 		options.drawTimeout = options.drawTimeout || 5000;
 		options.cacheSkeleton = options.cacheSkeleton || false;
 		options.maxActiveRenders = options.maxActiveRenders || 12;
+		options.preloadedAssets = options.preloadedAssets || [];
 		options.debug = options.debug || false;
 
 		this.options = options;
@@ -175,22 +176,21 @@ export default class Sunwell {
 
 		card.sunwell = card.sunwell || {};
 
-		var assetsToLoad = card.getAssetsToLoad();
-
-		var texturesToLoad = [];
+		let assetsToLoad = card.getAssetsToLoad();
+		var texturesToLoad: Array<string> = [];
 
 		if (card.texture && typeof card.texture === "string") {
 			texturesToLoad.push(card.texture);
 		}
 
-		for (var i in assetsToLoad) {
-			var path = this.getAssetPath(assetsToLoad[i]);
+		for (let i in assetsToLoad) {
+			let path = this.getAssetPath(assetsToLoad[i]);
 			if (!this.assets[path]) texturesToLoad.push(path);
 		}
 
 		this.log("Preparing to load assets");
-		var fetches = [];
-		for (var i in texturesToLoad) {
+		let fetches: Array<Function> = [];
+		for (let i in texturesToLoad) {
 			fetches.push(this.fetchAsset(texturesToLoad[i]));
 		}
 
