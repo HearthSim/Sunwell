@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const mkdirp = require("mkdirp");
 const request = require("request");
 const ArgumentParser = require("argparse").ArgumentParser;
 const Canvas = require("canvas");
@@ -119,6 +120,8 @@ function main() {
 		}
 	}
 
+	let outdir = path.resolve(args.output_dir);
+	mkdirp.sync(outdir);
 
 	for (let i in args.file) {
 		let file = args.file[i];
@@ -127,7 +130,7 @@ function main() {
 				console.log("Error reading", file, err);
 				return;
 			}
-			drawFromJSON(sunwell, data, path.resolve(args.texture_dir), path.resolve(args.output_dir), args.resolution);
+			drawFromJSON(sunwell, data, path.resolve(args.texture_dir), outdir, args.resolution);
 		});
 	}
 }
