@@ -34,19 +34,7 @@ NodePlatform.prototype.loadAsset = function(img, path, loaded, error) {
 	});
 }
 
-sw = new Sunwell({
-	titleFont: "Belwe",
-	bodyFont: "Franklin Gothic",
-	bodyFontSize: 42,
-	bodyLineHeight: 55,
-	bodyFontOffset: {x: 0, y: 30},
-	assetFolder: path.join(__dirname, "..", "src", "assets/"),
-	debug: false,
-	platform: new NodePlatform(),
-	cacheSkeleton: false,
-});
-
-function renderCard(card, path, resolution) {
+function renderCard(sunwell, card, path, resolution) {
 	if (!card.type || !card.playerClass) {
 		console.log("Skipping", card.id, "(No card to render)");
 		return;
@@ -71,12 +59,12 @@ function renderCard(card, path, resolution) {
 			stream.on("error", (chunk) => { console.log("Error writing chunk", path); })
 		}
 
-		sw.createCard(card, resolution, null, callback);
+		sunwell.createCard(card, resolution, null, callback);
 	})
 }
 
 
-function drawFromJSON(body, textureDir, outputDir, resolution) {
+function drawFromJSON(sunwell, body, textureDir, outputDir, resolution) {
 	const data = JSON.parse(body);
 	for (i in data) {
 		var card = data[i];
@@ -86,46 +74,62 @@ function drawFromJSON(body, textureDir, outputDir, resolution) {
 
 		if (!fs.existsSync(renderPath)) {
 			card.texture = texturePath;
-			renderCard(card, renderPath, resolution);
+			renderCard(sunwell, card, renderPath, resolution);
 		}
 	}
 }
-
-
-var parser = new ArgumentParser({
-	"description": "Generate card renders",
-})
-parser.addArgument("file", {"nargs": "+"});
-parser.addArgument("--font-dir", {"defaultValue": path.join(__dirname, "fonts")});
-parser.addArgument("--output-dir", {"defaultValue": path.join(__dirname, "out")});
-parser.addArgument("--texture-dir", {"defaultValue": path.join(__dirname, "textures")});
-parser.addArgument("--resolution", {"type": "int", "defaultValue": 512})
-var args = parser.parseArgs();
-
 
 fonts = [
 	{"path": "belwe/belwe-extrabold.ttf", "family": "Belwe"},
 	{"path": "franklin-gothic/franklingothic-medcd.ttf", "family": "Franklin Gothic"},
 ]
 
-for (var i in fonts) {
-	var font = fonts[i];
-	var fontPath = path.join(args.font_dir, font.path);
-	if (!fs.existsSync(fontPath)) {
-		console.log("WARNING: Font not found:", fontPath);
-	} else {
-		Canvas.registerFont(fontPath, {"family": font.family});
+
+function main() {
+	var p = new ArgumentParser({
+		"description": "Generate card renders",
+	})
+	p.addArgument("file", {"nargs": "+"});
+	p.addArgument("--assets-dir", {"defaultValue": path.join(__dirname, "..", "src", "assets")});
+	p.addArgument("--font-dir", {"defaultValue": path.join(__dirname, "fonts")});
+	p.addArgument("--output-dir", {"defaultValue": path.join(__dirname, "out")});
+	p.addArgument("--texture-dir", {"defaultValue": path.join(__dirname, "textures")});
+	p.addArgument("--resolution", {"type": "int", "defaultValue": 512});
+	var args = p.parseArgs();
+
+	var sunwell = new Sunwell({
+		titleFont: "Belwe",
+		bodyFont: "Franklin Gothic",
+		bodyFontSize: 42,
+		bodyLineHeight: 55,
+		bodyFontOffset: {x: 0, y: 30},
+		assetFolder: args.assets_dir + "/",
+		debug: false,
+		platform: new NodePlatform(),
+		cacheSkeleton: false,
+	});
+
+	for (let i in fonts) {
+		let font = fonts[i];
+		let fontPath = path.join(args.font_dir, font.path);
+		if (!fs.existsSync(fontPath)) {
+			console.log("WARNING: Font not found:", fontPath);
+		} else {
+			Canvas.registerFont(fontPath, {"family": font.family});
+		}
+	}
+
+
+	for (let i in args.file) {
+		let file = args.file[i];
+		fs.readFile(file, function(err, data) {
+			if (err) {
+				console.log("Error reading", file, err);
+				return;
+			}
+			drawFromJSON(sunwell, data, args.texture_dir, args.output_dir, args.resolution);
+		});
 	}
 }
 
-
-for (var i in args.file) {
-	var file = args.file[i];
-	fs.readFile(file, function(err, data) {
-		if (err) {
-			console.log("Error reading", file, err);
-			return;
-		}
-		drawFromJSON(data, args.texture_dir, args.output_dir, args.resolution);
-	});
-}
+main();
