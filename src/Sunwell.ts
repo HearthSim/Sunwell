@@ -216,7 +216,7 @@ export default class Sunwell {
 			return;
 		}
 		if (!asset.loaded) {
-			this.error("Attempting to getAsset not loaded", asset);
+			this.error("Attempting to getAsset not loaded", asset, path);
 			return;
 		}
 		return asset;

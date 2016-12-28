@@ -90,10 +90,10 @@ function main() {
 		"description": "Generate card renders",
 	})
 	p.addArgument("file", {"nargs": "+"});
-	p.addArgument("--assets-dir", {"defaultValue": path.join(__dirname, "..", "src", "assets")});
-	p.addArgument("--font-dir", {"defaultValue": path.join(__dirname, "fonts")});
-	p.addArgument("--output-dir", {"defaultValue": path.join(__dirname, "out")});
-	p.addArgument("--texture-dir", {"defaultValue": path.join(__dirname, "textures")});
+	p.addArgument("--assets-dir", {"defaultValue": path.resolve("..", "src", "assets")});
+	p.addArgument("--font-dir", {"defaultValue": path.resolve("fonts")});
+	p.addArgument("--output-dir", {"defaultValue": path.resolve("out")});
+	p.addArgument("--texture-dir", {"defaultValue": path.resolve("textures")});
 	p.addArgument("--resolution", {"type": "int", "defaultValue": 512});
 	var args = p.parseArgs();
 
@@ -103,7 +103,7 @@ function main() {
 		bodyFontSize: 42,
 		bodyLineHeight: 55,
 		bodyFontOffset: {x: 0, y: 30},
-		assetFolder: args.assets_dir + "/",
+		assetFolder: path.resolve(args.assets_dir) + "/",
 		debug: false,
 		platform: new NodePlatform(),
 		cacheSkeleton: false,
@@ -127,7 +127,7 @@ function main() {
 				console.log("Error reading", file, err);
 				return;
 			}
-			drawFromJSON(sunwell, data, args.texture_dir, args.output_dir, args.resolution);
+			drawFromJSON(sunwell, data, path.resolve(args.texture_dir), path.resolve(args.output_dir), args.resolution);
 		});
 	}
 }
