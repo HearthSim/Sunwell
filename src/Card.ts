@@ -542,7 +542,7 @@ export default class Card {
 			}
 
 			if (this.sunwell.options.cacheSkeleton) {
-				var cacheImage = new Image();
+				let cacheImage = new this.sunwell.options.platform.Image();
 				cacheImage.src = cvs.toDataURL();
 				this.sunwell.renderCache[this.cacheKey] = cacheImage;
 			}
