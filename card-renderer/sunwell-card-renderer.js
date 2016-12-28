@@ -55,7 +55,7 @@ function renderCard(sunwell, card, path, resolution) {
 			let out = fs.createWriteStream(path);
 			let stream = canvas.pngStream();
 			stream.on("data", (chunk) => { out.write(chunk); });
-			stream.on("error", (chunk) => { console.log("Done rendering", path); });
+			stream.on("end", (chunk) => { console.log("Done rendering", path); });
 			stream.on("error", (chunk) => { console.log("Error writing chunk", path); })
 		}
 
