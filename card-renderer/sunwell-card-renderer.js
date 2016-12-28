@@ -41,12 +41,12 @@ sw = new Sunwell({
 	bodyLineHeight: 55,
 	bodyFontOffset: {x: 0, y: 30},
 	assetFolder: path.join(__dirname, "..", "src", "assets/"),
-	debug: true,
+	debug: false,
 	platform: new NodePlatform(),
 	cacheSkeleton: false,
 });
 
-function renderCard(card, renderPath, renderWidth, resolution) {
+function renderCard(card, path, resolution) {
 	if (!card.type || !card.playerClass) {
 		console.log("Skipping", card.id, "(No card to render)");
 		return;
@@ -60,26 +60,18 @@ function renderCard(card, renderPath, renderWidth, resolution) {
 	// Turn the texture into an image object
 	fs.readFile(card.texture, function(err, data) {
 		if (err) throw err;
-		card.texture = new Canvas.Image;
+		card.texture = new Canvas.Image();
 		card.texture.src = data;
 
-		sw.createCard(card, renderWidth, function(canvas) {
-			var out = fs.createWriteStream(renderPath);
-			var stream = canvas.pngStream();
+		let callback = function(canvas) {
+			let out = fs.createWriteStream(path);
+			let stream = canvas.pngStream();
+			stream.on("data", (chunk) => { out.write(chunk); });
+			stream.on("error", (chunk) => { console.log("Done rendering", path); });
+			stream.on("error", (chunk) => { console.log("Error writing chunk", path); })
+		}
 
-			stream.on("error", function(chunk) {
-				console.log("Error!");
-			});
-
-			stream.on("data", function(chunk) {
-				out.write(chunk);
-			});
-
-			stream.on("end", function() {
-				out.end();
-				console.log("Rendered", renderPath);
-			});
-		});
+		sw.createCard(card, resolution, null, callback);
 	})
 }
 

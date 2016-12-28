@@ -279,6 +279,7 @@ export default class Card {
 	public width: number;
 	public key: number;
 
+	private callback: Function;
 	private cacheKey: number;
 	private cardFrameAsset: string;
 	private nameBannerAsset: string;
@@ -286,29 +287,16 @@ export default class Card {
 	private multiBannerAsset: string;
 	private watermarkAsset: string;
 
-	constructor(sunwell: Sunwell, props, width: number, renderTarget) {
-		var height = Math.round(width * 1.4397905759);
+	constructor(sunwell: Sunwell, props, width: number, canvas, target, callback?: Function) {
 		this.sunwell = sunwell;
 
 		if (!props) {
 			throw new Error("No card properties given");
 		}
 
-		if (renderTarget) {
-			if (typeof window === "undefined" || renderTarget instanceof HTMLImageElement) {
-				this.target = renderTarget;
-			} else if (renderTarget instanceof HTMLCanvasElement) {
-				this.canvas = renderTarget;
-				this.canvas.width = width;
-				this.canvas.height = height;
-			}
-		} else {
-			this.target = new this.sunwell.options.platform.Image();
-		}
-
-		if (!this.canvas) {
-			this.canvas = sunwell.getBuffer(width, height, true);
-		}
+		this.canvas = canvas;
+		this.target = target;
+		this.callback = callback;
 
 		this.width = width;
 		this.type = props.type;
@@ -566,6 +554,10 @@ export default class Card {
 
 		ctx.restore();
 		clearTimeout(drawTimeout);
+
+		if (this.callback) {
+			this.callback(cvs);
+		}
 
 		if (this.target) {
 			if (typeof this.target == "function") {

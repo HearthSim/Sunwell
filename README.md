@@ -55,7 +55,7 @@ You can pass a `card` object from the HearthstoneJSON API as-is and get a usable
 
 
 ```js
-var card = sunwell.createCard(card, width, target);
+var card = sunwell.createCard(card, width, target, callback);
 ```
 
 `width` is the size of the render (height is determined automatically).
@@ -65,6 +65,8 @@ Internally, Sunwell renders to a Canvas already. If you target an image, the con
 to PNG and compression will result in performance loss with frequent updates.
 Rendering to a Canvas is more direct, however will likely result in performance degradation
 with large amounts of cards on screen. Pick your poison.
+
+The optional `callback` argument is a function called when the rendering finishes.
 
 
 ### Sunwell options

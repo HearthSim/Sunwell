@@ -72,6 +72,7 @@ export default class Sunwell {
 	constructor(options) {
 		options.titleFont = options.titleFont || "Belwe";
 		options.bodyFont = options.bodyFont || "Franklin Gothic";
+		options.aspectRatio = options.aspectRatio || 1.4397905759;
 		options.bodyFontSize = options.bodyFontSize || 60;
 		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};
 		options.bodyLineHeight = options.bodyLineHeight || 50;
@@ -227,8 +228,19 @@ export default class Sunwell {
 		this.options.platform.requestAnimationFrame(callback);
 	}
 
-	public createCard(props, width: number, renderTarget): Card {
-		return new Card(this, props, width, renderTarget);
+	public createCard(props, width: number, target, callback?: Function): Card {
+		let canvas;
+		let height = Math.round(width * this.options.aspectRatio);
+
+		if (target && target instanceof HTMLCanvasElement) {
+			canvas = target;
+			canvas.width = width;
+			canvas.height = height;
+		} else {
+			canvas = this.getBuffer(width, height, true);
+		}
+
+		return new Card(this, props, width, canvas, target, callback);
 	}
 }
 
