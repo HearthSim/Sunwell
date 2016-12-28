@@ -18,6 +18,8 @@ module.exports = {
 		extensions: [".webpack.js", ".web.js", ".ts", ".js", ".node"],
 	},
 	node: {
+		"__dirname": false,
+		"__filename": false,
 		"fs": "empty",
 	},
 	module: {
