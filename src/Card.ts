@@ -339,7 +339,7 @@ export default class Card {
 		this.costColor = getNumberStyle(props.costStyle);
 		this.attackColor = getNumberStyle(props.costStyle);
 		this.healthColor = getNumberStyle(props.healthStyle);
-		this.bodyText = props.collectionText || props.text;
+		this.bodyText = props.collectionText || props.text || "";
 		this.bodyTextColor = (this.type === CardType.WEAPON ? "white" : "black");
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
