@@ -44,7 +44,8 @@ Sunwell should work with any fallback font you give it.
 Instanciate a new `Sunwell` object as such:
 
 ```js
-var sunwell = new Sunwell(options);
+const Sunwell = require("Sunwell").Sunwell;
+let sunwell = new Sunwell(options);
 ```
 
 The `options` object is defined further down.

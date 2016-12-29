@@ -56,7 +56,7 @@ WebPlatform.prototype.loadAsset = function(img, url, loaded, error) {
 }
 
 
-export default class Sunwell {
+export class Sunwell {
 	public options;
 	public assets;
 	public bodyFontSizeExtra;
@@ -243,6 +243,3 @@ export default class Sunwell {
 		return new Card(this, props, width, canvas, target, callback);
 	}
 }
-
-declare var module: any;
-module.exports = Sunwell;

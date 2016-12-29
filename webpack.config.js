@@ -16,7 +16,7 @@ module.exports = [{
 		path: path.resolve(__dirname, "dist"),
 		filename: PROD ? "[name].min.js" : "[name].js",
 		library: "Sunwell",
-		libraryTarget: "var",
+		libraryTarget: "commonjs2",
 	},
 	resolve: {
 		extensions: [".webpack.js", ".web.js", ".ts", ".js"],
