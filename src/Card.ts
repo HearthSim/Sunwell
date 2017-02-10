@@ -9,7 +9,7 @@ function cleanEnum(val: string | number, e) {
 			return e["INVALID"];
 		}
 	}
-	return val;
+	return val || 0;
 }
 
 
