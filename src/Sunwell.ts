@@ -117,13 +117,13 @@ export class Sunwell {
 				_this.log("Requesting", path);
 				_this.options.platform.loadAsset(assets[path], path, function() {
 					assets[path].loaded = true;
-					resolve();
 					if (assetListeners[path]) {
 						for (var a in assetListeners[path]) {
 							assetListeners[path][a](assets[path]);
 						}
-						delete assetListeners[path]
+						delete assetListeners[path];
 					}
+					resolve();
 				}, function() {
 					_this.error("Error loading asset:", path);
 					// An asset load error should not reject the promise
@@ -185,7 +185,7 @@ export class Sunwell {
 
 		for (let i in assetsToLoad) {
 			let path = this.getAssetPath(assetsToLoad[i]);
-			if (!this.assets[path]) texturesToLoad.push(path);
+			if (!this.assets[path] || !this.assets[path].loaded) texturesToLoad.push(path);
 		}
 
 		this.log("Preparing to load assets");
