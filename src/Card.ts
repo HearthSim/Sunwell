@@ -434,6 +434,7 @@ export default class Card {
 
 	private getCardFrameAsset(): string {
 		let sclass = CardClass[this.cardClass || CardClass.NEUTRAL].toLowerCase();
+		if (this.cardClass == CardClass.DREAM) sclass = "hunter";
 		switch (this.type) {
 			case CardType.MINION: return "frame-minion-" + sclass;
 			case CardType.SPELL: return "frame-spell-" + sclass;
