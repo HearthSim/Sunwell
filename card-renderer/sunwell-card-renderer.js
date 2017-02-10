@@ -41,6 +41,11 @@ function renderCard(sunwell, card, path, resolution) {
 		return;
 	}
 
+	if (card.type != "MINION" && card.type != "SPELL" && card.type != "WEAPON") {
+		console.log("Skipping", card.id, "(Not a renderable card)");
+		return;
+	}
+
 	if (!fs.existsSync(card.texture)) {
 		console.log("Skipping", card.id, "(Texture not found)", card.texture);
 		return;
