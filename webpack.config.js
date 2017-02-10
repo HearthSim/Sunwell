@@ -25,23 +25,4 @@ module.exports = [{
 		loaders: [TS_LOADER],
 	},
 	plugins: PROD ? [MINIFY] : [],
-}, {
-	name: "node-sunwell",
-	target: "node",
-	entry: {
-		sunwell: path.join(__dirname, "src/Sunwell.ts"),
-	},
-	output: {
-		path: path.resolve(__dirname, "dist"),
-		filename: "node-sunwell.js",
-		library: "Sunwell",
-		libraryTarget: "commonjs2",
-	},
-	resolve: {
-		extensions: [".webpack.js", ".web.js", ".ts", ".js"],
-	},
-	module: {
-		loaders: [TS_LOADER],
-	},
-	plugins: PROD ? [MINIFY] : [],
 }];

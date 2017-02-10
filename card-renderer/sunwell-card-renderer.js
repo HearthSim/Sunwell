@@ -5,7 +5,7 @@ const request = require("request");
 const ArgumentParser = require("argparse").ArgumentParser;
 const Canvas = require("canvas");
 const Promise = require("promise");
-const Sunwell = require("../dist/node-sunwell");
+const Sunwell = require("../dist/sunwell").Sunwell;
 
 
 function NodePlatform() {
@@ -89,7 +89,7 @@ fonts = [
 function main() {
 	var p = new ArgumentParser({
 		"description": "Generate card renders",
-	})
+	});
 	p.addArgument("file", {"nargs": "+"});
 	p.addArgument("--assets-dir", {"defaultValue": path.resolve("..", "src", "assets")});
 	p.addArgument("--font-dir", {"defaultValue": path.resolve("fonts")});
