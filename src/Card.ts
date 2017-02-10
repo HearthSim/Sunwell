@@ -433,18 +433,29 @@ export default class Card {
 	}
 
 	private getCardFrameAsset(): string {
-		let sclass = CardClass[this.cardClass].toLowerCase();
-		let stype = CardType[this.type].toLowerCase();
-		return "frame-" + stype + "-" + sclass;
+		let sclass = CardClass[this.cardClass || CardClass.NEUTRAL].toLowerCase();
+		switch (this.type) {
+			case CardType.MINION: return "frame-minion-" + sclass;
+			case CardType.SPELL: return "frame-spell-" + sclass;
+			case CardType.WEAPON: return "frame-weapon-" + sclass;
+		}
+		return "";
 	}
 
 	private getNameBannerAsset(): string {
-		let stype = CardType[this.type].toLowerCase();
-		return "name-banner-" + stype;
+		switch (this.type) {
+			case CardType.MINION: return "name-banner-minion";
+			case CardType.SPELL: return "name-banner-spell";
+			case CardType.WEAPON: return "name-banner-weapon";
+		}
+		return "";
 	}
 
 	private getRarityGemAsset(): string {
-		if (this.rarity == Rarity.FREE || (this.rarity == Rarity.COMMON && this.set == CardSet.CORE)) {
+		if (this.rarity == Rarity.INVALID || this.rarity == Rarity.FREE) {
+			return "";
+		}
+		if (this.rarity == Rarity.COMMON && this.set == CardSet.CORE) {
 			return "";
 		}
 
