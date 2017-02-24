@@ -224,7 +224,7 @@ export class Sunwell {
 
 	public renderTick(): void {
 		this.render();
-		let callback = this.renderTick.bind(this);
+		let callback = () => this.renderTick;
 		this.options.platform.requestAnimationFrame(callback);
 	}
 
