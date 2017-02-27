@@ -178,6 +178,7 @@ enum Race {
 	MURLOC = 14,
 	DEMON = 15,
 	MECHANICAL = 17,
+	ELEMENTAL = 18,
 	PET = 20,
 	BEAST = 20,
 	TOTEM = 21,
@@ -228,6 +229,7 @@ enum CardType {
 var RaceNames = {}
 RaceNames[Race.MURLOC] = {"enUS": "Murloc"};
 RaceNames[Race.MECHANICAL] = {"enUS": "Mech"};
+RaceNames[Race.ELEMENTAL] = {"enUS": "Elemental"};
 RaceNames[Race.BEAST] = {"enUS": "Beast"};
 RaceNames[Race.DEMON] = {"enUS": "Demon"};
 RaceNames[Race.PIRATE] = {"enUS": "Pirate"};
