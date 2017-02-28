@@ -826,40 +826,45 @@ export default class Card {
 		let ctx = buffer.getContext("2d");
 		ctx.save();
 
-		var pathMiddle = .58;
-		var maxWidth = 580;
+		var maxWidth = 560;
 
-		// Path midpoint at t = 0.56
-		var c = [
+		let pathMiddle = .55;
+		let c = [
 			{x: 0, y: 110},
-			{x: 102, y: 137},
+			{x: 122, y: 140},
 			{x: 368, y: 16},
-			{x: 580, y: 100}
+			{x: 580, y: 100},
 		];
 
 		if (this.type === CardType.SPELL) {
-			pathMiddle = .52;
-			maxWidth = 580;
+			pathMiddle = .49;
+			maxWidth = 560;
 			c = [
-				{x: 10, y: 100},
-				{x: 212, y: 40},
-				{x: 368, y: 40},
-				{x: 570, y: 95}
+				{x: 10, y: 97},
+				{x: 212, y: 45},
+				{x: 368, y: 45},
+				{x: 570, y: 100},
 			]
 		}
 
 		if (this.type === CardType.WEAPON) {
-			pathMiddle = .58;
+			pathMiddle = .56;
 			maxWidth = 580;
 			c = [
-				{x: 10, y: 75},
-				{x: 50, y: 75},
-				{x: 500, y: 75},
-				{x: 570, y: 75}
+				{x: 10, y: 77},
+				{x: 50, y: 77},
+				{x: 500, y: 77},
+				{x: 570, y: 77},
 			]
 		}
 
-		var fontSize = 51;
+		if(this.sunwell.options.debug) {
+			ctx.strokeStyle = "red";
+			ctx.fillStyle = "red";
+			for(let i in c) {
+				ctx.fillRect(c[i].x - 2, c[i].y - 2, 4, 4);
+			}
+		}
 
 		ctx.lineWidth = 13;
 		ctx.strokeStyle = "black";
@@ -870,25 +875,51 @@ export default class Card {
 		ctx.textAlign = "left";
 		ctx.textBaseline = "middle";
 
-		var textWidth = maxWidth + 1;
+		// calculate text width
+		const getCharDimensions = () => {
+			const dimensions = [];
+			const em = ctx.measureText("M").width;
+			for (let i = 0; i < name.length; i++) {
+				ctx.save();
+				const char = name[i];
+				const scale = {x: 1, y: 1};
+				let charWidth = ctx.measureText(char).width + 0.1 * em;
+				switch (char) {
+					case " ":
+						charWidth = 0.2 * em;
+						break;
+					case "'": // see "Death's Bite"
+						charWidth = 0.27 * em;
+						scale.x = 0.5;
+						scale.y = 1;
+						break;
+				}
+				dimensions[i] = {
+					width: charWidth,
+					scale: scale,
+				};
+				ctx.restore();
+			}
+			return dimensions;
+		};
 
-		while (textWidth > maxWidth && fontSize > 10) {
+		let dimensions = [];
+		let fontSize = 55;
+		do {
 			fontSize -= 1;
 			ctx.font = fontSize + "px " + this.titleFont;
-			textWidth = 0;
-			for (let i = 0; i < name.length; i++) {
-				textWidth += ctx.measureText(name[i]).width + 2;
-			}
+		} while ((dimensions = getCharDimensions()).reduce((a, b) => a + b.width, 0) > maxWidth && fontSize > 10);
 
-			textWidth *= 1.25;
-		}
-
+		let textWidth = dimensions.reduce((a, b) => a + b.width, 0);
 		textWidth = textWidth / maxWidth;
 		var begin = pathMiddle - (textWidth / 2);
 		var steps = textWidth / name.length;
 
-		var p, t, leftPos = 0, m;
+		// draw text
+		var p, t, leftPos = 0;
 		for (let i = 0; i < name.length; i++) {
+			const char = name[i].trim();
+			const dimension = dimensions[i];
 			if (leftPos === 0) {
 				t = begin + (steps * i);
 				p = getPointOnCurve(c, t);
@@ -902,31 +933,34 @@ export default class Card {
 				}
 			}
 
-			ctx.save();
-			ctx.translate(p.x, p.y);
+			if(char.length) {
 
-			ctx.scale(1.2, 1);
-			//ctx.setTransform(1.2, p.r, 0, 1, p.x, p.y);
-			ctx.rotate(p.r);
+				ctx.save();
+				ctx.translate(p.x, p.y);
 
-			ctx.lineWidth = 10 * (fontSize / 50);
-			ctx.strokeStyle = "black";
-			ctx.fillStyle = "black";
-			ctx.fillText(name[i], 0, 0);
-			ctx.strokeText(name[i], 0, 0);
-			m = ctx.measureText(name[i]).width * 1.25;
-			leftPos += m;
+				if(dimension.scale.x) {
+					ctx.scale(dimension.scale.x, dimension.scale.y);
+				}
+				//ctx.setTransform(1.2, p.r, 0, 1, p.x, p.y);
+				ctx.rotate(p.r);
 
-			if (["i", "f"].indexOf(name[i]) !== -1) {
-				leftPos += m * 0.1;
+				// shadow
+				ctx.lineWidth = 10 * (fontSize / 50);
+				ctx.strokeStyle = "black";
+				ctx.fillStyle = "black";
+				ctx.fillText(char, 0, 0);
+				ctx.strokeText(char, 0, 0);
+
+				// text
+				ctx.fillStyle = "white";
+				ctx.strokeStyle = "white";
+				ctx.lineWidth = 2.5 * (fontSize / 50);
+				ctx.fillText(char, 0, 0);
+
+				ctx.restore();
 			}
 
-			ctx.fillStyle = "white";
-			ctx.strokeStyle = "white";
-			ctx.lineWidth = 2.5 * (fontSize / 50);
-			ctx.fillText(name[i], 0, 0);
-
-			ctx.restore();
+			leftPos += dimension.width;
 		}
 
 		let coords: Coords = {
