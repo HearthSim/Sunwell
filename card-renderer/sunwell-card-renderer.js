@@ -123,9 +123,9 @@ function main() {
 	var sunwell = new Sunwell({
 		titleFont: "Belwe",
 		bodyFont: (bold, italic) => "Franklin Gothic" + (bold ? " Bold" : italic ? " Italic" : ""),
-		bodyFontSize: 52,
-		bodyLineHeight: 60,
-		bodyFontOffset: {x: 0, y: 50},
+		bodyFontSize: 53,
+		bodyLineHeight: 52.5,
+		bodyFontOffset: {x: 0, y: 40},
 		assetFolder: path.resolve(args.assets_dir) + "/",
 		debug: args.debug,
 		platform: new NodePlatform(),
