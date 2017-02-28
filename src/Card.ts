@@ -1134,17 +1134,20 @@ export default class Card {
 		let dx = 270;
 		let dy = 735;
 
-		ctx.globalCompositeOperation = "color-burn"; //?
+		ctx.globalCompositeOperation = "multiply";
 
-		if (this.type === CardType.MINION && this.raceText) {
-			dx -= 12; // Shift up
+		if (this.type === CardType.MINION) {
+			if(this.raceText) {
+				dy -= 10; // Shift up
+			}
+			ctx.globalAlpha = 0.6;
 		} else if (this.type === CardType.SPELL) {
 			ctx.globalAlpha = 0.7;
 			dx = 264;
 			dy = 726;
 		} else if (this.type === CardType.WEAPON) {
 			ctx.globalCompositeOperation = "lighten";
-			ctx.globalAlpha = 0.07;
+			ctx.globalAlpha = 0.1;
 			dx = 264;
 		}
 
