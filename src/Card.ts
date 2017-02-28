@@ -710,12 +710,19 @@ export default class Card {
 		bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
 
 		var spaceWidth = 3;
-		var baseFontmaterial = fontSize + "px" + this.sunwell.bodyFontSizeExtra + " '" + this.sunwell.options.bodyFont + "', sans-serif";
-		bufferRowCtx.font = baseFontmaterial;
-
-		var getFontMaterial = function() {
-			return (isBold > 0 ? "bold " : "") + (isItalic > 0 ? "italic " : "") + baseFontmaterial;
-		}
+		const getFontMaterial = () => {
+			let font = this.sunwell.options.bodyFont;
+			let prefix = "";
+			if(typeof font === "function") {
+				font = font(isBold > 0, isItalic > 0);
+			}
+			else {
+				prefix = (isBold > 0 ? "bold " : "") + (isItalic > 0 ? "italic " : "");
+			}
+			const material = prefix + fontSize + "px" + this.sunwell.bodyFontSizeExtra + ' "' + font + '", sans-serif';
+			return material;
+		};
+		bufferRowCtx.font = getFontMaterial();
 
 		for (var i = 0; i < words.length; i++) {
 			word = words[i];

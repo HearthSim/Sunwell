@@ -97,6 +97,14 @@ function drawFromData(sunwell, data, textureDir, outputDir, resolution) {
 const fonts = {
 	"belwe/belwe-extrabold.ttf": {family: "Belwe"},
 	"franklin-gothic/franklingothic-medcd.ttf": {family: "Franklin Gothic"},
+	"franklin-gothic-bold/franklingothic-demicd.ttf": {
+		family: "Franklin Gothic Bold",
+		weight: "bold",
+	},
+	"franklin-gothic-italic/franklingothic-medcdit.ttf": {
+		family: "Franklin Gothic Italic",
+		style: "italic",
+	},
 };
 
 function main() {
@@ -112,13 +120,12 @@ function main() {
 	p.addArgument("--only", {"type": "string", "defaultValue": ""});
 	p.addArgument("--debug", {"action": "storeTrue"});
 	var args = p.parseArgs();
-
 	var sunwell = new Sunwell({
 		titleFont: "Belwe",
-		bodyFont: "Franklin Gothic",
-		bodyFontSize: 42,
-		bodyLineHeight: 55,
-		bodyFontOffset: {x: 0, y: 30},
+		bodyFont: (bold, italic) => "Franklin Gothic" + (bold ? " Bold" : italic ? " Italic" : ""),
+		bodyFontSize: 52,
+		bodyLineHeight: 60,
+		bodyFontOffset: {x: 0, y: 50},
 		assetFolder: path.resolve(args.assets_dir) + "/",
 		debug: args.debug,
 		platform: new NodePlatform(),
