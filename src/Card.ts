@@ -1016,6 +1016,7 @@ export default class Card {
 		bufferCtx.textBaseline = "hanging";
 		bufferCtx.textAlign = "left";
 
+		const xWidth = bufferCtx.measureText("x").width;
 		for (let i = 0; i < text.length; i++) {
 			bufferCtx.lineWidth = 8;
 			bufferCtx.strokeStyle = "black";
@@ -1030,6 +1031,7 @@ export default class Card {
 			//ctx.strokeText(text[i], x, y);
 
 			x += bufferCtx.measureText(text[i]).width;
+			x += xWidth * 0.1;
 		}
 
 		var b = contextBoundingBox(bufferCtx);
