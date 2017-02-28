@@ -89,11 +89,10 @@ function drawFromData(sunwell, data, textureDir, outputDir, resolution) {
 	}
 }
 
-fonts = [
-	{"path": "belwe/belwe-extrabold.ttf", "family": "Belwe"},
-	{"path": "franklin-gothic/franklingothic-medcd.ttf", "family": "Franklin Gothic"},
-]
-
+const fonts = {
+	"belwe/belwe-extrabold.ttf": {family: "Belwe"},
+	"franklin-gothic/franklingothic-medcd.ttf": {family: "Franklin Gothic"},
+};
 
 function main() {
 	var p = new ArgumentParser({
@@ -121,13 +120,13 @@ function main() {
 		cacheSkeleton: false,
 	});
 
-	for (let i in fonts) {
-		let font = fonts[i];
-		let fontPath = path.join(args.font_dir, font.path);
+	for (let key of Object.keys(fonts)) {
+		let font = fonts[key];
+		let fontPath = path.join(args.font_dir, key);
 		if (!fs.existsSync(fontPath)) {
 			console.log("WARNING: Font not found:", fontPath);
 		} else {
-			Canvas.registerFont(fontPath, {"family": font.family});
+			Canvas.registerFont(fontPath, font);
 		}
 	}
 
