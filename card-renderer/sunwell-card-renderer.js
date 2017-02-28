@@ -106,6 +106,7 @@ function main() {
 	p.addArgument("--texture-dir", {"defaultValue": path.resolve("textures")});
 	p.addArgument("--resolution", {"type": "int", "defaultValue": 512});
 	p.addArgument("--only", {"type": "string", "defaultValue": ""});
+	p.addArgument("--debug", {"action": "storeTrue"});
 	var args = p.parseArgs();
 
 	var sunwell = new Sunwell({
@@ -115,7 +116,7 @@ function main() {
 		bodyLineHeight: 55,
 		bodyFontOffset: {x: 0, y: 30},
 		assetFolder: path.resolve(args.assets_dir) + "/",
-		debug: false,
+		debug: args.debug,
 		platform: new NodePlatform(),
 		cacheSkeleton: false,
 	});
