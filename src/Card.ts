@@ -636,10 +636,7 @@ export default class Card {
 			return;
 		}
 
-		var word,
-			chars,
-			char,
-			xPos = 0,
+		var xPos = 0,
 			yPos = 0,
 			isBold = 0,
 			isItalic = 0,
@@ -655,7 +652,7 @@ export default class Card {
 		}
 		bodyText = pBodyText;
 
-		var words = bodyText.replace(/[\$#_]/g, "").split(/( |\n)/g);
+		var words = bodyText.replace(/[\$#_]/g, "").replace(/\n/g, " \n ").split(/ /g);
 
 		this.sunwell.log("Rendering body", bodyText);
 
@@ -709,8 +706,7 @@ export default class Card {
 		bufferRowCtx.fillStyle = this.bodyTextColor;
 		bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
 
-		var spaceWidth = 3;
-		const getFontMaterial = () => {
+			const getFontMaterial = () => {
 			let font = this.sunwell.options.bodyFont;
 			let prefix = "";
 			if(typeof font === "function") {
@@ -724,41 +720,36 @@ export default class Card {
 		};
 		bufferRowCtx.font = getFontMaterial();
 
-		for (var i = 0; i < words.length; i++) {
-			word = words[i];
-			chars = word.split("");
+		for (let i = 0; i < words.length; i++) {
+			const word = words[i];
+			const cleanWord = word.trim().replace(/<((?!>).)*>/g, "");
 
-			var width = bufferRowCtx.measureText(word).width;
+			const width = bufferRowCtx.measureText(cleanWord).width;
 			this.sunwell.log("Next word:", word);
 
-			if (!manualBreak && (xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.8))) {
+			if (!manualBreak && (xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) && !justLineBreak) {
 				this.sunwell.log((xPos + width), ">", bufferRow.width);
 				this.sunwell.log("Calculated line break");
 				smallerFirstLine = false;
-				lineCount++;
-				var r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
-				xPos = r[0];
-				yPos = r[1];
 				justLineBreak = true;
+				lineCount++;
+				[xPos, yPos] = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
 			}
 
-			for (var j = 0; j < chars.length; j++) {
-				char = chars[j];
+			const chars = word.split("");
 
-				if (char === "\n") {
-					if (justLineBreak) {
-						justLineBreak = false;
-						continue;
-					}
-					lineCount++;
-					var r = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
-					xPos = r[0];
-					yPos = r[1];
-					this.sunwell.log("Manual line break");
-					continue;
-				}
+			if (word === "\n") {
+				this.sunwell.log("Manual line break");
+				lineCount++;
+				[xPos, yPos] = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
+				justLineBreak = true;
+				continue;
+			}
 
-				justLineBreak = false;
+			justLineBreak = false;
+
+			for (let j = 0; j < chars.length; j++) {
+				const char = chars[j];
 
 				// <b>
 				if (char === "<" && chars[j + 1] === "b" && chars[j + 2] === ">") {
@@ -794,10 +785,10 @@ export default class Card {
 
 				bufferRowCtx.fillText(char, xPos + this.sunwell.options.bodyFontOffset.x, this.sunwell.options.bodyFontOffset.y);
 
-				xPos += bufferRowCtx.measureText(char).width + (spaceWidth / 8);
+				xPos += bufferRowCtx.measureText(char).width;
 			}
-
-			xPos += spaceWidth;
+			const em = bufferRowCtx.measureText("M").width;
+			xPos += 0.275 * em;
 		}
 
 		lineCount++;
