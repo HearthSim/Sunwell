@@ -155,7 +155,7 @@ function main() {
 				return;
 			}
 			let data = JSON.parse(body);
-			if (only.length) {
+			if (only.length && only[0].length) {
 				data = data.filter((card) => only.indexOf(card.id) !== -1);
 			}
 			drawFromData(sunwell, data, path.resolve(args.texture_dir), outdir, args.resolution);
