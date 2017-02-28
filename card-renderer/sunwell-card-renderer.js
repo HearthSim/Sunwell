@@ -7,7 +7,6 @@ const Canvas = require("canvas");
 const Promise = require("promise");
 const Sunwell = require("../dist/sunwell").Sunwell;
 
-
 function NodePlatform() {
 	this.name = "NODE";
 	this.Image = Canvas.Image;
@@ -17,14 +16,15 @@ function NodePlatform() {
 	this.requestAnimationFrame = (cb) => setTimeout(cb, 16);
 }
 
-NodePlatform.prototype.getBuffer = function(width, height, clear) {
+NodePlatform.prototype.getBuffer = function (width, height, clear) {
 	return new Canvas(width, height);
 }
 
-NodePlatform.prototype.freeBuffer = function(buffer) {}
+NodePlatform.prototype.freeBuffer = function (buffer) {
+}
 
-NodePlatform.prototype.loadAsset = function(img, path, loaded, error) {
-	fs.readFile(path, function(err, data) {
+NodePlatform.prototype.loadAsset = function (img, path, loaded, error) {
+	fs.readFile(path, function (err, data) {
 		if (err) {
 			console.log("Error loading asset", path);
 			error();
@@ -52,23 +52,28 @@ function renderCard(sunwell, card, path, resolution) {
 	}
 
 	// Turn the texture into an image object
-	fs.readFile(card.texture, function(err, data) {
+	fs.readFile(card.texture, function (err, data) {
 		if (err) throw err;
 		card.texture = new Canvas.Image();
 		card.texture.src = data;
 
-		let callback = function(canvas) {
+		let callback = function (canvas) {
 			let out = fs.createWriteStream(path);
 			let stream = canvas.pngStream();
-			stream.on("data", (chunk) => { out.write(chunk); });
-			stream.on("end", (chunk) => { console.log("Done rendering", path); });
-			stream.on("error", (chunk) => { console.log("Error writing chunk", path); })
+			stream.on("data", (chunk) => {
+				out.write(chunk);
+			});
+			stream.on("end", (chunk) => {
+				console.log("Done rendering", path);
+			});
+			stream.on("error", (chunk) => {
+				console.log("Error writing chunk", path);
+			})
 		}
 
 		sunwell.createCard(card, resolution, null, callback);
 	})
 }
-
 
 function drawFromJSON(sunwell, body, textureDir, outputDir, resolution) {
 	const data = JSON.parse(body);
@@ -137,13 +142,13 @@ function main() {
 
 	for (let i in args.file) {
 		let file = args.file[i];
-		fs.readFile(file, function(err, body) {
+		fs.readFile(file, function (err, body) {
 			if (err) {
 				console.log("Error reading", file, err);
 				return;
 			}
 			let data = JSON.parse(body);
-			if(only.length) {
+			if (only.length) {
 				data = data.filter((card) => only.indexOf(card.id) !== -1);
 			}
 			drawFromData(sunwell, data, path.resolve(args.texture_dir), outdir, args.resolution);
