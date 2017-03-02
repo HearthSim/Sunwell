@@ -652,7 +652,7 @@ export default class Card {
 		}
 		bodyText = pBodyText;
 
-		var words = bodyText.replace(/[\$#_]/g, "").replace(/\n/g, " \n ").split(/ /g);
+		var words = bodyText.replace(/[\$#_]/g, "").replace(/\n/g, " \n ").replace(/ +/g, " ").split(/ /g);
 
 		this.sunwell.log("Rendering body", bodyText);
 
