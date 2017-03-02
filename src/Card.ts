@@ -1088,7 +1088,8 @@ export default class Card {
 			this.drawNumber(ctx, 116, 170, s, this.cost, 175, this.costColor);
 
 			if (this.type === CardType.MINION || this.type === CardType.WEAPON) {
-				this.drawNumber(ctx, 128, 994, s, this.attack, 160, this.attackColor);
+				const attackX = this.type === CardType.MINION ? 128 : 118;
+				this.drawNumber(ctx, attackX, 994, s, this.attack, 160, this.attackColor);
 				this.drawNumber(ctx, 668, 994, s, this.health, 160, this.healthColor);
 			}
 		}
