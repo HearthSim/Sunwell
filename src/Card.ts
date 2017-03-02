@@ -310,11 +310,6 @@ export default class Card {
 		this.language = props.language || "enUS";
 		this.name = props.name || "";
 
-		if (this.type === CardType.WEAPON && props.durability) {
-			// Weapons alias health to durability
-			this.health = props.durability;
-		}
-
 		this.multiClassGroup = cleanEnum(props.multiClassGroup, MultiClassGroup) as MultiClassGroup;
 		this.cardClass = cleanEnum(props.playerClass, CardClass) as CardClass;
 		this.set = cleanEnum(props.set, CardSet) as CardSet;
@@ -336,6 +331,11 @@ export default class Card {
 			this.elite = props.elite || false;
 			this.raceText = props.raceText || this.getRaceText();
 			this.silenced = props.silenced || false;
+		}
+
+		if (this.type === CardType.WEAPON && props.durability) {
+			// Weapons alias health to durability
+			this.health = props.durability;
 		}
 
 		this.costColor = getNumberStyle(props.costStyle);
