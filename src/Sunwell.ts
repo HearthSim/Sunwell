@@ -141,6 +141,9 @@ export class Sunwell {
 
 	public prepareRenderingCard(card: Card): void {
 		this.log("Queried render:", card.name);
+		if(this.renderQuery[card.key]) {
+			this.log("Skipping", card.key, "(already queued)");
+		}
 		this.renderQuery[card.key] = card;
 		if (!this.isRendering) {
 			this.renderTick();
@@ -231,7 +234,7 @@ export class Sunwell {
 
 	public createCard(props, width: number, target, callback?: Function): Card {
 		let canvas;
-		let height = Math.round(width * this.options.aspectRatio);
+		const height = Math.round(width * this.options.aspectRatio);
 
 		if (target && target instanceof HTMLCanvasElement) {
 			canvas = target;
