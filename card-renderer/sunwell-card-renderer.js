@@ -83,6 +83,7 @@ function drawFromJSON(sunwell, body, textureDir, outputDir, resolution) {
 function drawFromData(sunwell, data, textureDir, outputDir, resolution) {
 	for (i in data) {
 		var card = data[i];
+		card.key = i;
 		var renderPath = path.join(outputDir, card.id + ".png");
 		var textureName = card.id + ".jpg";
 		var texturePath = path.join(textureDir, textureName);
