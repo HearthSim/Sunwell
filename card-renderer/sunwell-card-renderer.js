@@ -13,7 +13,7 @@ function NodePlatform() {
 	this.Promise = Promise;
 	// The notation "16px/1em" is not supported by node-canvas
 	this.bodyFontSizeExtra = "";
-	this.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+	this.requestAnimationFrame = (cb) => setImmediate(cb);
 }
 
 NodePlatform.prototype.getBuffer = function (width, height, clear) {
