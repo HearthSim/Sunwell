@@ -346,32 +346,19 @@ export default class Card {
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
 
-		this.cacheKey = this.checksum();
+		this.cacheKey = this.checksum(props);
 		this.key = props.key || this.cacheKey;
 		sunwell.prepareRenderingCard(this);
 	}
 
-	private checksum(): number {
-		let s = "";
-		let chk = 0x12345678;
-
-		s = s + this.id +
-			this.cardClass +
-			this.rarity +
-			this.set +
-			this.elite +
-			this.silenced +
-			this.costsHealth +
-			this.hideStats +
-			this.texture +
-			this.type +
-			this.width
-
-		// Race text is rendered separately, we only need to know that it's displayed
-		s += !!this.raceText
-
-		for (let i = 0; i < s.length; i++) {
-			chk += (s.charCodeAt(i) * (i + 1));
+	private checksum(props): number {
+		const string = JSON.stringify(props) + this.width;
+		const length = string.length;
+		let chk = 0;
+		for (let i = 0; i < length; i++) {
+			const char = string.charCodeAt(i);
+			chk = ((chk << 5) - chk) + char;
+			chk |= 0;
 		}
 
 		return chk;
