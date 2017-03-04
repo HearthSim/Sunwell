@@ -37,17 +37,17 @@ NodePlatform.prototype.loadAsset = function (img, path, loaded, error) {
 
 function renderCard(sunwell, card, path, resolution) {
 	if (!card.type || !card.playerClass) {
-		console.log("Skipping", card.id, "(No card to render)");
+		console.log("Skipping", card.id, "(no card to render)");
 		return;
 	}
 
 	if (card.type != "MINION" && card.type != "SPELL" && card.type != "WEAPON") {
-		console.log("Skipping", card.id, "(Not a renderable card)");
+		console.log("Skipping", card.id, "(not a renderable card)");
 		return;
 	}
 
 	if (!fs.existsSync(card.texture)) {
-		console.log("Skipping", card.id, "(Texture not found)", card.texture);
+		console.log("Skipping", card.id, "(texture not found)", card.texture);
 		return;
 	}
 
@@ -69,7 +69,7 @@ function renderCard(sunwell, card, path, resolution) {
 			stream.on("error", (chunk) => {
 				console.log("Error writing chunk", path);
 			})
-		}
+		};
 
 		sunwell.createCard(card, resolution, null, callback);
 	})
