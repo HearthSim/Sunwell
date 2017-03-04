@@ -8,7 +8,7 @@ var WebPlatform = function() {
 	this.Promise = Promise;
 	// The notation "16px/1em" is not supported by node-canvas
 	this.bodyFontSizeExtra = "/1em";
-	this.requestAnimationFrame = () => { window.requestAnimationFrame };
+	this.requestAnimationFrame = (cb) => window.requestAnimationFrame(cb);
 }
 
 
@@ -68,6 +68,7 @@ export class Sunwell {
 	private assetListeners;
 	private renderQuery;
 	private renderCache;
+	private isRendering;
 
 	constructor(options) {
 		options.titleFont = options.titleFont || "Belwe";
@@ -80,7 +81,6 @@ export class Sunwell {
 		options.platform = options.platform || new WebPlatform();
 		options.drawTimeout = options.drawTimeout || 5000;
 		options.cacheSkeleton = options.cacheSkeleton || false;
-		options.maxActiveRenders = options.maxActiveRenders || 12;
 		options.preloadedAssets = options.preloadedAssets || [];
 		options.debug = options.debug || false;
 
@@ -91,6 +91,7 @@ export class Sunwell {
 		this.activeRenders = 0;
 		this.renderCache = {};
 		this.bodyFontSizeExtra = this.options.platform.bodyFontSizeExtra;
+		this.isRendering = false;
 	}
 
 	public log(...args: any[]): void {
@@ -141,7 +142,7 @@ export class Sunwell {
 	public prepareRenderingCard(card: Card): void {
 		this.log("Queried render:", card.name);
 		this.renderQuery[card.key] = card;
-		if (!this.activeRenders) {
+		if (!this.isRendering) {
 			this.renderTick();
 		}
 	}
@@ -155,9 +156,6 @@ export class Sunwell {
 	}
 
 	public render(): void {
-		if (this.activeRenders > this.options.maxActiveRenders) {
-			return;
-		}
 		let keys = Object.keys(this.renderQuery);
 		if (!keys.length) {
 			return;
@@ -166,7 +164,6 @@ export class Sunwell {
 		let first = keys[0];
 		let card: Card = this.renderQuery[first];
 		delete this.renderQuery[first];
-		this.activeRenders++;
 
 		var cvs = card.canvas;
 		var ctx = cvs.getContext("2d");
@@ -198,10 +195,15 @@ export class Sunwell {
 			let start = Date.now();
 			card.draw(ctx, s);
 			this.log(card, "finished drawing in " + (Date.now() - start) + "ms");
+			// check whether we have more to do
+			this.isRendering = false;
 			if (Object.keys(this.renderQuery).length) {
 				this.renderTick();
 			}
-		}).catch((e) => { this.error("Error while drawing card:", e) });
+		}).catch((e) => {
+			this.error("Error while drawing card:", e);
+			this.isRendering = false;
+		});
 	};
 
 	public getAssetPath(key: string): string {
@@ -223,9 +225,8 @@ export class Sunwell {
 	}
 
 	public renderTick(): void {
-		this.render();
-		let callback = () => this.renderTick;
-		this.options.platform.requestAnimationFrame(callback);
+		this.isRendering = true;
+		this.options.platform.requestAnimationFrame(() => this.render());
 	}
 
 	public createCard(props, width: number, target, callback?: Function): Card {
