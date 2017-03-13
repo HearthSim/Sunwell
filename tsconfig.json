@@ -1,11 +1,13 @@
 {
 	"compilerOptions": {
+		"declaration": false,
 		"lib": ["es6", "dom"],
 		"target": "es5",
-		"module": "commonjs",
+		"outDir": "dist/",
 		"moduleResolution": "node",
-		"noLib": false,
 		"isolatedModules": false,
+		"removeComments": false,
+		"noLib": false,
 		"alwaysStrict": true,
 		"noUnusedLocals": true
 	},
