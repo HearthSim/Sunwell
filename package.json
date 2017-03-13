@@ -1,6 +1,6 @@
 {
   "name": "sunwell",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Canvas-based high quality Hearthstone card renderer",
   "keywords": [
     "hearthstone"
