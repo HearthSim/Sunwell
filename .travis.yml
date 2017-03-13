@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - "7"
+script:
+  - yarn run build
+deploy:
+  provider: npm
+  email: benedict@hearthsim.net
+  api_key:
+    secure: WZB9qu/QK9OiEJkn5AhX8AqIy84qTl0A7WU6aRG+ryGKdfOMsm1RKFgmxK5KgR6Y1d5EgYRaTdHOeHFa4i15jowY3s4ptYhnZ8zxX0Ee5MPSWjG8XuzLM/hH0jLaq934HNMjrpK0dZmH7iOoZHT3/C3HIVxosjKfi8TOUDsxzZYApQ375xOu8UdE872BYxP5zOf5foDsbkDE3LiRwtZeH+qS9ASb6dYrohA2MZIVn4Sl4fr1lHi1lkwtNViBf2kcMkDWXmGSniF23s+kfM6NM+NOpyGDPaxu2Q3ZD70gpjtDSGrTt6PaJg5B66K6uUs+YRihzpFf06yodft/76VEvf1FZqBPQuk8hRV+V/F02T5rcOzi/e5oNbwe6cEv5KJbSlfvIUVlKUJScf2EeDiAnlxeBe8kMVn7qdW4kU1+7hifGv1f50HEmvEUqSsUuzO+lUjr3tUllyH6CBIl6vgNDgftBMLKXGpzRw6W1U5bdJoyL9I6bl7XzU9lKdu5G4cTtP3908Om8uyg37Anr1bZ2seTmpOZuduCbL20wXyqSSadLdd1j38ifCNdtNFqumCWQmM/lgk4cLyG1B0HZe1/Gys+i4M4aky5SmNC4Z7N1u8MRXrW9jmzjCZi45V5+XW4KoVWRppex5NzYfK3qAZERl+gCeb5GvFFvnx9Y5jO0gU=
+  on:
+    tags: true
+    branch: master
+    skip_cleanup: true
+cache:
+  yarn: true
+notifications:
+  email:
+    on_failure: always
+    on_success: change
+  irc:
+    channels:
+      - "chat.freenode.net#hearthsim-commits"
+    use_notice: true
+    skip_join: true
+    on_failure: always
+    on_success: change
+    template:
+      - "(%{branch} @ %{commit} : %{author}): %{message} %{build_url}"
