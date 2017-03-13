@@ -5,9 +5,9 @@
   "keywords": [
     "hearthstone"
   ],
-  "homepage": "https://github.com/HearthSim/npm-hearthstonejson#readme",
+  "homepage": "https://github.com/HearthSim/Sunwell#readme",
   "bugs": {
-    "url": "https://github.com/HearthSim/npm-hearthstonejson/issues"
+    "url": "https://github.com/HearthSim/Sunwell/issues"
   },
   "license": "MIT",
   "author": "Jerome Leclanche <jerome@leclan.ch>",
@@ -17,7 +17,7 @@
   "main": "dist/Sunwell.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HearthSim/sunwell.git"
+    "url": "git+https://github.com/HearthSim/Sunwell.git"
   },
   "scripts": {
     "prepublishOnly": "tsc",
