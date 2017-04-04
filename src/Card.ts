@@ -214,6 +214,7 @@ enum CardSet {
 	KARA = 23,
 	OG = 21,
 	GANGS = 25,
+	UNGORO = 27,
 }
 
 enum CardType {
@@ -469,6 +470,7 @@ export default class Card {
 			case CardSet.OG: return "set-og";
 			case CardSet.KARA: return "set-kara";
 			case CardSet.GANGS: return "set-gangs";
+			case CardSet.UNGORO: return "set-ungoro";
 		}
 		return "";
 	}
@@ -523,7 +525,11 @@ export default class Card {
 			this.drawStatsTextures(ctx, s);
 
 			if (this.elite) {
-				this.drawImage(ctx, "elite", {dx: 196, dy: 0, dWidth: 529, ratio: s});
+				if (this.type == CardType.SPELL) {
+					this.drawImage(ctx, "elite-spell", {dx: 201, dy: 70, dWidth: 601, ratio: s});
+				} else {
+					this.drawImage(ctx, "elite", {dx: 196, dy: 0, dWidth: 529, ratio: s});
+				}
 			}
 
 			if (this.watermarkAsset) {
