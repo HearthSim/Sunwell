@@ -5,7 +5,7 @@ const request = require("request");
 const ArgumentParser = require("argparse").ArgumentParser;
 const Canvas = require("canvas");
 const Promise = require("promise");
-const Sunwell = require("../dist/sunwell").Sunwell;
+const Sunwell = require("../dist/Sunwell").Sunwell;
 
 function NodePlatform() {
 	this.name = "NODE";
