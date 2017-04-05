@@ -329,7 +329,6 @@ export default class Card {
 		}
 
 		if (this.type === CardType.MINION) {
-			this.elite = props.elite || false;
 			this.raceText = props.raceText || this.getRaceText();
 			this.silenced = props.silenced || false;
 		}
@@ -339,6 +338,7 @@ export default class Card {
 			this.health = props.durability;
 		}
 
+		this.elite = props.elite || false;
 		this.costColor = getNumberStyle(props.costStyle);
 		this.attackColor = getNumberStyle(props.costStyle);
 		this.healthColor = getNumberStyle(props.healthStyle);
@@ -384,7 +384,13 @@ export default class Card {
 			}
 		}
 
-		if (this.elite) assetsToLoad.push("elite");
+		if (this.elite) {
+			if (this.type == CardType.SPELL) {
+				assetsToLoad.push("elite-spell");
+			} else {
+				assetsToLoad.push("elite");
+			}
+		}
 		if (this.raceText) assetsToLoad.push("race-banner");
 		if (this.silenced) assetsToLoad.push("silence-x");
 		if (this.multiBannerAsset) assetsToLoad.push(this.multiBannerAsset);
