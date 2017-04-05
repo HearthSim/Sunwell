@@ -206,6 +206,7 @@ enum CardSet {
 	INVALID = 0,
 	CORE = 2,
 	EXPERT1 = 3,
+	HOF = 4,
 	NAXX = 12,
 	GVG = 13,
 	BRM = 14,
@@ -477,6 +478,7 @@ export default class Card {
 			case CardSet.KARA: return "set-kara";
 			case CardSet.GANGS: return "set-gangs";
 			case CardSet.UNGORO: return "set-ungoro";
+			case CardSet.HOF: return "set-hof";
 		}
 		return "";
 	}
