@@ -744,6 +744,7 @@ export default class Card {
 				lineCount++;
 				[xPos, yPos] = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
 				justLineBreak = true;
+				smallerFirstLine = false;
 				continue;
 			}
 
