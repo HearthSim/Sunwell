@@ -694,19 +694,36 @@ export default class Card {
 		bufferRowCtx.fillStyle = this.bodyTextColor;
 		bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
 
-		if (totalLength >= 65) {
-			fontSize = this.sunwell.options.bodyFontSize * 0.95;
-			lineHeight = this.sunwell.options.bodyLineHeight * 0.95;
+		if (manualBreak) {
+			let maxWidth = 0;
+			bufferRowCtx.font = this.getFontMaterial(fontSize, false, false);
+			bodyText.split("\n").forEach((line: string) => {
+				const width = this.getLineWidth(bufferRowCtx, fontSize, line);
+				if(width > maxWidth) {
+					maxWidth = width;
+				}
+			});
+			if (maxWidth > bufferText.width) {
+				const ratio = bufferText.width / maxWidth;
+				fontSize *= ratio;
+				lineHeight *= ratio;
+			}
 		}
+		else {
+			if (totalLength >= 65) {
+				fontSize = this.sunwell.options.bodyFontSize * 0.95;
+				lineHeight = this.sunwell.options.bodyLineHeight * 0.95;
+			}
 
-		if (totalLength >= 80) {
-			fontSize = this.sunwell.options.bodyFontSize * 0.9;
-			lineHeight = this.sunwell.options.bodyLineHeight * 0.9;
-		}
+			if (totalLength >= 80) {
+				fontSize = this.sunwell.options.bodyFontSize * 0.9;
+				lineHeight = this.sunwell.options.bodyLineHeight * 0.9;
+			}
 
-		if (totalLength >= 100) {
-			fontSize = this.sunwell.options.bodyFontSize * 0.8;
-			lineHeight = this.sunwell.options.bodyLineHeight * 0.8;
+			if (totalLength >= 100) {
+				fontSize = this.sunwell.options.bodyFontSize * 0.8;
+				lineHeight = this.sunwell.options.bodyLineHeight * 0.8;
+			}
 		}
 
 		const getFontMaterial = () => this.getFontMaterial(fontSize, isBold > 0, isItalic > 0);
@@ -823,6 +840,63 @@ export default class Card {
 		const material = prefix + fontSize + "px" + this.sunwell.bodyFontSizeExtra + ' "' + font + '", sans-serif';
 		return material;
 	};
+
+	protected getLineWidth(context, fontSize, line: string): number {
+		const words = line.split(" ");
+
+		let width = 0;
+		let isBold = 0;
+		let isItalic = 0;
+		const getFontMaterial = () => this.getFontMaterial(fontSize, isBold > 0, isItalic > 0);
+		for (let i = 0; i < words.length; i++) {
+			const word = words[i];
+			const chars = word.split("");
+
+			for (let j = 0; j < chars.length; j++) {
+				const char = chars[j];
+
+				// <b>
+				if (char === "<" && chars[j + 1] === "b" && chars[j + 2] === ">") {
+					isBold++;
+					j += 2;
+					context.font = getFontMaterial();
+					continue;
+				}
+
+				// </b>
+				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "b" && chars[j + 3] === ">") {
+					isBold--;
+					j += 3;
+					context.font = getFontMaterial();
+					continue;
+				}
+
+				// <i>
+				if (char === "<" && chars[j + 1] === "i" && chars[j + 2] === ">") {
+					isItalic++;
+					j += 2;
+					context.font = getFontMaterial();
+					continue;
+				}
+
+				// </i>
+				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "i" && chars[j + 3] === ">") {
+					isItalic--;
+					j += 3;
+					context.font = getFontMaterial();
+					continue;
+				}
+
+				context.fillText(char, width + this.sunwell.options.bodyFontOffset.x, this.sunwell.options.bodyFontOffset.y);
+
+				width += context.measureText(char).width;
+			}
+			const em = context.measureText("M").width;
+			width += 0.275 * em;
+		}
+
+		return width;
+	}
 
 	public drawName(targetCtx, s: number, name: string): void {
 		let buffer = this.sunwell.getBuffer(1024, 200);
