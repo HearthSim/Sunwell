@@ -1,6 +1,5 @@
 import {Sunwell} from "./Sunwell";
 
-
 function cleanEnum(val: string | number, e) {
 	if (typeof val === "string") {
 		if (val in e) {
@@ -631,8 +630,8 @@ export default class Card {
 	}
 
 	public drawBodyText(targetCtx, s: number, forceSmallerFirstLine: boolean, text: string): void {
-		var manualBreak = text.substr(0, 3) === "[x]";
-		var bodyText = manualBreak ? text.substr(3) : text;
+		const manualBreak = text.substr(0, 3) === "[x]";
+		let bodyText = manualBreak ? text.substr(3) : text;
 		if (!bodyText) {
 			return;
 		}
@@ -683,10 +682,22 @@ export default class Card {
 			bufferRow.width = 470;
 		}
 
-		var fontSize = this.sunwell.options.bodyFontSize;
-		var lineHeight = this.sunwell.options.bodyLineHeight;
-		var totalLength = bodyText.replace(/<\/*.>/g, "").length;
-		var smallerFirstLine = false;
+		let fontSize = this.sunwell.options.bodyFontSize;
+		let lineHeight = this.sunwell.options.bodyLineHeight;
+		let totalLength = bodyText.replace(/<\/*.>/g, "").length;
+		let smallerFirstLine = false;
+
+		const cleanText = bodyText.replace(/<\/*.>/g, "");
+		this.sunwell.log("counting length of " + cleanText);
+		this.sunwell.log("Length is " + totalLength);
+
+		bufferRowCtx.fillStyle = this.bodyTextColor;
+		bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
+
+		if (totalLength >= 65) {
+			fontSize = this.sunwell.options.bodyFontSize * 0.95;
+			lineHeight = this.sunwell.options.bodyLineHeight * 0.95;
+		}
 
 		if (totalLength >= 80) {
 			fontSize = this.sunwell.options.bodyFontSize * 0.9;
@@ -698,28 +709,14 @@ export default class Card {
 			lineHeight = this.sunwell.options.bodyLineHeight * 0.8;
 		}
 
+		const getFontMaterial = () => this.getFontMaterial(fontSize, isBold > 0, isItalic > 0);
+		bufferRowCtx.font = getFontMaterial();
+
 		bufferRow.height = lineHeight;
 
 		if (forceSmallerFirstLine || (totalLength >= 75 && this.type === CardType.SPELL)) {
 			smallerFirstLine = true;
 		}
-
-		bufferRowCtx.fillStyle = this.bodyTextColor;
-		bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
-
-			const getFontMaterial = () => {
-			let font = this.sunwell.options.bodyFont;
-			let prefix = "";
-			if(typeof font === "function") {
-				font = font(isBold > 0, isItalic > 0);
-			}
-			else {
-				prefix = (isBold > 0 ? "bold " : "") + (isItalic > 0 ? "italic " : "");
-			}
-			const material = prefix + fontSize + "px" + this.sunwell.bodyFontSizeExtra + ' "' + font + '", sans-serif';
-			return material;
-		};
-		bufferRowCtx.font = getFontMaterial();
 
 		for (let i = 0; i < words.length; i++) {
 			const word = words[i];
@@ -813,6 +810,19 @@ export default class Card {
 
 		this.sunwell.freeBuffer(bufferText);
 	}
+
+	protected getFontMaterial(fontSize: number, bold: boolean, italic: boolean) {
+		let font = this.sunwell.options.bodyFont;
+		let prefix = "";
+		if(typeof font === "function") {
+			font = font(bold, italic);
+		}
+		else {
+			prefix = (bold ? "bold " : "") + (italic ? "italic " : "");
+		}
+		const material = prefix + fontSize + "px" + this.sunwell.bodyFontSizeExtra + ' "' + font + '", sans-serif';
+		return material;
+	};
 
 	public drawName(targetCtx, s: number, name: string): void {
 		let buffer = this.sunwell.getBuffer(1024, 200);
