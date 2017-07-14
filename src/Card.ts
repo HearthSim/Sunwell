@@ -529,7 +529,8 @@ export default class Card {
 				this.drawImage(ctx, "race-banner", {dx: 125, dy: 937, ratio: s});
 			}
 
-			this.drawStatsTextures(ctx, s);
+			this.drawAttackTexture(ctx, s);
+			this.drawHealthTexture(ctx, s);
 
 			if (this.elite) {
 				if (this.type == CardType.SPELL) {
@@ -1181,30 +1182,41 @@ export default class Card {
 		}
 	}
 
-	public drawStatsTextures(ctx, s: number): void {
-		if (!this.hideStats) {
-			switch (this.type) {
-				case CardType.MINION:
-					this.drawImage(
-						ctx, "attack",
-						{sWidth: 214, sHeight: 238, dx: 0, dy: 862, dWidth: 214, dHeight: 238, ratio: s}
-					)
-					this.drawImage(
-						ctx, "health",
-						{sWidth: 167, sHeight: 218, dx: 575, dy: 876, dWidth: 167, dHeight: 218, ratio: s}
-					)
-					break;
-				case CardType.WEAPON:
-					this.drawImage(
-						ctx, "attack-weapon",
-						{sWidth: 312, sHeight: 306, dx: 32, dy: 906, dWidth: 187, dHeight: 183, ratio: s}
-					)
-					this.drawImage(
-						ctx, "health-weapon",
-						{sWidth: 301, sHeight: 333, dx: 584, dy: 890, dWidth: 186, dHeight: 205, ratio: s}
-					)
-					break;
-			}
+	public drawAttackTexture(ctx, s: number): void {
+		if (this.hideStats) return;
+
+		switch (this.type) {
+			case CardType.MINION:
+				this.drawImage(
+					ctx, "health",
+					{sWidth: 167, sHeight: 218, dx: 575, dy: 876, dWidth: 167, dHeight: 218, ratio: s}
+				);
+				break;
+			case CardType.WEAPON:
+				this.drawImage(
+					ctx, "health-weapon",
+					{sWidth: 301, sHeight: 333, dx: 584, dy: 890, dWidth: 186, dHeight: 205, ratio: s}
+				);
+				break;
+		}
+	}
+
+	public drawHealthTexture(ctx, s: number): void {
+		if (this.hideStats) return;
+
+		switch (this.type) {
+			case CardType.MINION:
+				this.drawImage(
+					ctx, "attack",
+					{sWidth: 214, sHeight: 238, dx: 0, dy: 862, dWidth: 214, dHeight: 238, ratio: s}
+				);
+				break;
+			case CardType.WEAPON:
+				this.drawImage(
+					ctx, "attack-weapon",
+					{sWidth: 312, sHeight: 306, dx: 32, dy: 906, dWidth: 187, dHeight: 183, ratio: s}
+				);
+				break;
 		}
 	}
 
