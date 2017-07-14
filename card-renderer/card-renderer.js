@@ -7,33 +7,6 @@ const Canvas = require("canvas");
 const Promise = require("promise");
 const Sunwell = require("../dist/Sunwell").Sunwell;
 
-function NodePlatform() {
-	this.name = "NODE";
-	this.Image = Canvas.Image;
-	this.Promise = Promise;
-	// The notation "16px/1em" is not supported by node-canvas
-	this.bodyFontSizeExtra = "";
-	this.requestAnimationFrame = (cb) => setImmediate(cb);
-}
-
-NodePlatform.prototype.getBuffer = function (width, height, clear) {
-	return new Canvas(width, height);
-}
-
-NodePlatform.prototype.freeBuffer = function (buffer) {
-}
-
-NodePlatform.prototype.loadAsset = function (img, path, loaded, error) {
-	fs.readFile(path, function (err, data) {
-		if (err) {
-			console.log("Error loading asset", path);
-			error();
-			return;
-		}
-		img.src = data;
-		loaded();
-	});
-}
 
 function renderCard(sunwell, card, path, resolution) {
 	if (!card.type || !card.playerClass) {
@@ -129,7 +102,6 @@ function main() {
 		bodyFontOffset: {x: 0, y: 40},
 		assetFolder: path.resolve(args.assets_dir) + "/",
 		debug: args.debug,
-		platform: new NodePlatform(),
 		cacheSkeleton: false,
 	});
 

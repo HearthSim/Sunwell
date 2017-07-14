@@ -4,17 +4,17 @@ const webpack = require("webpack");
 
 var PROD = process.env.NODE_ENV === "production";
 var MINIFY = new webpack.optimize.UglifyJsPlugin({minimize: true});
-var TS_LOADER = {test: /\.ts$/, loaders: ["ts-loader"]};
+// var MINIFY = new webpack.optimize.UglifyJsPlugin({minimize: true});
+
 
 module.exports = [{
-	name: "sunwell",
 	target: "web",
 	entry: {
 		sunwell: path.join(__dirname, "src/Sunwell.ts"),
 	},
 	output: {
 		path: path.resolve(__dirname, "dist"),
-		filename: PROD ? "[name].min.js" : "[name].js",
+		filename: PROD ? "sunwell.min.js" : "sunwell.js",
 		library: "Sunwell",
 		libraryTarget: "var",
 	},
@@ -22,7 +22,44 @@ module.exports = [{
 		extensions: [".webpack.js", ".web.js", ".ts", ".js"],
 	},
 	module: {
-		loaders: [TS_LOADER],
+		loaders: [{
+			test: /\.ts$/,
+			loaders: ["ts-loader"],
+		}],
 	},
-	plugins: PROD ? [MINIFY] : [],
+	plugins: [
+		new webpack.DefinePlugin({"process.env": {"PLATFORM": "web"}}),
+	],
+}, {
+	target: "node",
+	entry: {
+		sunwell: path.join(__dirname, "index.js"),
+	},
+	output: {
+		path: path.resolve(__dirname, "dist"),
+		filename: "index.js",
+	},
+	resolve: {
+		extensions: [".webpack.js", ".web.js", ".ts", ".js", ".node"],
+	},
+	node: {
+		"__dirname": false,
+		"__filename": false,
+		"fs": "empty",
+	},
+	module: {
+		loaders: [
+			{
+				test: /\.ts$/,
+				loaders: ["ts-loader"],
+			}, {
+				test: /\.node$/,
+				loaders: ["node-loader"],
+			}
+		],
+	},
+	plugins: [
+		new webpack.DefinePlugin({"process.env": {"PLATFORM": "node"}}),
+	],
 }];
+

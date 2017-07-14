@@ -1,63 +1,17 @@
 import Card from "./Card";
 
 
-var WebPlatform = function() {
-	this.name = "WEB";
-	this.buffers = [];
-	this.Image = Image;
-	this.Promise = Promise;
-	// The notation "16px/1em" is not supported by node-canvas
-	this.bodyFontSizeExtra = "/1em";
-	this.requestAnimationFrame = (cb) => window.requestAnimationFrame(cb);
+let Platform;
+
+if (process.env.PLATFORM == "node") {
+	Platform = require("./NodePlatform");
+} else if (process.env.PLATFORM == "web") {
+	Platform = require("./WebPlatform");
 }
-
-
-WebPlatform.prototype.getBuffer = function(width: number, height: number, clear: boolean) {
-	var cvs;
-
-	if (this.buffers.length) {
-		if (width) {
-			for (var i = 0; i < this.buffers.length; i++) {
-				if (this.buffers[i].width === width && this.buffers[i].height === height) {
-					cvs = this.buffers.splice(i, 1)[0];
-					break;
-				}
-			}
-		} else {
-			cvs = this.buffers.pop();
-		}
-		if (cvs) {
-			if (clear) {
-				cvs.getContext("2d").clearRect(0, 0, cvs.width, cvs.height);
-			}
-			return cvs;
-		}
-	}
-
-	cvs = document.createElement("canvas");
-
-	if (width) {
-		cvs.width = width;
-		cvs.height = height;
-	}
-
-	return cvs;
-}
-
-WebPlatform.prototype.freeBuffer = function(buffer) {
-	this.buffers.push(buffer);
-}
-
-WebPlatform.prototype.loadAsset = function(img, url, loaded, error) {
-	img.addEventListener("load", loaded);
-	img.addEventListener("error", error);
-
-	img.src = url;
-}
-
 
 export class Sunwell {
 	public options;
+	public platform;
 	public assets;
 	public bodyFontSizeExtra;
 	public races;
@@ -78,11 +32,11 @@ export class Sunwell {
 		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};
 		options.bodyLineHeight = options.bodyLineHeight || 50;
 		options.assetFolder = options.assetFolder || "/assets/";
-		options.platform = options.platform || new WebPlatform();
 		options.drawTimeout = options.drawTimeout || 5000;
 		options.cacheSkeleton = options.cacheSkeleton || false;
 		options.preloadedAssets = options.preloadedAssets || [];
 		options.debug = options.debug || false;
+		this.platform = options.platform || new Platform();
 
 		this.options = options;
 		this.assets = {};
@@ -90,7 +44,7 @@ export class Sunwell {
 		this.renderQuery = {};
 		this.activeRenders = 0;
 		this.renderCache = {};
-		this.bodyFontSizeExtra = this.options.platform.bodyFontSizeExtra;
+		this.bodyFontSizeExtra = this.platform.bodyFontSizeExtra;
 		this.isRendering = false;
 	}
 
@@ -104,19 +58,19 @@ export class Sunwell {
 		console.log.apply("[ERROR]", arguments);
 	}
 
-	public fetchAsset(path: string) {
+	public fetchAsset(path: string): Promise<Function> {
 		var assets = this.assets;
 		var assetListeners = this.assetListeners;
 		var _this = this;
 
-		return new this.options.platform.Promise((resolve) => {
+		return new Promise((resolve) => {
 			if (assets[path] === undefined) {
-				assets[path] = new _this.options.platform.Image();
+				assets[path] = new Image();
 				assets[path].crossOrigin = "Anonymous";
 				assets[path].loaded = false;
 
 				_this.log("Requesting", path);
-				_this.options.platform.loadAsset(assets[path], path, function() {
+				_this.platform.loadAsset(assets[path], path, function() {
 					assets[path].loaded = true;
 					if (assetListeners[path]) {
 						for (var a in assetListeners[path]) {
@@ -151,11 +105,11 @@ export class Sunwell {
 	}
 
 	public getBuffer(width: number, height: number, clear?: boolean) {
-		return this.options.platform.getBuffer(width, height, clear);
+		return this.platform.getBuffer(width, height, clear);
 	}
 
 	public freeBuffer(buffer) {
-		return this.options.platform.freeBuffer(buffer);
+		return this.platform.freeBuffer(buffer);
 	}
 
 	public render(): void {
@@ -189,12 +143,12 @@ export class Sunwell {
 		}
 
 		this.log("Preparing to load assets");
-		let fetches: Array<Function> = [];
+		let fetches: Array<Promise<Function>> = [];
 		for (let i in texturesToLoad) {
 			fetches.push(this.fetchAsset(texturesToLoad[i]));
 		}
 
-		this.options.platform.Promise.all(fetches).then(() => {
+		Promise.all(fetches).then(() => {
 			let start = Date.now();
 			card.draw(ctx, s);
 			this.log(card, "finished drawing in " + (Date.now() - start) + "ms");
@@ -229,7 +183,7 @@ export class Sunwell {
 
 	public renderTick(): void {
 		this.isRendering = true;
-		this.options.platform.requestAnimationFrame(() => this.render());
+		this.platform.requestAnimationFrame(() => this.render());
 	}
 
 	public createCard(props, width: number, target, callback?: Function): Card {
