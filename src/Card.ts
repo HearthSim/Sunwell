@@ -261,6 +261,7 @@ export default class Card {
 	public bodyText: string;
 	public raceText: string;
 	public cost: number;
+	public armor: number;
 	public attack: number;
 	public health: number;
 	public cardClass: CardClass;
@@ -305,6 +306,7 @@ export default class Card {
 		this.type = props.type;
 		this.cost = props.cost || 0;
 		this.attack = props.attack || 0;
+		this.armor = props.armor || 0;
 		this.health = props.health || 0;
 		this.costsHealth = props.costHealth || false;
 		this.hideStats = props.hideStats;
@@ -381,12 +383,16 @@ export default class Card {
 				assetsToLoad.push("attack", "health");
 			} else if (this.type === CardType.WEAPON) {
 				assetsToLoad.push("attack-weapon", "health-weapon");
+			} else if (this.type === CardType.HERO) {
+				assetsToLoad.push("attack", "armor");
 			}
 		}
 
 		if (this.elite) {
 			if (this.type == CardType.SPELL) {
 				assetsToLoad.push("elite-spell");
+			} else if (this.type == CardType.HERO) {
+				assetsToLoad.push("elite-hero");
 			} else {
 				assetsToLoad.push("elite");
 			}
@@ -432,6 +438,7 @@ export default class Card {
 		let sclass = CardClass[this.cardClass || CardClass.NEUTRAL].toLowerCase();
 		if (this.cardClass == CardClass.DREAM) sclass = "hunter";
 		switch (this.type) {
+			case CardType.HERO: return "frame-hero-" + sclass;
 			case CardType.MINION: return "frame-minion-" + sclass;
 			case CardType.SPELL: return "frame-spell-" + sclass;
 			case CardType.WEAPON: return "frame-weapon-" + sclass;
@@ -441,6 +448,7 @@ export default class Card {
 
 	private getNameBannerAsset(): string {
 		switch (this.type) {
+			case CardType.HERO: return "name-banner-hero";
 			case CardType.MINION: return "name-banner-minion";
 			case CardType.SPELL: return "name-banner-spell";
 			case CardType.WEAPON: return "name-banner-weapon";
@@ -1171,14 +1179,18 @@ export default class Card {
 	}
 
 	public drawStats(ctx, s: number): void {
-		if (!this.hideStats) {
-			this.drawNumber(ctx, 116, 170, s, this.cost, 175, this.costColor);
+		if (this.hideStats) return;
 
-			if (this.type === CardType.MINION || this.type === CardType.WEAPON) {
-				const attackX = this.type === CardType.MINION ? 128 : 118;
-				this.drawNumber(ctx, attackX, 994, s, this.attack, 160, this.attackColor);
-				this.drawNumber(ctx, 668, 994, s, this.health, 160, this.healthColor);
-			}
+		this.drawNumber(ctx, 116, 170, s, this.cost, 175, this.costColor);
+
+		if (this.type == CardType.HERO) {
+			this.drawNumber(ctx, 668, 994, s, this.armor, 160, this.healthColor);
+		} else if (this.type == CardType.MINION) {
+			this.drawNumber(ctx, 128, 994, s, this.attack, 160, this.attackColor);
+			this.drawNumber(ctx, 668, 994, s, this.health, 160, this.healthColor);
+		} else if (this.type == CardType.WEAPON) {
+			this.drawNumber(ctx, 118, 994, s, this.attack, 160, this.attackColor);
+			this.drawNumber(ctx, 668, 994, s, this.health, 160, this.healthColor);
 		}
 	}
 
@@ -1186,6 +1198,12 @@ export default class Card {
 		if (this.hideStats) return;
 
 		switch (this.type) {
+			case CardType.HERO:
+				this.drawImage(
+					ctx, "armor",
+					{sWidth: 167, sHeight: 218, dx: 575, dy: 876, dWidth: 167, dHeight: 218, ratio: s}
+				);
+				break;
 			case CardType.MINION:
 				this.drawImage(
 					ctx, "health",
