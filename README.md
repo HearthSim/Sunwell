@@ -106,7 +106,7 @@ Enums are standard Hearthstone enums. They can be passed as an int (preferred) o
 string variant:
 
 - `type` (enum CardType): The card's type (only MINION, SPELL and WEAPON are supported).
-- `playerClass` (enum CardClass): The card's class. This determines the card frame to use.
+- `cardClass` (enum CardClass): The card's class. This determines the card frame to use.
 - `set` (enum CardSet): Determines the body text background watermark.
 - `rarity` (enum Rarity): Determines the card's rarity gem. Note that COMMON cards from the
   CORE set will not show a rarity gem, despite not being FREE.

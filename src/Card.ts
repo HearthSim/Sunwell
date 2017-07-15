@@ -312,7 +312,7 @@ export default class Card {
 		this.name = props.name || "";
 
 		this.multiClassGroup = cleanEnum(props.multiClassGroup, MultiClassGroup) as MultiClassGroup;
-		this.cardClass = cleanEnum(props.playerClass, CardClass) as CardClass;
+		this.cardClass = cleanEnum(props.cardClass, CardClass) as CardClass;
 		this.set = cleanEnum(props.set, CardSet) as CardSet;
 		this.type = cleanEnum(props.type, CardType) as CardType;
 		this.race = cleanEnum(props.race, Race) as Race;

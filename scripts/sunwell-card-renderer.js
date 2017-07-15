@@ -8,7 +8,7 @@ const Promise = require("promise");
 const Sunwell = require("../dist/sunwell.node");
 
 function renderCard(sunwell, card, path, resolution) {
-	if (!card.type || !card.playerClass) {
+	if (!card.type || !card.cardClass) {
 		console.log("Skipping", card.id, "(no card to render)");
 		return;
 	}
