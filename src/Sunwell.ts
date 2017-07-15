@@ -25,7 +25,7 @@ export default class Sunwell {
 		options.bodyFont = options.bodyFont || "Franklin Gothic";
 		options.aspectRatio = options.aspectRatio || 1.4397905759;
 		options.bodyFontSize = options.bodyFontSize || 60;
-		options.bodyFontOffset = options.bodyFontOffset || { x: 0, y: 0 };
+		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};
 		options.bodyLineHeight = options.bodyLineHeight || 50;
 		options.assetFolder = options.assetFolder || "/assets/";
 		options.platform = options.platform || new Platform();
@@ -59,27 +59,32 @@ export default class Sunwell {
 		var assetListeners = this.assetListeners;
 		var _this = this;
 
-		return new this.options.platform.Promise((resolve) => {
+		return new this.options.platform.Promise(resolve => {
 			if (assets[path] === undefined) {
 				assets[path] = new _this.options.platform.Image();
 				assets[path].crossOrigin = "Anonymous";
 				assets[path].loaded = false;
 
 				_this.log("Requesting", path);
-				_this.options.platform.loadAsset(assets[path], path, function () {
-					assets[path].loaded = true;
-					if (assetListeners[path]) {
-						for (var a in assetListeners[path]) {
-							assetListeners[path][a](assets[path]);
+				_this.options.platform.loadAsset(
+					assets[path],
+					path,
+					function() {
+						assets[path].loaded = true;
+						if (assetListeners[path]) {
+							for (var a in assetListeners[path]) {
+								assetListeners[path][a](assets[path]);
+							}
+							delete assetListeners[path];
 						}
-						delete assetListeners[path];
+						resolve();
+					},
+					function() {
+						_this.error("Error loading asset:", path);
+						// An asset load error should not reject the promise
+						resolve();
 					}
-					resolve();
-				}, function () {
-					_this.error("Error loading asset:", path);
-					// An asset load error should not reject the promise
-					resolve();
-				});
+				);
 			} else if (!assets[path].loaded) {
 				assetListeners[path] = assetListeners[path] || [];
 				assetListeners[path].push(resolve);
@@ -144,20 +149,23 @@ export default class Sunwell {
 			fetches.push(this.fetchAsset(texturesToLoad[i]));
 		}
 
-		this.options.platform.Promise.all(fetches).then(() => {
-			let start = Date.now();
-			card.draw(ctx, s);
-			this.log(card, "finished drawing in " + (Date.now() - start) + "ms");
-			// check whether we have more to do
-			this.isRendering = false;
-			if (Object.keys(this.renderQuery).length) {
-				this.renderTick();
-			}
-		}).catch((e) => {
-			this.error("Error while drawing card:", e);
-			this.isRendering = false;
-		});
-	};
+		this.options.platform.Promise
+			.all(fetches)
+			.then(() => {
+				let start = Date.now();
+				card.draw(ctx, s);
+				this.log(card, "finished drawing in " + (Date.now() - start) + "ms");
+				// check whether we have more to do
+				this.isRendering = false;
+				if (Object.keys(this.renderQuery).length) {
+					this.renderTick();
+				}
+			})
+			.catch(e => {
+				this.error("Error while drawing card:", e);
+				this.isRendering = false;
+			});
+	}
 
 	public getAssetPath(key: string): string {
 		return this.options.assetFolder + key + ".png";

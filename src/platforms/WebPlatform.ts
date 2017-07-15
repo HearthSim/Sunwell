@@ -1,11 +1,11 @@
-import IPlatform from "./IPlatform"
+import IPlatform from "./IPlatform";
 
 export default class WebPlatform implements IPlatform {
-	name = "WEB"
-	buffers = []
-	Image = Image
-	Promise = Promise
-	bodyFontSizeExtra = "/1em"
+	name = "WEB";
+	buffers = [];
+	Image = Image;
+	Promise = Promise;
+	bodyFontSizeExtra = "/1em";
 
 	getBuffer(width: number, height: number, clear: boolean): void {
 		var cvs;

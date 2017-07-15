@@ -10,8 +10,8 @@ interface IPlatform {
 	requestAnimationFrame(cb: Function): void;
 }
 
-export default IPlatform
+export default IPlatform;
 
 export interface IPlatformConstructable {
-	new(): IPlatform;
+	new (): IPlatform;
 }

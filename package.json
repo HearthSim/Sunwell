@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "^8.0.13",
+    "prettier": "^1.5.3",
     "request": "^2.81.0",
     "rollup": "^0.45.2",
     "rollup-plugin-cleanup": "^1.0.1",
@@ -44,5 +45,12 @@
     "canvas": "2.0.0-alpha.2",
     "mkdirp": "^0.5.1",
     "promise": "^8.0.1"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "useTabs": true,
+    "tabWidth": 4,
+    "bracketSpacing": false,
+    "trailingComma": "es5"
   }
 }
