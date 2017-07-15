@@ -432,6 +432,7 @@ export default class Card {
 		let sclass = CardClass[this.cardClass || CardClass.NEUTRAL].toLowerCase();
 		if (this.cardClass == CardClass.DREAM) sclass = "hunter";
 		switch (this.type) {
+			case CardType.HERO: return "frame-hero-" + sclass;
 			case CardType.MINION: return "frame-minion-" + sclass;
 			case CardType.SPELL: return "frame-spell-" + sclass;
 			case CardType.WEAPON: return "frame-weapon-" + sclass;
@@ -441,6 +442,7 @@ export default class Card {
 
 	private getNameBannerAsset(): string {
 		switch (this.type) {
+			case CardType.HERO: return "name-banner-hero";
 			case CardType.MINION: return "name-banner-minion";
 			case CardType.SPELL: return "name-banner-spell";
 			case CardType.WEAPON: return "name-banner-weapon";
@@ -458,6 +460,7 @@ export default class Card {
 
 		let srarity = Rarity[this.rarity].toLowerCase();
 		switch (this.type) {
+			case CardType.HERO: return "rarity-minion-" + srarity;
 			case CardType.MINION: return "rarity-minion-" + srarity;
 			case CardType.SPELL: return "rarity-spell-" + srarity;
 			case CardType.WEAPON: return "rarity-weapon-" + srarity;
@@ -609,6 +612,7 @@ export default class Card {
 
 		ctx.save();
 		switch (this.type) {
+			case CardType.HERO:
 			case CardType.MINION:
 				dx = 100, dy = 75, dWidth = 590, dHeight = 590;
 				drawEllipse(ctx, 180 * ratio, dy * ratio, 430 * ratio, dHeight * ratio);
@@ -665,22 +669,27 @@ export default class Card {
 		var bufferRow = this.sunwell.getBuffer();
 		var bufferRowCtx = bufferRow.getContext("2d");
 
-		if (this.type === CardType.MINION) {
-			bufferText.width = 520;
-			bufferText.height = 290;
-			bufferRow.width = 520;
-		}
-
-		if (this.type === CardType.SPELL) {
-			bufferText.width = 460;
-			bufferText.height = 290;
-			bufferRow.width = 460;
-		}
-
-		if (this.type === CardType.WEAPON) {
-			bufferText.width = 470;
-			bufferText.height = 250;
-			bufferRow.width = 470;
+		switch (this.type) {
+			case CardType.HERO:
+				bufferText.width = 490;
+				bufferText.height = 290;
+				bufferRow.width = 490;
+				break;
+			case CardType.MINION:
+				bufferText.width = 520;
+				bufferText.height = 290;
+				bufferRow.width = 520;
+				break;
+			case CardType.SPELL:
+				bufferText.width = 460;
+				bufferText.height = 290;
+				bufferRow.width = 460;
+				break;
+			case CardType.WEAPON:
+				bufferText.width = 470;
+				bufferText.height = 250;
+				bufferRow.width = 470;
+				break;
 		}
 
 		let fontSize = this.sunwell.options.bodyFontSize;
@@ -902,38 +911,52 @@ export default class Card {
 	public drawName(targetCtx, s: number, name: string): void {
 		let buffer = this.sunwell.getBuffer(1024, 200);
 		let ctx = buffer.getContext("2d");
+		let maxWidth: number;
+		let pathMiddle: number;
+		let c: Array<any>;
 		ctx.save();
 
-		var maxWidth = 560;
-
-		let pathMiddle = .55;
-		let c = [
-			{x: 0, y: 110},
-			{x: 122, y: 140},
-			{x: 368, y: 16},
-			{x: 580, y: 100},
-		];
-
-		if (this.type === CardType.SPELL) {
-			pathMiddle = .49;
-			maxWidth = 560;
-			c = [
-				{x: 10, y: 97},
-				{x: 212, y: 45},
-				{x: 368, y: 45},
-				{x: 570, y: 100},
-			]
-		}
-
-		if (this.type === CardType.WEAPON) {
-			pathMiddle = .56;
-			maxWidth = 580;
-			c = [
-				{x: 10, y: 77},
-				{x: 50, y: 77},
-				{x: 500, y: 77},
-				{x: 570, y: 77},
-			]
+		switch (this.type) {
+			case CardType.HERO:
+				pathMiddle = .56;
+				maxWidth = 520;
+				c = [
+					{x: 0, y: 135},
+					{x: 220, y: 42},
+					{x: 350, y: 42},
+					{x: 570, y: 125},
+				];
+				break;
+			case CardType.MINION:
+				pathMiddle = .55;
+				maxWidth = 560;
+				c = [
+					{x: 0, y: 110},
+					{x: 122, y: 140},
+					{x: 368, y: 16},
+					{x: 580, y: 100},
+				];
+				break;
+			case CardType.SPELL:
+				pathMiddle = .49;
+				maxWidth = 560;
+				c = [
+					{x: 10, y: 97},
+					{x: 212, y: 45},
+					{x: 368, y: 45},
+					{x: 570, y: 100},
+				];
+				break;
+			case CardType.WEAPON:
+				pathMiddle = .56;
+				maxWidth = 580;
+				c = [
+					{x: 10, y: 77},
+					{x: 50, y: 77},
+					{x: 500, y: 77},
+					{x: 570, y: 77},
+				];
+				break;
 		}
 
 		if(this.sunwell.options.debug) {
@@ -1055,6 +1078,9 @@ export default class Card {
 	public drawNameBanner(ctx, ratio: number) {
 		let coords : Coords;
 		switch (this.type) {
+			case CardType.HERO:
+				coords = {sWidth: 627, sHeight: 156, dx: 81, dy: 535, dWidth: 627, dHeight: 156};
+				break
 			case CardType.MINION:
 				coords = {sWidth: 608, sHeight: 144, dx: 94, dy: 546, dWidth: 608, dHeight: 144};
 				break
@@ -1160,6 +1186,7 @@ export default class Card {
 		let dx: number, dy: number;
 
 		switch(this.type) {
+			case CardType.HERO:
 			case CardType.MINION:
 				dx = 326, dy = 607;
 				break;
