@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+
+<body>
+	<canvas id="cardCanvas"></canvas>
+	<script src="../dist/sunwell.web.js"></script>
+	<script>
+		let sunwell = new Sunwell({
+			assetFolder: '../assets/',
+			debug: true
+		});
+		let cardCanvas = document.getElementById('cardCanvas')
+		sunwell.createCard({
+			"id": "EX1_116",
+			"dbfId": 559,
+			"name": "Leeroy Jenkins",
+			"text": "<b>Charge</b>. <b>Battlecry:</b> Summon two 1/1 Whelps for your opponent.",
+			"flavor": "At least he has Angry Chicken.",
+			"artist": "Gabe from Penny Arcade",
+			"attack": 6,
+			"cardClass": "NEUTRAL",
+			"collectible": true,
+			"cost": 5,
+			"elite": true,
+			"faction": "ALLIANCE",
+			"health": 2,
+			"mechanics": [
+				"BATTLECRY",
+				"CHARGE"
+			],
+			"rarity": "LEGENDARY",
+			"set": "EXPERT1",
+			"type": "MINION",
+			"texture": "../textures/EX1_609.jpg"
+		}, 200, cardCanvas, function() {
+			console.log('done')
+		});
+	</script>
+</body>
+
+</html>

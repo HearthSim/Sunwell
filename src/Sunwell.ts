@@ -1,62 +1,12 @@
+/*#if _PLATFORM == "node"
+import Platform from "./platforms/NodePlatform.ts";
+//#else */
+import Platform from "./platforms/WebPlatform";
+//#endif
+
 import Card from "./Card";
 
-
-var WebPlatform = function() {
-	this.name = "WEB";
-	this.buffers = [];
-	this.Image = Image;
-	this.Promise = Promise;
-	// The notation "16px/1em" is not supported by node-canvas
-	this.bodyFontSizeExtra = "/1em";
-	this.requestAnimationFrame = (cb) => window.requestAnimationFrame(cb);
-}
-
-
-WebPlatform.prototype.getBuffer = function(width: number, height: number, clear: boolean) {
-	var cvs;
-
-	if (this.buffers.length) {
-		if (width) {
-			for (var i = 0; i < this.buffers.length; i++) {
-				if (this.buffers[i].width === width && this.buffers[i].height === height) {
-					cvs = this.buffers.splice(i, 1)[0];
-					break;
-				}
-			}
-		} else {
-			cvs = this.buffers.pop();
-		}
-		if (cvs) {
-			if (clear) {
-				cvs.getContext("2d").clearRect(0, 0, cvs.width, cvs.height);
-			}
-			return cvs;
-		}
-	}
-
-	cvs = document.createElement("canvas");
-
-	if (width) {
-		cvs.width = width;
-		cvs.height = height;
-	}
-
-	return cvs;
-}
-
-WebPlatform.prototype.freeBuffer = function(buffer) {
-	this.buffers.push(buffer);
-}
-
-WebPlatform.prototype.loadAsset = function(img, url, loaded, error) {
-	img.addEventListener("load", loaded);
-	img.addEventListener("error", error);
-
-	img.src = url;
-}
-
-
-export class Sunwell {
+export default class Sunwell {
 	public options;
 	public assets;
 	public bodyFontSizeExtra;
@@ -75,10 +25,10 @@ export class Sunwell {
 		options.bodyFont = options.bodyFont || "Franklin Gothic";
 		options.aspectRatio = options.aspectRatio || 1.4397905759;
 		options.bodyFontSize = options.bodyFontSize || 60;
-		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};
+		options.bodyFontOffset = options.bodyFontOffset || { x: 0, y: 0 };
 		options.bodyLineHeight = options.bodyLineHeight || 50;
 		options.assetFolder = options.assetFolder || "/assets/";
-		options.platform = options.platform || new WebPlatform();
+		options.platform = options.platform || new Platform();
 		options.drawTimeout = options.drawTimeout || 5000;
 		options.cacheSkeleton = options.cacheSkeleton || false;
 		options.preloadedAssets = options.preloadedAssets || [];
@@ -116,7 +66,7 @@ export class Sunwell {
 				assets[path].loaded = false;
 
 				_this.log("Requesting", path);
-				_this.options.platform.loadAsset(assets[path], path, function() {
+				_this.options.platform.loadAsset(assets[path], path, function () {
 					assets[path].loaded = true;
 					if (assetListeners[path]) {
 						for (var a in assetListeners[path]) {
@@ -125,7 +75,7 @@ export class Sunwell {
 						delete assetListeners[path];
 					}
 					resolve();
-				}, function() {
+				}, function () {
 					_this.error("Error loading asset:", path);
 					// An asset load error should not reject the promise
 					resolve();
@@ -141,7 +91,7 @@ export class Sunwell {
 
 	public prepareRenderingCard(card: Card): void {
 		this.log("Queried render:", card.name);
-		if(this.renderQuery[card.key]) {
+		if (this.renderQuery[card.key]) {
 			this.log("Skipping", card.key, "(already queued)");
 		}
 		this.renderQuery[card.key] = card;

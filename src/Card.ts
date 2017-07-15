@@ -1,4 +1,4 @@
-import {Sunwell} from "./Sunwell";
+import Sunwell from "./Sunwell";
 
 function cleanEnum(val: string | number, e) {
 	if (typeof val === "string") {

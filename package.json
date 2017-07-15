@@ -21,12 +21,28 @@
   },
   "scripts": {
     "prepublishOnly": "tsc",
-    "build": "tsc",
+    "build": "rollup -c && BROWSER=true rollup -c",
     "dev": "tsc --watch"
   },
   "devDependencies": {
+    "@types/node": "^8.0.13",
+    "request": "^2.81.0",
+    "rollup": "^0.45.2",
+    "rollup-plugin-cleanup": "^1.0.1",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-jscc": "^0.3.3",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^1.1.1",
+    "rollup-plugin-typescript": "^0.8.1",
     "ts-loader": "^2.0.1",
     "typescript": "^2.1.4",
-    "webpack": "^2.2.1"
+    "webpack": "^3.2.0",
+    "webpack-node-externals": "^1.6.0"
+  },
+  "dependencies": {
+    "argparse": "^1.0.9",
+    "canvas": "2.0.0-alpha.2",
+    "mkdirp": "^0.5.1",
+    "promise": "^8.0.1"
   }
 }
