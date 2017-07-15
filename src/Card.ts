@@ -1064,6 +1064,9 @@ export default class Card {
 			case CardType.WEAPON:
 				coords = {sWidth: 660, sHeight: 140, dx: 56, dy: 551, dWidth: 660, dHeight: 140};
 				break;
+			default:
+				this.sunwell.log("Not drawing a name banner (this should not happen)");
+				return;
 		}
 
 		coords.ratio = ratio;
