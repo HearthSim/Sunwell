@@ -5,6 +5,8 @@ export default class SpellCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 460, height: 290};
 	public nameBannerAsset = "name-banner-spell";
+	public dragonAsset = "elite-spell";
+	public dragonCoords = {dx: 201, dy: 70, dWidth: 601};
 	public attackGemAsset = null;
 	public healthGemAsset = null;
 	public attackGemCoords = null;

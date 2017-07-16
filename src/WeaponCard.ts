@@ -5,6 +5,8 @@ export default class WeaponCard extends Card {
 	public bodyTextColor = "white";
 	public bodyTextSize = {width: 470, height: 250};
 	public nameBannerAsset = "name-banner-weapon";
+	public dragonAsset = null;
+	public dragonCoords = null;
 	public attackGemAsset = "health-minion";
 	public healthGemAsset = "durability";
 	public attackGemCoords = {

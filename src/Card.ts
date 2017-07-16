@@ -298,6 +298,8 @@ export default abstract class Card {
 	public abstract rarityGemCoords: ICoords;
 	public abstract bodyTextColor: string;
 	public abstract nameBannerAsset: string;
+	public abstract dragonAsset: string;
+	public abstract dragonCoords: ICoords;
 	public abstract attackGemAsset: string;
 	public abstract attackGemCoords: ICoords;
 	public abstract healthGemAsset: string;
@@ -347,12 +349,8 @@ export default abstract class Card {
 			}
 		}
 
-		if (this.elite) {
-			if (this.type === CardType.SPELL) {
-				assetsToLoad.push("elite-spell");
-			} else {
-				assetsToLoad.push("elite");
-			}
+		if (this.elite && this.dragonAsset) {
+			assetsToLoad.push(this.dragonAsset);
 		}
 		if (this.raceText) {
 			assetsToLoad.push("race-banner");
@@ -524,22 +522,10 @@ export default abstract class Card {
 			this.drawAttackTexture(ctx, s);
 			this.drawHealthTexture(ctx, s);
 
-			if (this.elite) {
-				if (this.type === CardType.SPELL) {
-					this.drawImage(ctx, "elite-spell", {
-						dx: 201,
-						dy: 70,
-						dWidth: 601,
-						ratio: s,
-					});
-				} else {
-					this.drawImage(ctx, "elite", {
-						dx: 196,
-						dy: 0,
-						dWidth: 529,
-						ratio: s,
-					});
-				}
+			if (this.elite && this.dragonAsset) {
+				let coords = this.dragonCoords;
+				coords.ratio = s;
+				this.drawImage(ctx, this.dragonAsset, coords);
 			}
 
 			if (this.watermarkAsset) {

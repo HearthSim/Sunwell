@@ -5,6 +5,8 @@ export default class HeroCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 490, height: 290};
 	public nameBannerAsset = "name-banner-hero";
+	public dragonAsset = "elite-hero";
+	public dragonCoords = null; // TODO
 	public attackGemAsset = null;
 	public healthGemAsset = "armor";
 	public attackGemCoords = null;
