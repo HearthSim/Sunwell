@@ -3,6 +3,7 @@ import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import jscc from 'rollup-plugin-jscc'
 import cleanup from 'rollup-plugin-cleanup'
+import uglify from 'rollup-plugin-uglify'
 
 const ExternalModulesList = [].concat(
   require('builtin-modules'),
@@ -35,6 +36,7 @@ export default {
       ignoreGlobal: true,
       extensions: ['.js', '.ts']
     }),
-    cleanup()
+	cleanup(),
+	PRODUCTION ? uglify() : undefined
   ]
 }
