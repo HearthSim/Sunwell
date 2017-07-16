@@ -241,19 +241,15 @@ export default abstract class Card {
 	private multiBannerAsset: string;
 	private nameBannerAsset: string;
 	private watermarkAsset: string;
+	private _propsJson: string;
 
-	constructor(sunwell: Sunwell, props, width: number, canvas, target, callback?: Function) {
+	constructor(sunwell: Sunwell, props) {
 		this.sunwell = sunwell;
 
 		if (!props) {
 			throw new Error("No card properties given");
 		}
 
-		this.canvas = canvas;
-		this.target = target;
-		this.callback = callback;
-
-		this.width = width;
 		this.type = props.type;
 		this.cost = props.cost || 0;
 		this.attack = props.attack || 0;
@@ -298,10 +294,7 @@ export default abstract class Card {
 		this.bodyTextColor = this.type === CardType.WEAPON ? "white" : "black";
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
-
-		this.cacheKey = this.checksum(props);
-		this.key = props.key || this.cacheKey;
-		sunwell.prepareRenderingCard(this);
+		this._propsJson = JSON.stringify(props);
 	}
 
 	public abstract getCardFrameAsset(cardClass: CardClass): string;
@@ -311,8 +304,8 @@ export default abstract class Card {
 	public abstract getNameBannerCoords(): ICoords;
 	public abstract getWatermarkCoords(): ICoords;
 
-	private checksum(props): number {
-		const s = JSON.stringify(props) + this.width;
+	private checksum(): number {
+		const s = this._propsJson + this.width;
 		const length = s.length;
 		let chk = 0;
 		for (let i = 0; i < length; i++) {
@@ -322,6 +315,16 @@ export default abstract class Card {
 		}
 
 		return chk;
+	}
+
+	public render(width: number, canvas, target, callback?: Function): void {
+		this.width = width;
+		this.canvas = canvas;
+		this.target = target;
+		this.callback = callback;
+		this.cacheKey = this.checksum();
+		this.key = this.cacheKey;
+		this.sunwell.prepareRenderingCard(this);
 	}
 
 	public getAssetsToLoad(): string[] {

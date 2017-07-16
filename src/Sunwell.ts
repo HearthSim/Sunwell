@@ -220,6 +220,8 @@ export default class Sunwell {
 			throw new Error("Got an unrenderable card type");
 		}
 
-		return new ctor(this, props, width, canvas, target, callback);
+		const card = new ctor(this, props);
+		card.render(width, canvas, target, callback);
+		return card;
 	}
 }
