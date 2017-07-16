@@ -308,6 +308,8 @@ export abstract class Card {
 	abstract getCardFrameAsset(cardClass: CardClass): string;
 	abstract getRarityGemAsset(rarity: Rarity): string;
 	abstract getNameBannerAsset(): string;
+	abstract getNameBannerCoords(): Coords;
+	abstract getWatermarkCoords(): Coords;
 
 	private callback: Function;
 	private cacheKey: number;
@@ -1149,53 +1151,7 @@ export abstract class Card {
 	}
 
 	public drawNameBanner(ctx, ratio: number) {
-		let coords: Coords;
-		switch (this.type) {
-			case CardType.HERO:
-				coords = {
-					sWidth: 627,
-					sHeight: 156,
-					dx: 81,
-					dy: 535,
-					dWidth: 627,
-					dHeight: 156,
-				};
-				break;
-			case CardType.MINION:
-				coords = {
-					sWidth: 608,
-					sHeight: 144,
-					dx: 94,
-					dy: 546,
-					dWidth: 608,
-					dHeight: 144,
-				};
-				break;
-			case CardType.SPELL:
-				coords = {
-					sWidth: 646,
-					sHeight: 199,
-					dx: 66,
-					dy: 530,
-					dWidth: 646,
-					dHeight: 199,
-				};
-				break;
-			case CardType.WEAPON:
-				coords = {
-					sWidth: 660,
-					sHeight: 140,
-					dx: 56,
-					dy: 551,
-					dWidth: 660,
-					dHeight: 140,
-				};
-				break;
-			default:
-				this.sunwell.log("Not drawing a name banner (this should not happen)");
-				return;
-		}
-
+		let coords = this.getNameBannerCoords();
 		coords.ratio = ratio;
 		this.drawImage(ctx, this.nameBannerAsset, coords);
 	}
@@ -1390,33 +1346,21 @@ export abstract class Card {
 	}
 
 	public drawWatermark(ctx, s: number): void {
-		let dx = 270;
-		let dy = 735;
+		let coords = this.getWatermarkCoords();
+		coords.ratio = s;
 
-		ctx.globalCompositeOperation = "multiply";
-
-		if (this.type === CardType.MINION) {
-			if (this.raceText) {
-				dy -= 10; // Shift up
-			}
+		if (this.type === CardType.MINION || this.type === CardType.HERO) {
+			ctx.globalCompositeOperation = "multiply";
 			ctx.globalAlpha = 0.6;
 		} else if (this.type === CardType.SPELL) {
+			ctx.globalCompositeOperation = "multiply";
 			ctx.globalAlpha = 0.7;
-			dx = 264;
-			dy = 726;
 		} else if (this.type === CardType.WEAPON) {
 			ctx.globalCompositeOperation = "lighten";
 			ctx.globalAlpha = 0.1;
-			dx = 264;
 		}
 
-		this.drawImage(ctx, this.watermarkAsset, {
-			dx: dx,
-			dy: dy,
-			dWidth: 256,
-			dHeight: 256,
-			ratio: s,
-		});
+		this.drawImage(ctx, this.watermarkAsset, coords);
 
 		ctx.globalCompositeOperation = "source-over";
 		ctx.globalAlpha = 1;
@@ -1428,6 +1372,17 @@ export class HeroCard extends Card {
 		return "name-banner-hero";
 	}
 
+	getNameBannerCoords() {
+		return {
+			sWidth: 627,
+			sHeight: 156,
+			dx: 81,
+			dy: 535,
+			dWidth: 627,
+			dHeight: 156,
+		};
+	}
+
 	getCardFrameAsset(cardClass) {
 		return "frame-hero-" + CardClass[cardClass].toLowerCase();
 	}
@@ -1435,11 +1390,31 @@ export class HeroCard extends Card {
 	getRarityGemAsset(rarity) {
 		return "rarity-hero-" + Rarity[rarity].toLowerCase();
 	}
+
+	getWatermarkCoords() {
+		return {
+			dx: 270,
+			dy: 735,
+			dWidth: 256,
+			dHeight: 256,
+		};
+	}
 }
 
 export class MinionCard extends Card {
 	getNameBannerAsset() {
 		return "name-banner-minion";
+	}
+
+	getNameBannerCoords() {
+		return {
+			sWidth: 608,
+			sHeight: 144,
+			dx: 94,
+			dy: 546,
+			dWidth: 608,
+			dHeight: 144,
+		};
 	}
 
 	getCardFrameAsset(cardClass) {
@@ -1449,11 +1424,36 @@ export class MinionCard extends Card {
 	getRarityGemAsset(rarity) {
 		return "rarity-minion-" + Rarity[rarity].toLowerCase();
 	}
+
+	getWatermarkCoords() {
+		let dy = 735;
+		if (this.raceText) {
+			dy -= 10; // Shift up
+		}
+
+		return {
+			dx: 270,
+			dy: dy,
+			dWidth: 256,
+			dHeight: 256,
+		};
+	}
 }
 
 export class SpellCard extends Card {
 	getNameBannerAsset() {
 		return "name-banner-spell";
+	}
+
+	getNameBannerCoords() {
+		return {
+			sWidth: 646,
+			sHeight: 199,
+			dx: 66,
+			dy: 530,
+			dWidth: 646,
+			dHeight: 199,
+		};
 	}
 
 	getCardFrameAsset(cardClass) {
@@ -1463,11 +1463,31 @@ export class SpellCard extends Card {
 	getRarityGemAsset(rarity) {
 		return "rarity-spell-" + Rarity[rarity].toLowerCase();
 	}
+
+	getWatermarkCoords() {
+		return {
+			dx: 264,
+			dy: 726,
+			dWidth: 256,
+			dHeight: 256,
+		};
+	}
 }
 
 export class WeaponCard extends Card {
 	getNameBannerAsset() {
 		return "name-banner-weapon";
+	}
+
+	getNameBannerCoords() {
+		return {
+			sWidth: 660,
+			sHeight: 140,
+			dx: 56,
+			dy: 551,
+			dWidth: 660,
+			dHeight: 140,
+		};
 	}
 
 	getCardFrameAsset(cardClass) {
@@ -1476,5 +1496,14 @@ export class WeaponCard extends Card {
 
 	getRarityGemAsset(rarity) {
 		return "rarity-weapon-" + Rarity[rarity].toLowerCase();
+	}
+
+	getWatermarkCoords() {
+		return {
+			dx: 264,
+			dy: 735,
+			dWidth: 256,
+			dHeight: 256,
+		};
 	}
 }
