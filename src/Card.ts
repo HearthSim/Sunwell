@@ -155,7 +155,7 @@ function finishLine(
 interface IPoint {
 	x: number;
 	y: number;
-	r: number;
+	r?: number;
 }
 
 /**
@@ -797,7 +797,7 @@ export default abstract class Card {
 		const ctx = buffer.getContext("2d");
 		let maxWidth: number;
 		let pathMiddle: number;
-		let c: Array<{x: number; y: number}>;
+		let c: IPoint[];
 		ctx.save();
 
 		switch (this.type) {
