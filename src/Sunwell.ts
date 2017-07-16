@@ -10,20 +10,35 @@ import MinionCard from "./MinionCard";
 import SpellCard from "./SpellCard";
 import WeaponCard from "./WeaponCard";
 
+
+interface SunwellOptions {
+	titleFont: string;
+	bodyFont: string;
+	aspectRatio: number;
+	bodyFontSize: number;
+	bodyFontOffset: {x: number, y: number};
+	bodyLineHeight: number;
+	assetFolder: string;
+	platform: Platform;
+	drawTimeout: number;
+	cacheSkeleton: boolean;
+	debug: boolean;
+}
+
+
 export default class Sunwell {
-	public options;
-	public assets;
-	public races;
-	public canvas;
-	public target;
+	public options: SunwellOptions;
+	public assets: {[key: string]: any};
+	public canvas: HTMLCanvasElement;
+	public target: any;
 
-	private activeRenders;
-	private assetListeners;
-	private renderQuery;
-	private renderCache;
-	private isRendering;
+	private activeRenders: number;
+	private assetListeners: {[path: string]: Function[]};
+	private renderQuery: {[key: string]: Card};
+	private renderCache: {[cacheKey: string]: any};
+	private isRendering: boolean;
 
-	constructor(options) {
+	constructor(options: SunwellOptions) {
 		options.titleFont = options.titleFont || "Belwe";
 		options.bodyFont = options.bodyFont || "Franklin Gothic";
 		options.aspectRatio = options.aspectRatio || 1.4397905759;
@@ -34,7 +49,6 @@ export default class Sunwell {
 		options.platform = options.platform || new Platform();
 		options.drawTimeout = options.drawTimeout || 5000;
 		options.cacheSkeleton = options.cacheSkeleton || false;
-		options.preloadedAssets = options.preloadedAssets || [];
 		options.debug = options.debug || false;
 
 		this.options = options;
@@ -122,7 +136,7 @@ export default class Sunwell {
 		}
 
 		const first = keys[0];
-		const card: Card = this.renderQuery[first];
+		const card = this.renderQuery[first];
 		delete this.renderQuery[first];
 
 		const cvs = card.canvas;
@@ -147,7 +161,7 @@ export default class Sunwell {
 		}
 
 		this.log("Preparing to load assets");
-		const fetches: Function[] = [];
+		const fetches: Promise<{}>[] = [];
 		for (const texture of texturesToLoad) {
 			fetches.push(this.fetchAsset(texture));
 		}
