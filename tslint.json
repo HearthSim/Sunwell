@@ -3,8 +3,11 @@
 	"extends": [
 		"tslint:recommended"
 	],
-	"jsRules": {},
+	"jsRules": {
+		"indent": [false]
+	},
 	"rules": {
+		"arrow-parens": [false],
 		"comment-format": [false],
 		"indent": [false],
 		"object-literal-shorthand": [false],

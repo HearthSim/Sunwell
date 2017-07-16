@@ -15,12 +15,13 @@ export default class NodePlatform implements IPlatform {
 		return new Canvas(width, height);
 	}
 
-	public freeBuffer(buffer: any): void {}
+	public freeBuffer(buffer: any): void {
+		// Nothing to do
+	}
 
 	public loadAsset(img: any, path: any, loaded: any, error: any): void {
 		fs.readFile(path, (err, data) => {
 			if (err) {
-				console.log("Error loading asset", path);
 				error();
 				return;
 			}

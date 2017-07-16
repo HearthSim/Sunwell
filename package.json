@@ -22,6 +22,7 @@
   "scripts": {
     "prepublishOnly": "yarn build",
     "build": "rollup -c && PLATFORM=web rollup -c  && PLATFORM=cdn rollup -c",
+    "qa": "tslint src/**/*.ts",
     "dev": "tsc --watch"
   },
   "devDependencies": {

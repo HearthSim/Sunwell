@@ -69,15 +69,15 @@ export default class Sunwell {
 	public fetchAsset(path: string) {
 		const assets = this.assets;
 		const assetListeners = this.assetListeners;
-		const _this = this;
+		const sw = this;
 
 		return new this.platform.Promise(resolve => {
 			if (assets[path] === undefined) {
-				assets[path] = new _this.platform.Image();
+				assets[path] = new sw.platform.Image();
 				assets[path].crossOrigin = "Anonymous";
 
-				_this.log("Requesting", path);
-				_this.platform.loadAsset(
+				sw.log("Requesting", path);
+				sw.platform.loadAsset(
 					assets[path],
 					path,
 					() => {
@@ -90,7 +90,7 @@ export default class Sunwell {
 						resolve();
 					},
 					() => {
-						_this.error("Error loading asset:", path);
+						sw.error("Error loading asset:", path);
 						// An asset load error should not reject the promise
 						resolve();
 					}
