@@ -129,7 +129,6 @@ export default class Sunwell {
 
 		const cvs = card.canvas;
 		const ctx = cvs.getContext("2d");
-		const s = card.width / 764;
 
 		this.log("Preparing assets for", card.name);
 
@@ -159,7 +158,7 @@ export default class Sunwell {
 			.all(fetches)
 			.then(() => {
 				const start = Date.now();
-				card.draw(ctx, s);
+				card.draw(ctx);
 				this.log(card, "finished drawing in " + (Date.now() - start) + "ms");
 				// check whether we have more to do
 				this.isRendering = false;

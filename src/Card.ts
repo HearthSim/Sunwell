@@ -453,8 +453,9 @@ export default abstract class Card {
 		return "";
 	}
 
-	public draw(ctx, s: number): void {
+	public draw(ctx): void {
 		const cvs = this.canvas;
+		const ratio = this.width / 764;
 
 		const drawTimeout = setTimeout(() => {
 			this.sunwell.error("Drawing timed out", this.name);
@@ -469,7 +470,7 @@ export default abstract class Card {
 			this.sunwell.log("Skipping skeleton draw");
 			ctx.drawImage(this.sunwell.renderCache[this.cacheKey], 0, 0);
 		} else {
-			this.drawCardArt(ctx, s);
+			this.drawCardArt(ctx, ratio);
 
 			this.drawImage(ctx, this.cardFrameAsset, {
 				dx: 0,
@@ -482,14 +483,24 @@ export default abstract class Card {
 				this.drawImage(ctx, this.multiBannerAsset, {
 					dx: 17,
 					dy: 88,
-					ratio: s,
+					ratio: ratio,
 				});
 			}
 
 			if (this.costsHealth) {
-				ctx.drawImage(this.sunwell.getAsset("health"), 0, 0, 167, 218, 24 * s, 62 * s, 167 * s, 218 * s);
+				ctx.drawImage(
+					this.sunwell.getAsset("health"),
+					0,
+					0,
+					167,
+					218,
+					24 * ratio,
+					62 * ratio,
+					167 * ratio,
+					218 * ratio
+				);
 				ctx.save();
-				ctx.shadowBlur = 50 * s;
+				ctx.shadowBlur = 50 * ratio;
 				ctx.shadowColor = "#FF7275";
 				ctx.shadowOffsetX = 1000;
 				ctx.globalAlpha = 0.5;
@@ -499,37 +510,37 @@ export default abstract class Card {
 					0,
 					167,
 					218,
-					24 * s - 1000,
-					62 * s,
-					167 * s,
-					218 * s
+					24 * ratio - 1000,
+					62 * ratio,
+					167 * ratio,
+					218 * ratio
 				);
 				ctx.restore();
 			} else {
-				this.drawImage(ctx, "cost-mana", {dx: 24, dy: 82, ratio: s});
+				this.drawImage(ctx, "cost-mana", {dx: 24, dy: 82, ratio: ratio});
 			}
 
 			if (this.rarityGemAsset) {
-				this.drawRarityGem(ctx, s);
+				this.drawRarityGem(ctx, ratio);
 			}
 
-			this.drawNameBanner(ctx, s);
+			this.drawNameBanner(ctx, ratio);
 
 			if (this.raceText) {
-				this.drawImage(ctx, "race-banner", {dx: 125, dy: 937, ratio: s});
+				this.drawImage(ctx, "race-banner", {dx: 125, dy: 937, ratio: ratio});
 			}
 
-			this.drawAttackTexture(ctx, s);
-			this.drawHealthTexture(ctx, s);
+			this.drawAttackTexture(ctx, ratio);
+			this.drawHealthTexture(ctx, ratio);
 
 			if (this.elite && this.dragonAsset) {
 				let coords = this.dragonCoords;
-				coords.ratio = s;
+				coords.ratio = ratio;
 				this.drawImage(ctx, this.dragonAsset, coords);
 			}
 
 			if (this.watermarkAsset) {
-				this.drawWatermark(ctx, s);
+				this.drawWatermark(ctx, ratio);
 			}
 
 			if (this.sunwell.options.cacheSkeleton) {
@@ -541,18 +552,18 @@ export default abstract class Card {
 
 		// <<<<<<<< Finished Skeleton drawing
 
-		this.drawName(ctx, s, this.name);
+		this.drawName(ctx, ratio, this.name);
 
-		this.drawStats(ctx, s);
+		this.drawStats(ctx, ratio);
 
 		if (this.raceText) {
-			this.drawRaceText(ctx, s, this.raceText);
+			this.drawRaceText(ctx, ratio, this.raceText);
 		}
 
-		this.drawBodyText(ctx, s, false, this.bodyText);
+		this.drawBodyText(ctx, ratio, false, this.bodyText);
 
 		if (this.silenced) {
-			this.drawImage(ctx, "silence-x", {dx: 200, dy: 660, ratio: s});
+			this.drawImage(ctx, "silence-x", {dx: 200, dy: 660, ratio: ratio});
 		}
 
 		ctx.restore();
