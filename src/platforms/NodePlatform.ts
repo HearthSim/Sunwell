@@ -1,23 +1,23 @@
-import * as fs from "fs";
 import * as Canvas from "canvas";
+import * as fs from "fs";
 
 import IPlatform from "./IPlatform";
 
 export default class NodePlatform implements IPlatform {
-	name = "NODE";
-	buffers = [];
-	Image = Canvas.Image;
-	Promise = Promise;
+	public name = "NODE";
+	public buffers = [];
+	public Image = Canvas.Image;
+	public Promise = Promise;
 	// The notation "16px/1em" is not supported by node-canvas
-	bodyFontSizeExtra = "";
+	public bodyFontSizeExtra = "";
 
-	getBuffer(width: number, height: number, clear: boolean): void {
+	public getBuffer(width: number, height: number, clear: boolean): void {
 		return new Canvas(width, height);
 	}
 
-	freeBuffer(buffer: any): void {}
+	public freeBuffer(buffer: any): void {}
 
-	loadAsset(img: any, path: any, loaded: any, error: any): void {
+	public loadAsset(img: any, path: any, loaded: any, error: any): void {
 		fs.readFile(path, function(err, data) {
 			if (err) {
 				console.log("Error loading asset", path);
@@ -28,7 +28,8 @@ export default class NodePlatform implements IPlatform {
 			loaded();
 		});
 	}
-	requestAnimationFrame(cb) {
+
+	public requestAnimationFrame(cb) {
 		setImmediate(cb);
 	}
 }

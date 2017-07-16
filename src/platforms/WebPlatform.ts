@@ -1,17 +1,17 @@
 import IPlatform from "./IPlatform";
 
 export default class WebPlatform implements IPlatform {
-	name = "WEB";
-	buffers = [];
-	Image = Image;
-	Promise = Promise;
-	bodyFontSizeExtra = "/1em";
+	public name = "WEB";
+	public Image = Image;
+	public Promise = Promise;
+	public bodyFontSizeExtra = "/1em";
+	public buffers = [];
 
-	getBuffer(width: number, height: number, clear: boolean): void {
-		var cvs;
+	public getBuffer(width: number, height: number, clear: boolean): void {
+		let cvs;
 		if (this.buffers.length) {
 			if (width) {
-				for (var i = 0; i < this.buffers.length; i++) {
+				for (let i = 0; i < this.buffers.length; i++) {
 					if (this.buffers[i].width === width && this.buffers[i].height === height) {
 						cvs = this.buffers.splice(i, 1)[0];
 						break;
@@ -38,17 +38,17 @@ export default class WebPlatform implements IPlatform {
 		return cvs;
 	}
 
-	freeBuffer(buffer: any): void {
+	public freeBuffer(buffer: any): void {
 		this.buffers.push(buffer);
 	}
 
-	loadAsset(img: any, url: any, loaded: any, error: any): void {
+	public loadAsset(img: any, url: any, loaded: any, error: any): void {
 		img.addEventListener("load", loaded);
 		img.addEventListener("error", error);
 		img.src = url;
 	}
 
-	requestAnimationFrame(cb) {
+	public requestAnimationFrame(cb) {
 		window.requestAnimationFrame(cb);
 	}
 }

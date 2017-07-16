@@ -55,9 +55,9 @@ export default class Sunwell {
 	}
 
 	public fetchAsset(path: string) {
-		var assets = this.assets;
-		var assetListeners = this.assetListeners;
-		var _this = this;
+		const assets = this.assets;
+		const assetListeners = this.assetListeners;
+		const _this = this;
 
 		return new this.options.platform.Promise(resolve => {
 			if (assets[path] === undefined) {
@@ -72,8 +72,8 @@ export default class Sunwell {
 					function() {
 						assets[path].loaded = true;
 						if (assetListeners[path]) {
-							for (var a in assetListeners[path]) {
-								assetListeners[path][a](assets[path]);
+							for (const listener of assetListeners[path]) {
+								listener(assets[path]);
 							}
 							delete assetListeners[path];
 						}
@@ -114,45 +114,47 @@ export default class Sunwell {
 	}
 
 	public render(): void {
-		let keys = Object.keys(this.renderQuery);
+		const keys = Object.keys(this.renderQuery);
 		if (!keys.length) {
 			return;
 		}
 
-		let first = keys[0];
-		let card: Card = this.renderQuery[first];
+		const first = keys[0];
+		const card: Card = this.renderQuery[first];
 		delete this.renderQuery[first];
 
-		var cvs = card.canvas;
-		var ctx = cvs.getContext("2d");
-		var s = card.width / 764;
+		const cvs = card.canvas;
+		const ctx = cvs.getContext("2d");
+		const s = card.width / 764;
 
 		this.log("Preparing assets for", card.name);
 
 		card.sunwell = card.sunwell || {};
 
-		let assetsToLoad = card.getAssetsToLoad();
-		var texturesToLoad: Array<string> = [];
+		const assetsToLoad = card.getAssetsToLoad();
+		const texturesToLoad: string[] = [];
 
 		if (card.texture && typeof card.texture === "string") {
 			texturesToLoad.push(card.texture);
 		}
 
-		for (let i in assetsToLoad) {
-			let path = this.getAssetPath(assetsToLoad[i]);
-			if (!this.assets[path] || !this.assets[path].loaded) texturesToLoad.push(path);
+		for (const asset of assetsToLoad) {
+			const path = this.getAssetPath(asset);
+			if (!this.assets[path] || !this.assets[path].loaded) {
+				texturesToLoad.push(path);
+			}
 		}
 
 		this.log("Preparing to load assets");
-		let fetches: Array<Function> = [];
-		for (let i in texturesToLoad) {
-			fetches.push(this.fetchAsset(texturesToLoad[i]));
+		const fetches: Function[] = [];
+		for (const texture of texturesToLoad) {
+			fetches.push(this.fetchAsset(texture));
 		}
 
 		this.options.platform.Promise
 			.all(fetches)
 			.then(() => {
-				let start = Date.now();
+				const start = Date.now();
 				card.draw(ctx, s);
 				this.log(card, "finished drawing in " + (Date.now() - start) + "ms");
 				// check whether we have more to do
@@ -172,8 +174,8 @@ export default class Sunwell {
 	}
 
 	public getAsset(key: string) {
-		let path = this.getAssetPath(key);
-		let asset = this.assets[path];
+		const path = this.getAssetPath(key);
+		const asset = this.assets[path];
 		if (!asset) {
 			this.error("Missing asset", key, "at", path);
 			return;
@@ -202,14 +204,14 @@ export default class Sunwell {
 			canvas = this.getBuffer(width, height, true);
 		}
 
-		let ctors: {[type: string]: any} = {
+		const ctors: {[type: string]: any} = {
 			HERO: HeroCard,
 			MINION: MinionCard,
 			SPELL: SpellCard,
 			WEAPON: WeaponCard,
 		};
 
-		let ctor = ctors[props.type];
+		const ctor = ctors[props.type];
 		if (!ctor) {
 			throw new Error("Got an unrenderable card type");
 		}

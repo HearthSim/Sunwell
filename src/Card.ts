@@ -5,7 +5,7 @@ function cleanEnum(val: string | number, e) {
 		if (val in e) {
 			return e[val];
 		} else {
-			return e["INVALID"];
+			return e.INVALID;
 		}
 	}
 	return val || 0;
@@ -15,13 +15,13 @@ function cleanEnum(val: string | number, e) {
  * Helper function to draw the oval mask for the cards artwork.
  */
 function drawEllipse(ctx, x: number, y: number, w: number, h: number): void {
-	var kappa = 0.5522848,
-		ox = w / 2 * kappa, // control point offset horizontal
-		oy = h / 2 * kappa, // control point offset vertical
-		xe = x + w, // x-end
-		ye = y + h, // y-end
-		xm = x + w / 2, // x-middle
-		ym = y + h / 2; // y-middle
+	const kappa = 0.5522848;
+	const ox = w / 2 * kappa; // control point offset horizontal
+	const oy = h / 2 * kappa; // control point offset vertical
+	const xe = x + w; // x-end
+	const ye = y + h; // y-end
+	const xm = x + w / 2; // x-middle
+	const ym = y + h / 2; // y-middle
 
 	ctx.beginPath();
 	ctx.moveTo(x, ym);
@@ -29,7 +29,7 @@ function drawEllipse(ctx, x: number, y: number, w: number, h: number): void {
 	ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
 	ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
 	ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-	//ctx.closePath(); // not used correctly, see comments (use to close off open path)
+	// ctx.closePath(); // not used correctly, see comments (use to close off open path)
 	ctx.stroke();
 }
 
@@ -38,15 +38,15 @@ function drawEllipse(ctx, x: number, y: number, w: number, h: number): void {
  * @returns {{x: *, y: *, maxX: (number|*|w), maxY: *, w: number, h: number}}
  */
 function contextBoundingBox(ctx) {
-	var w = ctx.canvas.width,
-		h = ctx.canvas.height;
-	var data = ctx.getImageData(0, 0, w, h).data;
-	var minX = 999,
-		minY = 999,
-		maxX = 0,
-		maxY = 0;
+	const w = ctx.canvas.width;
+	const h = ctx.canvas.height;
+	const data = ctx.getImageData(0, 0, w, h).data;
+	let minX = 999;
+	let minY = 999;
+	let maxX = 0;
+	let maxY = 0;
 
-	var out = false;
+	let out = false;
 
 	for (let y = h - 1; y > -1; y--) {
 		if (out) {
@@ -124,7 +124,7 @@ function finishLine(
 	yPos: number,
 	totalWidth: number
 ): [number, number] {
-	var xCalc = totalWidth / 2 - xPos / 2;
+	let xCalc = totalWidth / 2 - xPos / 2;
 
 	if (xCalc < 0) {
 		xCalc = 0;
@@ -157,23 +157,21 @@ function finishLine(
  * @returns {{x: (number|*), y: (number|*), r: number}}
  */
 function getPointOnCurve(curve, t) {
-	var rX, rY, x, y;
-
-	rX =
+	const rX =
 		3 * Math.pow(1 - t, 2) * (curve[1].x - curve[0].x) +
 		6 * (1 - t) * t * (curve[2].x - curve[1].x) +
 		3 * Math.pow(t, 2) * (curve[3].x - curve[2].x);
-	rY =
+	const rY =
 		3 * Math.pow(1 - t, 2) * (curve[1].y - curve[0].y) +
 		6 * (1 - t) * t * (curve[2].y - curve[1].y) +
 		3 * Math.pow(t, 2) * (curve[3].y - curve[2].y);
 
-	x =
+	const x =
 		Math.pow(1 - t, 3) * curve[0].x +
 		3 * Math.pow(1 - t, 2) * t * curve[1].x +
 		3 * (1 - t) * Math.pow(t, 2) * curve[2].x +
 		Math.pow(t, 3) * curve[3].x;
-	y =
+	const y =
 		Math.pow(1 - t, 3) * curve[0].y +
 		3 * Math.pow(1 - t, 2) * t * curve[1].y +
 		3 * (1 - t) * Math.pow(t, 2) * curve[2].y +
@@ -252,7 +250,7 @@ enum CardType {
 	HERO_POWER = 10,
 }
 
-var RaceNames = {};
+const RaceNames = {};
 RaceNames[Race.MURLOC] = {enUS: "Murloc"};
 RaceNames[Race.MECHANICAL] = {enUS: "Mech"};
 RaceNames[Race.ELEMENTAL] = {enUS: "Elemental"};
@@ -262,7 +260,7 @@ RaceNames[Race.PIRATE] = {enUS: "Pirate"};
 RaceNames[Race.DRAGON] = {enUS: "Dragon"};
 RaceNames[Race.TOTEM] = {enUS: "Totem"};
 
-interface Coords {
+interface ICoords {
 	sx?: number;
 	sy?: number;
 	sWidth?: number;
@@ -304,13 +302,6 @@ export abstract class Card {
 	public healthColor: string;
 	public width: number;
 	public key: number;
-
-	abstract getCardFrameAsset(cardClass: CardClass): string;
-	abstract getRarityGemAsset(rarity: Rarity): string;
-	abstract getRarityGemCoords(): Coords;
-	abstract getNameBannerAsset(): string;
-	abstract getNameBannerCoords(): Coords;
-	abstract getWatermarkCoords(): Coords;
 
 	private callback: Function;
 	private cacheKey: number;
@@ -354,7 +345,7 @@ export abstract class Card {
 		this.watermarkAsset = this.getWatermarkAsset();
 
 		if (this.multiClassGroup) {
-			let smulti = MultiClassGroup[this.multiClassGroup];
+			const smulti = MultiClassGroup[this.multiClassGroup];
 			this.multiBannerAsset = "multi-" + smulti.toLowerCase();
 		}
 
@@ -382,12 +373,19 @@ export abstract class Card {
 		sunwell.prepareRenderingCard(this);
 	}
 
+	public abstract getCardFrameAsset(cardClass: CardClass): string;
+	public abstract getRarityGemAsset(rarity: Rarity): string;
+	public abstract getRarityGemCoords(): ICoords;
+	public abstract getNameBannerAsset(): string;
+	public abstract getNameBannerCoords(): ICoords;
+	public abstract getWatermarkCoords(): ICoords;
+
 	private checksum(props): number {
-		const string = JSON.stringify(props) + this.width;
-		const length = string.length;
+		const s = JSON.stringify(props) + this.width;
+		const length = s.length;
 		let chk = 0;
 		for (let i = 0; i < length; i++) {
-			const char = string.charCodeAt(i);
+			const char = s.charCodeAt(i);
 			chk = (chk << 5) - chk + char;
 			chk |= 0;
 		}
@@ -395,8 +393,8 @@ export abstract class Card {
 		return chk;
 	}
 
-	public getAssetsToLoad(): Array<string> {
-		var assetsToLoad: Array<string> = [this.cardFrameAsset, this.nameBannerAsset];
+	public getAssetsToLoad(): string[] {
+		const assetsToLoad: string[] = [this.cardFrameAsset, this.nameBannerAsset];
 
 		if (this.costsHealth) {
 			assetsToLoad.push("health");
@@ -413,22 +411,32 @@ export abstract class Card {
 		}
 
 		if (this.elite) {
-			if (this.type == CardType.SPELL) {
+			if (this.type === CardType.SPELL) {
 				assetsToLoad.push("elite-spell");
 			} else {
 				assetsToLoad.push("elite");
 			}
 		}
-		if (this.raceText) assetsToLoad.push("race-banner");
-		if (this.silenced) assetsToLoad.push("silence-x");
-		if (this.multiBannerAsset) assetsToLoad.push(this.multiBannerAsset);
-		if (this.rarityGemAsset) assetsToLoad.push(this.rarityGemAsset);
-		if (this.watermarkAsset) assetsToLoad.push(this.watermarkAsset);
+		if (this.raceText) {
+			assetsToLoad.push("race-banner");
+		}
+		if (this.silenced) {
+			assetsToLoad.push("silence-x");
+		}
+		if (this.multiBannerAsset) {
+			assetsToLoad.push(this.multiBannerAsset);
+		}
+		if (this.rarityGemAsset) {
+			assetsToLoad.push(this.rarityGemAsset);
+		}
+		if (this.watermarkAsset) {
+			assetsToLoad.push(this.watermarkAsset);
+		}
 
 		return assetsToLoad;
 	}
 
-	public getCardArtTexture() {
+	public getCardArtTexture(): any {
 		if (!this.texture) {
 			this.sunwell.log("No card texture specified. Creating empty texture.");
 			return this.sunwell.getBuffer(1024, 1024);
@@ -437,8 +445,8 @@ export abstract class Card {
 		} else if (typeof this.texture === "string") {
 			return this.sunwell.assets[this.texture];
 		} else {
-			let t = this.sunwell.getBuffer(this.texture.crop.w, this.texture.crop.h);
-			var tCtx = t.getContext("2d");
+			const t = this.sunwell.getBuffer(this.texture.crop.w, this.texture.crop.h);
+			const tCtx = t.getContext("2d");
 			tCtx.drawImage(
 				this.texture.image,
 				this.texture.crop.x,
@@ -455,7 +463,7 @@ export abstract class Card {
 	}
 
 	public getRaceText(): string {
-		if (this.race && this.type == CardType.MINION && this.race in RaceNames) {
+		if (this.race && this.type === CardType.MINION && this.race in RaceNames) {
 			return RaceNames[this.race][this.language];
 		}
 		return "";
@@ -473,9 +481,9 @@ export abstract class Card {
 	}
 
 	private getRarityGem(): Rarity {
-		if (this.rarity == Rarity.INVALID) {
+		if (this.rarity === Rarity.INVALID) {
 			return Rarity.FREE;
-		} else if (this.rarity == Rarity.COMMON && this.set == CardSet.CORE) {
+		} else if (this.rarity === Rarity.COMMON && this.set === CardSet.CORE) {
 			return Rarity.FREE;
 		}
 
@@ -511,9 +519,9 @@ export abstract class Card {
 	}
 
 	public draw(ctx, s: number): void {
-		var cvs = this.canvas;
+		const cvs = this.canvas;
 
-		var drawTimeout = setTimeout(() => {
+		const drawTimeout = setTimeout(() => {
 			this.sunwell.error("Drawing timed out", this.name);
 			this.sunwell.activeRenders--;
 		}, this.sunwell.options.drawTimeout);
@@ -580,7 +588,7 @@ export abstract class Card {
 			this.drawHealthTexture(ctx, s);
 
 			if (this.elite) {
-				if (this.type == CardType.SPELL) {
+				if (this.type === CardType.SPELL) {
 					this.drawImage(ctx, "elite-spell", {
 						dx: 201,
 						dy: 70,
@@ -602,7 +610,7 @@ export abstract class Card {
 			}
 
 			if (this.sunwell.options.cacheSkeleton) {
-				let cacheImage = new this.sunwell.options.platform.Image();
+				const cacheImage = new this.sunwell.options.platform.Image();
 				cacheImage.src = cvs.toDataURL();
 				this.sunwell.renderCache[this.cacheKey] = cacheImage;
 			}
@@ -632,7 +640,7 @@ export abstract class Card {
 		}
 
 		if (this.target) {
-			if (typeof this.target == "function") {
+			if (typeof this.target === "function") {
 				this.target(cvs);
 			} else {
 				this.target.src = cvs.toDataURL();
@@ -642,15 +650,15 @@ export abstract class Card {
 		this.sunwell.activeRenders--;
 	}
 
-	private drawImage(ctx, assetKey: string, coords: Coords): void {
-		let asset = this.sunwell.getAsset(assetKey);
+	private drawImage(ctx, assetKey: string, coords: ICoords): void {
+		const asset = this.sunwell.getAsset(assetKey);
 		if (!asset) {
 			this.sunwell.error("Not drawing asset", assetKey);
 			return;
 		}
-		let ratio = coords.ratio || 1;
-		let width = coords.sWidth || asset.width;
-		let height = coords.sHeight || asset.height;
+		const ratio = coords.ratio || 1;
+		const width = coords.sWidth || asset.width;
+		const height = coords.sHeight || asset.height;
 		ctx.drawImage(
 			asset,
 			coords.sx || 0,
@@ -665,8 +673,11 @@ export abstract class Card {
 	}
 
 	public drawCardArt(ctx, ratio: number) {
-		let dx: number, dy: number, dWidth: number, dHeight: number;
-		let t = this.getCardArtTexture();
+		let dx: number;
+		let dy: number;
+		let dWidth: number;
+		let dHeight: number;
+		const t = this.getCardArtTexture();
 
 		ctx.save();
 		switch (this.type) {
@@ -699,15 +710,15 @@ export abstract class Card {
 			return;
 		}
 
-		var xPos = 0,
-			yPos = 0,
-			isBold = 0,
-			isItalic = 0,
-			justLineBreak,
-			lineCount = 0,
-			plurals,
-			pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g,
-			pBodyText;
+		const pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g;
+		let xPos = 0;
+		let yPos = 0;
+		let isItalic = 0;
+		let isBold = 0;
+		let lineCount = 0;
+		let justLineBreak;
+		let plurals;
+		let pBodyText;
 
 		pBodyText = bodyText;
 		while ((plurals = pluralRegex.exec(bodyText)) !== null) {
@@ -717,18 +728,17 @@ export abstract class Card {
 			);
 		}
 		bodyText = pBodyText;
-
-		var words = bodyText.replace(/[\$#_]/g, "").replace(/\n/g, " \n ").replace(/ +/g, " ").split(/ /g);
-
 		this.sunwell.log("Rendering body", bodyText);
 
-		var centerLeft = 390;
-		var centerTop = 860;
-		var bufferText = this.sunwell.getBuffer();
-		var bufferTextCtx = bufferText.getContext("2d");
+		const centerLeft = 390;
+		const centerTop = 860;
+		const words = bodyText.replace(/[\$#_]/g, "").replace(/\n/g, " \n ").replace(/ +/g, " ").split(/ /g);
 
-		var bufferRow = this.sunwell.getBuffer();
-		var bufferRowCtx = bufferRow.getContext("2d");
+		const bufferText = this.sunwell.getBuffer();
+		const bufferTextCtx = bufferText.getContext("2d");
+
+		const bufferRow = this.sunwell.getBuffer();
+		const bufferRowCtx = bufferRow.getContext("2d");
 
 		switch (this.type) {
 			case CardType.HERO:
@@ -755,7 +765,7 @@ export abstract class Card {
 
 		let fontSize = this.sunwell.options.bodyFontSize;
 		let lineHeight = this.sunwell.options.bodyLineHeight;
-		let totalLength = bodyText.replace(/<\/*.>/g, "").length;
+		const totalLength = bodyText.replace(/<\/*.>/g, "").length;
 		let smallerFirstLine = false;
 
 		const cleanText = bodyText.replace(/<\/*.>/g, "");
@@ -805,8 +815,7 @@ export abstract class Card {
 			smallerFirstLine = true;
 		}
 
-		for (let i = 0; i < words.length; i++) {
-			const word = words[i];
+		for (const word of words) {
 			const cleanWord = word.trim().replace(/<((?!>).)*>/g, "");
 
 			const width = bufferRowCtx.measureText(cleanWord).width;
@@ -897,7 +906,7 @@ export abstract class Card {
 			}
 		}
 
-		var b = contextBoundingBox(bufferTextCtx);
+		const b = contextBoundingBox(bufferTextCtx);
 
 		b.h = Math.ceil(b.h / bufferRow.height) * bufferRow.height;
 
@@ -916,7 +925,7 @@ export abstract class Card {
 		this.sunwell.freeBuffer(bufferText);
 	}
 
-	protected getFontMaterial(fontSize: number, bold: boolean, italic: boolean) {
+	protected getFontMaterial(fontSize: number, bold: boolean, italic: boolean): string {
 		let font = this.sunwell.options.bodyFont;
 		let prefix = "";
 		if (typeof font === "function") {
@@ -936,8 +945,7 @@ export abstract class Card {
 		let isBold = 0;
 		let isItalic = 0;
 		const getFontMaterial = () => this.getFontMaterial(fontSize, isBold > 0, isItalic > 0);
-		for (let i = 0; i < words.length; i++) {
-			const word = words[i];
+		for (const word of words) {
 			const chars = word.split("");
 
 			for (let j = 0; j < chars.length; j++) {
@@ -991,11 +999,11 @@ export abstract class Card {
 	}
 
 	public drawName(targetCtx, s: number, name: string): void {
-		let buffer = this.sunwell.getBuffer(1024, 200);
-		let ctx = buffer.getContext("2d");
+		const buffer = this.sunwell.getBuffer(1024, 200);
+		const ctx = buffer.getContext("2d");
 		let maxWidth: number;
 		let pathMiddle: number;
-		let c: Array<any>;
+		let c: Array<{x: number; y: number}>;
 		ctx.save();
 
 		switch (this.type) {
@@ -1024,8 +1032,8 @@ export abstract class Card {
 		if (this.sunwell.options.debug) {
 			ctx.strokeStyle = "red";
 			ctx.fillStyle = "red";
-			for (let i in c) {
-				ctx.fillRect(c[i].x - 2, c[i].y - 2, 4, 4);
+			for (const coord of c) {
+				ctx.fillRect(coord.x - 2, coord.y - 2, 4, 4);
 			}
 		}
 
@@ -1040,7 +1048,7 @@ export abstract class Card {
 
 		// calculate text width
 		const getCharDimensions = () => {
-			const dimensions = [];
+			const dimensions_ = [];
 			const em = ctx.measureText("M").width;
 			for (let i = 0; i < name.length; i++) {
 				ctx.save();
@@ -1057,13 +1065,13 @@ export abstract class Card {
 						scale.y = 1;
 						break;
 				}
-				dimensions[i] = {
+				dimensions_[i] = {
 					width: charWidth,
 					scale: scale,
 				};
 				ctx.restore();
 			}
-			return dimensions;
+			return dimensions_;
 		};
 
 		let dimensions = [];
@@ -1073,13 +1081,12 @@ export abstract class Card {
 			ctx.font = fontSize + "px " + this.titleFont;
 		} while ((dimensions = getCharDimensions()).reduce((a, b) => a + b.width, 0) > maxWidth && fontSize > 10);
 
-		let textWidth = dimensions.reduce((a, b) => a + b.width, 0);
-		textWidth = textWidth / maxWidth;
-		var begin = pathMiddle - textWidth / 2;
-		var steps = textWidth / name.length;
+		const textWidth = dimensions.reduce((a, b) => a + b.width, 0) / maxWidth;
+		const begin = pathMiddle - textWidth / 2;
+		const steps = textWidth / name.length;
 
 		// draw text
-		var p,
+		let p,
 			t,
 			leftPos = 0;
 		for (let i = 0; i < name.length; i++) {
@@ -1105,7 +1112,7 @@ export abstract class Card {
 				if (dimension.scale.x) {
 					ctx.scale(dimension.scale.x, dimension.scale.y);
 				}
-				//ctx.setTransform(1.2, p.r, 0, 1, p.x, p.y);
+				// ctx.setTransform(1.2, p.r, 0, 1, p.x, p.y);
 				ctx.rotate(p.r);
 
 				// shadow
@@ -1127,7 +1134,7 @@ export abstract class Card {
 			leftPos += dimension.width;
 		}
 
-		let coords: Coords = {
+		const coords: ICoords = {
 			sx: 0,
 			sy: 0,
 			sWidth: 580,
@@ -1152,7 +1159,7 @@ export abstract class Card {
 	}
 
 	public drawNameBanner(ctx, ratio: number) {
-		let coords = this.getNameBannerCoords();
+		const coords = this.getNameBannerCoords();
 		coords.ratio = ratio;
 		this.drawImage(ctx, this.nameBannerAsset, coords);
 	}
@@ -1170,41 +1177,34 @@ export abstract class Card {
 		size: number,
 		color: string
 	): void {
-		var buffer = this.sunwell.getBuffer();
-		var bufferCtx = buffer.getContext("2d");
-
-		buffer.width = 256;
-		buffer.height = 256;
-
-		let n = num.toString().split("");
-
-		var tX = 10;
+		const buffer = this.sunwell.getBuffer(256, 256);
+		const bufferCtx = buffer.getContext("2d");
+		const n = num.toString().split("");
+		let tX = 10;
 
 		bufferCtx.font = size + "px " + this.titleFont;
-
 		bufferCtx.lineCap = "round";
 		bufferCtx.lineJoin = "round";
+		bufferCtx.textAlign = "left";
 		bufferCtx.textBaseline = "hanging";
 
-		bufferCtx.textAlign = "left";
-
-		for (let i = 0; i < n.length; i++) {
+		for (const cnum of n) {
 			bufferCtx.lineWidth = 13;
 			bufferCtx.strokeStyle = "black";
 			bufferCtx.fillStyle = "black";
-			bufferCtx.fillText(n[i], tX, 10);
-			bufferCtx.strokeText(n[i], tX, 10);
+			bufferCtx.fillText(cnum, tX, 10);
+			bufferCtx.strokeText(cnum, tX, 10);
 
 			bufferCtx.fillStyle = color;
 			bufferCtx.strokeStyle = color;
 			bufferCtx.lineWidth = 2.5;
-			bufferCtx.fillText(n[i], tX, 10);
-			//ctx.strokeText(text[i], x, y);
+			bufferCtx.fillText(cnum, tX, 10);
+			// ctx.strokeText(cnum, x, y);
 
-			tX += bufferCtx.measureText(n[i]).width;
+			tX += bufferCtx.measureText(cnum).width;
 		}
 
-		var b = contextBoundingBox(bufferCtx);
+		const b = contextBoundingBox(bufferCtx);
 
 		targetCtx.drawImage(buffer, b.x, b.y, b.w, b.h, (x - b.w / 2) * s, (y - b.h / 2) * s, b.w * s, b.h * s);
 
@@ -1212,10 +1212,10 @@ export abstract class Card {
 	}
 
 	public drawRaceText(targetCtx, s: number, raceText: string): void {
-		let buffer = this.sunwell.getBuffer(300, 60);
-		let bufferCtx = buffer.getContext("2d");
+		const buffer = this.sunwell.getBuffer(300, 60);
+		const bufferCtx = buffer.getContext("2d");
 		let x = 10;
-		let text = raceText.split("");
+		const text = raceText.split("");
 
 		bufferCtx.font = "45px " + this.titleFont;
 		bufferCtx.lineCap = "round";
@@ -1224,24 +1224,24 @@ export abstract class Card {
 		bufferCtx.textAlign = "left";
 
 		const xWidth = bufferCtx.measureText("x").width;
-		for (let i = 0; i < text.length; i++) {
+		for (const char of text) {
 			bufferCtx.lineWidth = 8;
 			bufferCtx.strokeStyle = "black";
 			bufferCtx.fillStyle = "black";
-			bufferCtx.fillText(text[i], x, 10);
-			bufferCtx.strokeText(text[i], x, 10);
+			bufferCtx.fillText(char, x, 10);
+			bufferCtx.strokeText(char, x, 10);
 
 			bufferCtx.fillStyle = "white";
 			bufferCtx.strokeStyle = "white";
 			bufferCtx.lineWidth = 1;
-			bufferCtx.fillText(text[i], x, 10);
-			//ctx.strokeText(text[i], x, y);
+			bufferCtx.fillText(char, x, 10);
+			// ctx.strokeText(char, x, y);
 
-			x += bufferCtx.measureText(text[i]).width;
+			x += bufferCtx.measureText(char).width;
 			x += xWidth * 0.1;
 		}
 
-		var b = contextBoundingBox(bufferCtx);
+		const b = contextBoundingBox(bufferCtx);
 
 		targetCtx.drawImage(
 			buffer,
@@ -1259,7 +1259,7 @@ export abstract class Card {
 	}
 
 	public drawRarityGem(ctx, ratio: number): void {
-		let coords = this.getRarityGemCoords();
+		const coords = this.getRarityGemCoords();
 		coords.ratio = ratio;
 		this.drawImage(ctx, this.rarityGemAsset, coords);
 	}
@@ -1277,7 +1277,9 @@ export abstract class Card {
 	}
 
 	public drawAttackTexture(ctx, s: number): void {
-		if (this.hideStats) return;
+		if (this.hideStats) {
+			return;
+		}
 
 		switch (this.type) {
 			case CardType.MINION:
@@ -1306,7 +1308,9 @@ export abstract class Card {
 	}
 
 	public drawHealthTexture(ctx, s: number): void {
-		if (this.hideStats) return;
+		if (this.hideStats) {
+			return;
+		}
 
 		switch (this.type) {
 			case CardType.MINION:
@@ -1335,7 +1339,7 @@ export abstract class Card {
 	}
 
 	public drawWatermark(ctx, s: number): void {
-		let coords = this.getWatermarkCoords();
+		const coords = this.getWatermarkCoords();
 		coords.ratio = s;
 
 		if (this.type === CardType.MINION || this.type === CardType.HERO) {
@@ -1357,11 +1361,11 @@ export abstract class Card {
 }
 
 export class HeroCard extends Card {
-	getNameBannerAsset() {
+	public getNameBannerAsset() {
 		return "name-banner-hero";
 	}
 
-	getNameBannerCoords() {
+	public getNameBannerCoords() {
 		return {
 			sWidth: 627,
 			sHeight: 156,
@@ -1372,19 +1376,19 @@ export class HeroCard extends Card {
 		};
 	}
 
-	getCardFrameAsset(cardClass) {
+	public getCardFrameAsset(cardClass) {
 		return "frame-hero-" + CardClass[cardClass].toLowerCase();
 	}
 
-	getRarityGemAsset(rarity) {
+	public getRarityGemAsset(rarity) {
 		return "rarity-hero-" + Rarity[rarity].toLowerCase();
 	}
 
-	getRarityGemCoords() {
+	public getRarityGemCoords() {
 		return {dx: 327, dy: 607};
 	}
 
-	getWatermarkCoords() {
+	public getWatermarkCoords() {
 		return {
 			dx: 270,
 			dy: 735,
@@ -1395,11 +1399,11 @@ export class HeroCard extends Card {
 }
 
 export class MinionCard extends Card {
-	getNameBannerAsset() {
+	public getNameBannerAsset() {
 		return "name-banner-minion";
 	}
 
-	getNameBannerCoords() {
+	public getNameBannerCoords() {
 		return {
 			sWidth: 608,
 			sHeight: 144,
@@ -1410,19 +1414,19 @@ export class MinionCard extends Card {
 		};
 	}
 
-	getCardFrameAsset(cardClass) {
+	public getCardFrameAsset(cardClass) {
 		return "frame-minion-" + CardClass[cardClass].toLowerCase();
 	}
 
-	getRarityGemAsset(rarity) {
+	public getRarityGemAsset(rarity) {
 		return "rarity-minion-" + Rarity[rarity].toLowerCase();
 	}
 
-	getRarityGemCoords() {
+	public getRarityGemCoords() {
 		return {dx: 327, dy: 607};
 	}
 
-	getWatermarkCoords() {
+	public getWatermarkCoords() {
 		let dy = 735;
 		if (this.raceText) {
 			dy -= 10; // Shift up
@@ -1438,11 +1442,11 @@ export class MinionCard extends Card {
 }
 
 export class SpellCard extends Card {
-	getNameBannerAsset() {
+	public getNameBannerAsset() {
 		return "name-banner-spell";
 	}
 
-	getNameBannerCoords() {
+	public getNameBannerCoords() {
 		return {
 			sWidth: 646,
 			sHeight: 199,
@@ -1453,19 +1457,19 @@ export class SpellCard extends Card {
 		};
 	}
 
-	getCardFrameAsset(cardClass) {
+	public getCardFrameAsset(cardClass) {
 		return "frame-spell-" + CardClass[cardClass].toLowerCase();
 	}
 
-	getRarityGemAsset(rarity) {
+	public getRarityGemAsset(rarity) {
 		return "rarity-spell-" + Rarity[rarity].toLowerCase();
 	}
 
-	getRarityGemCoords() {
+	public getRarityGemCoords() {
 		return {dx: 311, dy: 607};
 	}
 
-	getWatermarkCoords() {
+	public getWatermarkCoords() {
 		return {
 			dx: 264,
 			dy: 726,
@@ -1476,11 +1480,11 @@ export class SpellCard extends Card {
 }
 
 export class WeaponCard extends Card {
-	getNameBannerAsset() {
+	public getNameBannerAsset() {
 		return "name-banner-weapon";
 	}
 
-	getNameBannerCoords() {
+	public getNameBannerCoords() {
 		return {
 			sWidth: 660,
 			sHeight: 140,
@@ -1491,19 +1495,19 @@ export class WeaponCard extends Card {
 		};
 	}
 
-	getCardFrameAsset(cardClass) {
+	public getCardFrameAsset(cardClass) {
 		return "frame-weapon-" + CardClass[cardClass].toLowerCase();
 	}
 
-	getRarityGemAsset(rarity) {
+	public getRarityGemAsset(rarity) {
 		return "rarity-weapon-" + Rarity[rarity].toLowerCase();
 	}
 
-	getRarityGemCoords() {
+	public getRarityGemCoords() {
 		return {dx: 311, dy: 607};
 	}
 
-	getWatermarkCoords() {
+	public getWatermarkCoords() {
 		return {
 			dx: 264,
 			dy: 735,
