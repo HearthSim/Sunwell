@@ -236,6 +236,7 @@ export default abstract class Card {
 	private callback: Function;
 	private cacheKey: number;
 	private cardFrameAsset: string;
+	private costGemAsset: string;
 	private rarityGemAsset: string;
 	private multiBannerAsset: string;
 	private watermarkAsset: string;
@@ -267,6 +268,12 @@ export default abstract class Card {
 		this.cardFrameAsset = this.getCardFrameAsset(this.getCardFrameClass());
 		this.rarityGemAsset = this.getRarityGemAsset(this.getRarityGem());
 		this.watermarkAsset = this.getWatermarkAsset();
+
+		if (this.costsHealth) {
+			this.costGemAsset = "health";
+		} else {
+			this.costGemAsset = "cost-mana";
+		}
 
 		if (this.multiClassGroup) {
 			const smulti = MultiClassGroup[this.multiClassGroup];
@@ -332,13 +339,7 @@ export default abstract class Card {
 	}
 
 	public getAssetsToLoad(): string[] {
-		const assetsToLoad: string[] = [this.cardFrameAsset, this.nameBannerAsset];
-
-		if (this.costsHealth) {
-			assetsToLoad.push("health");
-		} else {
-			assetsToLoad.push("cost-mana");
-		}
+		const assetsToLoad: string[] = [this.cardFrameAsset, this.nameBannerAsset, this.costGemAsset];
 
 		if (!this.hideStats) {
 			if (this.attackGemAsset) {
@@ -488,7 +489,7 @@ export default abstract class Card {
 
 			if (this.costsHealth) {
 				ctx.drawImage(
-					this.sunwell.getAsset("health"),
+					this.sunwell.getAsset(this.costGemAsset),
 					0,
 					0,
 					167,
@@ -504,7 +505,7 @@ export default abstract class Card {
 				ctx.shadowOffsetX = 1000;
 				ctx.globalAlpha = 0.5;
 				ctx.drawImage(
-					this.sunwell.getAsset("health"),
+					this.sunwell.getAsset(this.costGemAsset),
 					0,
 					0,
 					167,
@@ -516,7 +517,7 @@ export default abstract class Card {
 				);
 				ctx.restore();
 			} else {
-				this.drawImage(ctx, "cost-mana", {dx: 24, dy: 82, ratio: ratio});
+				this.drawImage(ctx, this.costGemAsset, {dx: 24, dy: 82, ratio: ratio});
 			}
 
 			if (this.rarityGemAsset) {
