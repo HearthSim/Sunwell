@@ -38,5 +38,5 @@ export default {
     }),
 	cleanup(),
 	PRODUCTION ? uglify() : undefined
-  ]
+  ].filter(p => p)
 }
