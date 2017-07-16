@@ -554,7 +554,17 @@ export default abstract class Card {
 		ctx.clip();
 		ctx.fillStyle = "grey";
 		ctx.fillRect(0, 0, 765 * ratio, 1100 * ratio);
-		ctx.drawImage(t, 0, 0, t.width, t.height, dx * ratio, dy * ratio, dWidth * ratio, dHeight * ratio);
+		ctx.drawImage(
+			t,
+			0,
+			0,
+			t.width,
+			t.height,
+			dx * ratio,
+			dy * ratio,
+			dWidth * ratio,
+			dHeight * ratio
+		);
 		ctx.restore();
 	}
 
@@ -592,7 +602,11 @@ export default abstract class Card {
 
 		const centerLeft = 390;
 		const centerTop = 860;
-		const words = bodyText.replace(/[\$#_]/g, "").replace(/\n/g, " \n ").replace(/ +/g, " ").split(/ /g);
+		const words = bodyText
+			.replace(/[\$#_]/g, "")
+			.replace(/\n/g, " \n ")
+			.replace(/ +/g, " ")
+			.split(/ /g);
 
 		const bufferText = this.sunwell.getBuffer(this.bodyTextSize.width, this.bodyTextSize.height);
 		const bufferTextCtx = bufferText.getContext("2d");
@@ -661,7 +675,8 @@ export default abstract class Card {
 
 			if (
 				!manualBreak &&
-				(xPos + width > bufferRow.width || (smallerFirstLine && xPos + width > bufferRow.width * 0.8)) &&
+				(xPos + width > bufferRow.width ||
+					(smallerFirstLine && xPos + width > bufferRow.width * 0.8)) &&
 				!justLineBreak
 			) {
 				this.sunwell.log(xPos + width, ">", bufferRow.width);
@@ -669,7 +684,14 @@ export default abstract class Card {
 				smallerFirstLine = false;
 				justLineBreak = true;
 				lineCount++;
-				[xPos, yPos] = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
+				[xPos, yPos] = finishLine(
+					bufferTextCtx,
+					bufferRow,
+					bufferRowCtx,
+					xPos,
+					yPos,
+					bufferText.width
+				);
 			}
 
 			const chars = word.split("");
@@ -677,7 +699,14 @@ export default abstract class Card {
 			if (word === "\n") {
 				this.sunwell.log("Manual line break");
 				lineCount++;
-				[xPos, yPos] = finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
+				[xPos, yPos] = finishLine(
+					bufferTextCtx,
+					bufferRow,
+					bufferRowCtx,
+					xPos,
+					yPos,
+					bufferText.width
+				);
 				justLineBreak = true;
 				smallerFirstLine = false;
 				continue;
@@ -844,7 +873,10 @@ export default abstract class Card {
 		do {
 			fontSize -= 1;
 			ctx.font = fontSize + "px " + this.titleFont;
-		} while ((dimensions = getCharDimensions()).reduce((a, b) => a + b.width, 0) > maxWidth && fontSize > 10);
+		} while (
+			(dimensions = getCharDimensions()).reduce((a, b) => a + b.width, 0) > maxWidth &&
+			fontSize > 10
+		);
 
 		const textWidth = dimensions.reduce((a, b) => a + b.width, 0) / maxWidth;
 		const begin = pathMiddle - textWidth / 2;
@@ -971,7 +1003,17 @@ export default abstract class Card {
 
 		const b = contextBoundingBox(bufferCtx);
 
-		targetCtx.drawImage(buffer, b.x, b.y, b.w, b.h, (x - b.w / 2) * s, (y - b.h / 2) * s, b.w * s, b.h * s);
+		targetCtx.drawImage(
+			buffer,
+			b.x,
+			b.y,
+			b.w,
+			b.h,
+			(x - b.w / 2) * s,
+			(y - b.h / 2) * s,
+			b.w * s,
+			b.h * s
+		);
 
 		this.sunwell.freeBuffer(buffer);
 	}

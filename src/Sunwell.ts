@@ -31,7 +31,7 @@ export default class Sunwell {
 	public platform: Platform;
 	public renderCache: {[cacheKey: string]: any};
 
-	private assetListeners: {[path: string]: Array<(HTMLCanvasElement) => void> };
+	private assetListeners: {[path: string]: Array<(HTMLCanvasElement) => void>};
 	private renderQuery: {[key: string]: Card};
 	private isRendering: boolean;
 

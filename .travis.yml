@@ -1,19 +1,27 @@
+# https://travis-ci.org/HearthSim/Sunwell
+sudo: false
 language: node_js
 node_js:
   - "7"
-script:
-  - yarn run build
-deploy:
-  provider: npm
-  email: benedict@hearthsim.net
-  api_key:
-    secure: GKItTCTOSyeyx0X102GBGubL/xunDq6go3zXF5ZEFuRJXfhUBqOfznJF+rE1tTUKu0Wtqnd0iKfKxrV+W5AhApmq8j2fqMCSDflYSdnF/XGkxFFw7OwnFRRkVmIzbg1tgII77jqJisHzyKV7QJ5e0qL38Yf/rymkMH591SYguFwnzlywIox9AO1kkPwE/VGubSHobtWoguxsXghULqEUMlcP5qW139gBvnS9eQ9AbRbOX02n8Izr8OcUVdPYym6LwGFkyR1Wbh6SIScmiSOHRbPnHSeWoJh68iCDgOI9/T5SeB7h0WozlOSshqvlPtTEnOsFY/NLClbTlxkOK9VqmXG5UuLb73FZvdMpYhUXloZY1K8S93akYT3PJrBGompD0JidR8WdIcQBOkL1FQWc1ZApqodQIoqyD7vIXOcdccJEcnH6pLeSqdUqQCTplKuU62ZR1tMNPI9gWAgbJyUa12XOsnPtbrftnj+dK23nfiaghrqyFObGlvcU7vylmcTC5s5aoutfan2EsngBo2bkv+M7ExKVyPYKgBhxSIVS10dQkomsq4TVw3PzGDxfmOqld5ItR77bwGoxYnn+zja8q+LQ+Pvj7G4V0b5RqF7CiEdGTHqzRxXXVGnIyc2UHjGaP9NSFfDlwcPQrHrYWry7k4cbJKkRIH/IQ47Bw+Yqpb8=
-  on:
-    tags: true
-    branch: master
-    skip_cleanup: true
+  - "8"
+
 cache:
   yarn: true
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-6
+      - libgif-dev
+
+env:
+  - CXX=g++-6
+
+script:
+  - yarn run build
+
 notifications:
   email:
     on_failure: always

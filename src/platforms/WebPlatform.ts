@@ -8,7 +8,7 @@ export default class WebPlatform implements IPlatform {
 	public buffers = [];
 
 	public getBuffer(width?: number, height?: number, clear?: boolean): HTMLCanvasElement {
-		let cvs;
+		let cvs: HTMLCanvasElement;
 		if (this.buffers.length) {
 			if (width) {
 				for (let i = 0; i < this.buffers.length; i++) {
