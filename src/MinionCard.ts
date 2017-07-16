@@ -4,10 +4,7 @@ import {CardClass, Rarity} from "./Enums";
 export default class MinionCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 520, height: 290};
-
-	public getNameBannerAsset() {
-		return "name-banner-minion";
-	}
+	public nameBannerAsset = "name-banner-minion";
 
 	public getNameBannerCoords() {
 		return {

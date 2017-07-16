@@ -4,10 +4,7 @@ import {CardClass, Rarity} from "./Enums";
 export default class WeaponCard extends Card {
 	public bodyTextColor = "white";
 	public bodyTextSize = {width: 470, height: 250};
-
-	public getNameBannerAsset() {
-		return "name-banner-weapon";
-	}
+	public nameBannerAsset = "name-banner-weapon";
 
 	public getNameBannerCoords() {
 		return {

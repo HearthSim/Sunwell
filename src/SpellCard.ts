@@ -4,10 +4,7 @@ import {CardClass, Rarity} from "./Enums";
 export default class SpellCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 460, height: 290};
-
-	public getNameBannerAsset() {
-		return "name-banner-spell";
-	}
+	public nameBannerAsset = "name-banner-spell";
 
 	public getNameBannerCoords() {
 		return {

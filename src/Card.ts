@@ -238,7 +238,6 @@ export default abstract class Card {
 	private cardFrameAsset: string;
 	private rarityGemAsset: string;
 	private multiBannerAsset: string;
-	private nameBannerAsset: string;
 	private watermarkAsset: string;
 	private _propsJson: string;
 
@@ -267,7 +266,6 @@ export default abstract class Card {
 
 		this.cardFrameAsset = this.getCardFrameAsset(this.getCardFrameClass());
 		this.rarityGemAsset = this.getRarityGemAsset(this.getRarityGem());
-		this.nameBannerAsset = this.getNameBannerAsset();
 		this.watermarkAsset = this.getWatermarkAsset();
 
 		if (this.multiClassGroup) {
@@ -299,7 +297,7 @@ export default abstract class Card {
 	public abstract getRarityGemAsset(rarity: Rarity): string;
 	public abstract rarityGemCoords: ICoords;
 	public abstract bodyTextColor: string;
-	public abstract getNameBannerAsset(): string;
+	public abstract nameBannerAsset: string;
 	public abstract getNameBannerCoords(): ICoords;
 	public abstract getWatermarkCoords(): ICoords;
 	public abstract bodyTextSize: {width: number; height: number};
