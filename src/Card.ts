@@ -459,7 +459,6 @@ export default abstract class Card {
 
 		const drawTimeout = setTimeout(() => {
 			this.sunwell.error("Drawing timed out", this.name);
-			this.sunwell.activeRenders--;
 		}, this.sunwell.options.drawTimeout);
 
 		ctx.save();
@@ -580,8 +579,6 @@ export default abstract class Card {
 				this.target.src = cvs.toDataURL();
 			}
 		}
-
-		this.sunwell.activeRenders--;
 	}
 
 	private drawImage(ctx, assetKey: string, coords: ICoords): void {

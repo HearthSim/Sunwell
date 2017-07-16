@@ -32,7 +32,6 @@ export default class Sunwell {
 	public canvas: HTMLCanvasElement;
 	public target: any;
 
-	private activeRenders: number;
 	private assetListeners: {[path: string]: Function[]};
 	private renderQuery: {[key: string]: Card};
 	private renderCache: {[cacheKey: string]: any};
@@ -55,7 +54,6 @@ export default class Sunwell {
 		this.assets = {};
 		this.assetListeners = {};
 		this.renderQuery = {};
-		this.activeRenders = 0;
 		this.renderCache = {};
 		this.isRendering = false;
 	}
