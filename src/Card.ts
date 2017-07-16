@@ -307,6 +307,7 @@ export abstract class Card {
 
 	abstract getCardFrameAsset(cardClass: CardClass): string;
 	abstract getRarityGemAsset(rarity: Rarity): string;
+	abstract getRarityGemCoords(): Coords;
 	abstract getNameBannerAsset(): string;
 	abstract getNameBannerCoords(): Coords;
 	abstract getWatermarkCoords(): Coords;
@@ -1258,21 +1259,9 @@ export abstract class Card {
 	}
 
 	public drawRarityGem(ctx, ratio: number): void {
-		let dx: number, dy: number;
-
-		switch (this.type) {
-			case CardType.HERO:
-			case CardType.MINION:
-				(dx = 326), (dy = 607);
-				break;
-			case CardType.SPELL:
-				(dx = 311), (dy = 607);
-				break;
-			case CardType.WEAPON:
-				(dx = 311), (dy = 607);
-				break;
-		}
-		this.drawImage(ctx, this.rarityGemAsset, {dx: dx, dy: dy, ratio: ratio});
+		let coords = this.getRarityGemCoords();
+		coords.ratio = ratio;
+		this.drawImage(ctx, this.rarityGemAsset, coords);
 	}
 
 	public drawStats(ctx, s: number): void {
@@ -1391,6 +1380,10 @@ export class HeroCard extends Card {
 		return "rarity-hero-" + Rarity[rarity].toLowerCase();
 	}
 
+	getRarityGemCoords() {
+		return {dx: 327, dy: 607};
+	}
+
 	getWatermarkCoords() {
 		return {
 			dx: 270,
@@ -1423,6 +1416,10 @@ export class MinionCard extends Card {
 
 	getRarityGemAsset(rarity) {
 		return "rarity-minion-" + Rarity[rarity].toLowerCase();
+	}
+
+	getRarityGemCoords() {
+		return {dx: 327, dy: 607};
 	}
 
 	getWatermarkCoords() {
@@ -1464,6 +1461,10 @@ export class SpellCard extends Card {
 		return "rarity-spell-" + Rarity[rarity].toLowerCase();
 	}
 
+	getRarityGemCoords() {
+		return {dx: 311, dy: 607};
+	}
+
 	getWatermarkCoords() {
 		return {
 			dx: 264,
@@ -1496,6 +1497,10 @@ export class WeaponCard extends Card {
 
 	getRarityGemAsset(rarity) {
 		return "rarity-weapon-" + Rarity[rarity].toLowerCase();
+	}
+
+	getRarityGemCoords() {
+		return {dx: 311, dy: 607};
 	}
 
 	getWatermarkCoords() {
