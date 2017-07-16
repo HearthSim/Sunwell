@@ -20,8 +20,8 @@
     "url": "git+https://github.com/HearthSim/Sunwell.git"
   },
   "scripts": {
-    "prepublishOnly": "tsc",
-    "build": "rollup -c && BROWSER=true rollup -c",
+    "prepublishOnly": "yarn build",
+    "build": "rollup -c && PLATFORM=web rollup -c  && PLATFORM=cdn rollup -c",
     "dev": "tsc --watch"
   },
   "devDependencies": {
