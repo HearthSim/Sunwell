@@ -7,7 +7,7 @@ export default class WebPlatform implements IPlatform {
 	public bodyFontSizeExtra = "/1em";
 	public buffers = [];
 
-	public getBuffer(width: number, height: number, clear: boolean): void {
+	public getBuffer(width?: number, height?: number, clear?: boolean): HTMLCanvasElement {
 		let cvs;
 		if (this.buffers.length) {
 			if (width) {

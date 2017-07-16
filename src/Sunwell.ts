@@ -31,10 +31,10 @@ export default class Sunwell {
 	public canvas: HTMLCanvasElement;
 	public target: any;
 	public platform: Platform;
+	public renderCache: {[cacheKey: string]: any};
 
 	private assetListeners: {[path: string]: Function[]};
 	private renderQuery: {[key: string]: Card};
-	private renderCache: {[cacheKey: string]: any};
 	private isRendering: boolean;
 
 	constructor(options: SunwellOptions) {
@@ -119,7 +119,7 @@ export default class Sunwell {
 		}
 	}
 
-	public getBuffer(width: number, height: number, clear?: boolean) {
+	public getBuffer(width?: number, height?: number, clear?: boolean) {
 		return this.platform.getBuffer(width, height, clear);
 	}
 
@@ -141,8 +141,6 @@ export default class Sunwell {
 		const ctx = cvs.getContext("2d");
 
 		this.log("Preparing assets for", card.name);
-
-		card.sunwell = card.sunwell || {};
 
 		const assetsToLoad = card.getAssetsToLoad();
 		const texturesToLoad: string[] = [];

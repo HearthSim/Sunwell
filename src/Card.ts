@@ -206,7 +206,7 @@ interface ICoords {
 export default abstract class Card {
 	public canvas;
 	public target;
-	public sunwell;
+	public sunwell: Sunwell;
 	public texture;
 	public id: string;
 	public name: string;
@@ -682,7 +682,7 @@ export default abstract class Card {
 		this.sunwell.log("Length is " + totalLength);
 
 		bufferRowCtx.fillStyle = this.bodyTextColor;
-		bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
+		// bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
 
 		if (manualBreak) {
 			let maxWidth = 0;
