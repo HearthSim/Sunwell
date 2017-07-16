@@ -302,6 +302,7 @@ export default abstract class Card {
 	public abstract getNameBannerAsset(): string;
 	public abstract getNameBannerCoords(): ICoords;
 	public abstract getWatermarkCoords(): ICoords;
+	public abstract bodyTextSize: {width: number; height: number};
 
 	private checksum(): number {
 		const s = this._propsJson + this.width;
@@ -667,34 +668,12 @@ export default abstract class Card {
 		const centerTop = 860;
 		const words = bodyText.replace(/[\$#_]/g, "").replace(/\n/g, " \n ").replace(/ +/g, " ").split(/ /g);
 
-		const bufferText = this.sunwell.getBuffer();
+		const bufferText = this.sunwell.getBuffer(this.bodyTextSize.width, this.bodyTextSize.height);
 		const bufferTextCtx = bufferText.getContext("2d");
 
 		const bufferRow = this.sunwell.getBuffer();
 		const bufferRowCtx = bufferRow.getContext("2d");
-
-		switch (this.type) {
-			case CardType.HERO:
-				bufferText.width = 490;
-				bufferText.height = 290;
-				bufferRow.width = 490;
-				break;
-			case CardType.MINION:
-				bufferText.width = 520;
-				bufferText.height = 290;
-				bufferRow.width = 520;
-				break;
-			case CardType.SPELL:
-				bufferText.width = 460;
-				bufferText.height = 290;
-				bufferRow.width = 460;
-				break;
-			case CardType.WEAPON:
-				bufferText.width = 470;
-				bufferText.height = 250;
-				bufferRow.width = 470;
-				break;
-		}
+		bufferRow.width = bufferText.width;
 
 		let fontSize = this.sunwell.options.bodyFontSize;
 		let lineHeight = this.sunwell.options.bodyLineHeight;

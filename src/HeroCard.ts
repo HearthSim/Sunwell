@@ -3,6 +3,7 @@ import {CardClass, Rarity} from "./Enums";
 
 export default class HeroCard extends Card {
 	public bodyTextColor = "black";
+	public bodyTextSize = {width: 490, height: 290};
 
 	public getNameBannerAsset() {
 		return "name-banner-hero";
