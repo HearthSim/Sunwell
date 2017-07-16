@@ -118,9 +118,9 @@ function getNumberStyle(style: string) {
  * Finishes a text line and starts a new one.
  */
 function finishLine(
-	bufferTextCtx,
-	bufferRow,
-	bufferRowCtx,
+	bufferTextCtx: CanvasRenderingContext2D,
+	bufferRow: HTMLCanvasElement,
+	bufferRowCtx: CanvasRenderingContext2D,
 	xPos: number,
 	yPos: number,
 	totalWidth: number
@@ -204,7 +204,7 @@ interface ICoords {
 }
 
 export default abstract class Card {
-	public canvas;
+	public canvas: HTMLCanvasElement;
 	public target;
 	public sunwell: Sunwell;
 	public texture;
@@ -454,7 +454,7 @@ export default abstract class Card {
 		return "";
 	}
 
-	public draw(ctx): void {
+	public draw(ctx: CanvasRenderingContext2D): void {
 		const cvs = this.canvas;
 		const ratio = this.width / 764;
 
@@ -635,7 +635,12 @@ export default abstract class Card {
 		ctx.restore();
 	}
 
-	public drawBodyText(targetCtx, s: number, forceSmallerFirstLine: boolean, text: string): void {
+	public drawBodyText(
+		targetCtx: CanvasRenderingContext2D,
+		s: number,
+		forceSmallerFirstLine: boolean,
+		text: string
+	): void {
 		const manualBreak = text.substr(0, 3) === "[x]";
 		let bodyText = manualBreak ? text.substr(3) : text;
 		if (!bodyText) {
@@ -648,9 +653,9 @@ export default abstract class Card {
 		let isItalic = 0;
 		let isBold = 0;
 		let lineCount = 0;
-		let justLineBreak;
-		let plurals;
-		let pBodyText;
+		let justLineBreak: boolean;
+		let plurals: RegExpExecArray;
+		let pBodyText: string;
 
 		pBodyText = bodyText;
 		while ((plurals = pluralRegex.exec(bodyText)) !== null) {

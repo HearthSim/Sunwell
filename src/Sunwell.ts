@@ -115,11 +115,11 @@ export default class Sunwell {
 		}
 	}
 
-	public getBuffer(width?: number, height?: number, clear?: boolean) {
+	public getBuffer(width?: number, height?: number, clear?: boolean): HTMLCanvasElement {
 		return this.platform.getBuffer(width, height, clear);
 	}
 
-	public freeBuffer(buffer) {
+	public freeBuffer(buffer: HTMLCanvasElement) {
 		return this.platform.freeBuffer(buffer);
 	}
 
