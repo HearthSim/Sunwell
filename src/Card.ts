@@ -305,12 +305,16 @@ export abstract class Card {
 	public width: number;
 	public key: number;
 
+	abstract getCardFrameAsset(cardClass: CardClass): string;
+	abstract getRarityGemAsset(rarity: Rarity): string;
+	abstract getNameBannerAsset(): string;
+
 	private callback: Function;
 	private cacheKey: number;
 	private cardFrameAsset: string;
-	private nameBannerAsset: string;
 	private rarityGemAsset: string;
 	private multiBannerAsset: string;
+	private nameBannerAsset: string;
 	private watermarkAsset: string;
 
 	constructor(sunwell: Sunwell, props, width: number, canvas, target, callback?: Function) {
@@ -341,9 +345,9 @@ export abstract class Card {
 		this.race = cleanEnum(props.race, Race) as Race;
 		this.rarity = cleanEnum(props.rarity, Rarity) as Rarity;
 
-		this.cardFrameAsset = this.getCardFrameAsset();
+		this.cardFrameAsset = this.getCardFrameAsset(this.getCardFrameClass());
+		this.rarityGemAsset = this.getRarityGemAsset(this.getRarityGem());
 		this.nameBannerAsset = this.getNameBannerAsset();
-		this.rarityGemAsset = this.getRarityGemAsset();
 		this.watermarkAsset = this.getWatermarkAsset();
 
 		if (this.multiClassGroup) {
@@ -454,56 +458,25 @@ export abstract class Card {
 		return "";
 	}
 
-	private getCardFrameAsset(): string {
-		let sclass = CardClass[this.cardClass || CardClass.NEUTRAL].toLowerCase();
-		if (this.cardClass == CardClass.DREAM) sclass = "hunter";
-		switch (this.type) {
-			case CardType.HERO:
-				return "frame-hero-" + sclass;
-			case CardType.MINION:
-				return "frame-minion-" + sclass;
-			case CardType.SPELL:
-				return "frame-spell-" + sclass;
-			case CardType.WEAPON:
-				return "frame-weapon-" + sclass;
+	private getCardFrameClass(): CardClass {
+		switch (this.cardClass) {
+			case CardClass.DREAM:
+				return CardClass.HUNTER;
+			case CardClass.INVALID:
+				return CardClass.NEUTRAL;
+			default:
+				return this.cardClass;
 		}
-		return "";
 	}
 
-	private getNameBannerAsset(): string {
-		switch (this.type) {
-			case CardType.HERO:
-				return "name-banner-hero";
-			case CardType.MINION:
-				return "name-banner-minion";
-			case CardType.SPELL:
-				return "name-banner-spell";
-			case CardType.WEAPON:
-				return "name-banner-weapon";
-		}
-		return "";
-	}
-
-	private getRarityGemAsset(): string {
-		if (this.rarity == Rarity.INVALID || this.rarity == Rarity.FREE) {
-			return "";
-		}
-		if (this.rarity == Rarity.COMMON && this.set == CardSet.CORE) {
-			return "";
+	private getRarityGem(): Rarity {
+		if (this.rarity == Rarity.INVALID) {
+			return Rarity.FREE;
+		} else if (this.rarity == Rarity.COMMON && this.set == CardSet.CORE) {
+			return Rarity.FREE;
 		}
 
-		let srarity = Rarity[this.rarity].toLowerCase();
-		switch (this.type) {
-			case CardType.HERO:
-				return "rarity-minion-" + srarity;
-			case CardType.MINION:
-				return "rarity-minion-" + srarity;
-			case CardType.SPELL:
-				return "rarity-spell-" + srarity;
-			case CardType.WEAPON:
-				return "rarity-weapon-" + srarity;
-		}
-		return "";
+		return this.rarity;
 	}
 
 	private getWatermarkAsset(): string {
@@ -1451,17 +1424,57 @@ export abstract class Card {
 }
 
 export class HeroCard extends Card {
+	getNameBannerAsset() {
+		return "name-banner-hero";
+	}
 
+	getCardFrameAsset(cardClass) {
+		return "frame-hero-" + CardClass[cardClass].toLowerCase();
+	}
+
+	getRarityGemAsset(rarity) {
+		return "rarity-hero-" + Rarity[rarity].toLowerCase();
+	}
 }
 
 export class MinionCard extends Card {
+	getNameBannerAsset() {
+		return "name-banner-minion";
+	}
 
+	getCardFrameAsset(cardClass) {
+		return "frame-minion-" + CardClass[cardClass].toLowerCase();
+	}
+
+	getRarityGemAsset(rarity) {
+		return "rarity-minion-" + Rarity[rarity].toLowerCase();
+	}
 }
 
 export class SpellCard extends Card {
+	getNameBannerAsset() {
+		return "name-banner-spell";
+	}
 
+	getCardFrameAsset(cardClass) {
+		return "frame-spell-" + CardClass[cardClass].toLowerCase();
+	}
+
+	getRarityGemAsset(rarity) {
+		return "rarity-spell-" + Rarity[rarity].toLowerCase();
+	}
 }
 
 export class WeaponCard extends Card {
+	getNameBannerAsset() {
+		return "name-banner-weapon";
+	}
 
+	getCardFrameAsset(cardClass) {
+		return "frame-weapon-" + CardClass[cardClass].toLowerCase();
+	}
+
+	getRarityGemAsset(rarity) {
+		return "rarity-weapon-" + Rarity[rarity].toLowerCase();
+	}
 }
