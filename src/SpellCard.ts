@@ -9,17 +9,14 @@ export default class SpellCard extends Card {
 	public healthGemAsset = null;
 	public attackGemCoords = null;
 	public healthGemCoords = null;
-
-	public getNameBannerCoords() {
-		return {
-			sWidth: 646,
-			sHeight: 199,
-			dx: 66,
-			dy: 530,
-			dWidth: 646,
-			dHeight: 199,
-		};
-	}
+	public nameBannerCoords = {
+		sWidth: 646,
+		sHeight: 199,
+		dx: 66,
+		dy: 530,
+		dWidth: 646,
+		dHeight: 199,
+	};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-spell-" + CardClass[cardClass].toLowerCase();

@@ -16,17 +16,14 @@ export default class HeroCard extends Card {
 		dWidth: 147,
 		dHeight: 174,
 	};
-
-	public getNameBannerCoords() {
-		return {
-			sWidth: 627,
-			sHeight: 156,
-			dx: 81,
-			dy: 535,
-			dWidth: 627,
-			dHeight: 156,
-		};
-	}
+	public nameBannerCoords = {
+		sWidth: 627,
+		sHeight: 156,
+		dx: 81,
+		dy: 535,
+		dWidth: 627,
+		dHeight: 156,
+	};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-hero-" + CardClass[cardClass].toLowerCase();

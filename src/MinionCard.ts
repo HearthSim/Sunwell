@@ -24,16 +24,14 @@ export default class MinionCard extends Card {
 		dHeight: 218,
 	};
 
-	public getNameBannerCoords() {
-		return {
-			sWidth: 608,
-			sHeight: 144,
-			dx: 94,
-			dy: 546,
-			dWidth: 608,
-			dHeight: 144,
-		};
-	}
+	public nameBannerCoords = {
+		sWidth: 608,
+		sHeight: 144,
+		dx: 94,
+		dy: 546,
+		dWidth: 608,
+		dHeight: 144,
+	};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-minion-" + CardClass[cardClass].toLowerCase();

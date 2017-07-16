@@ -302,7 +302,7 @@ export default abstract class Card {
 	public abstract attackGemCoords: ICoords;
 	public abstract healthGemAsset: string;
 	public abstract healthGemCoords: ICoords;
-	public abstract getNameBannerCoords(): ICoords;
+	public abstract nameBannerCoords: ICoords;
 	public abstract getWatermarkCoords(): ICoords;
 	public abstract bodyTextSize: {width: number; height: number};
 
@@ -1074,7 +1074,7 @@ export default abstract class Card {
 	}
 
 	public drawNameBanner(ctx, ratio: number) {
-		const coords = this.getNameBannerCoords();
+		const coords = this.nameBannerCoords;
 		coords.ratio = ratio;
 		this.drawImage(ctx, this.nameBannerAsset, coords);
 	}

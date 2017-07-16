@@ -24,16 +24,14 @@ export default class WeaponCard extends Card {
 		dHeight: 205,
 	};
 
-	public getNameBannerCoords() {
-		return {
-			sWidth: 660,
-			sHeight: 140,
-			dx: 56,
-			dy: 551,
-			dWidth: 660,
-			dHeight: 140,
-		};
-	}
+	public nameBannerCoords = {
+		sWidth: 660,
+		sHeight: 140,
+		dx: 56,
+		dy: 551,
+		dWidth: 660,
+		dHeight: 140,
+	};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-weapon-" + CardClass[cardClass].toLowerCase();
