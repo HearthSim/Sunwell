@@ -1,5 +1,5 @@
-import Sunwell from "./Sunwell";
 import {CardClass, CardSet, CardType, MultiClassGroup, Race, Rarity} from "./Enums";
+import Sunwell from "./Sunwell";
 
 function cleanEnum(val: string | number, e) {
 	if (typeof val === "string") {
@@ -152,12 +152,18 @@ function finishLine(
 	return [xPos, yPos];
 }
 
+interface IPoint {
+	x: number;
+	y: number;
+	r: number;
+}
+
 /**
  * Given a curve and t, the function returns the point on the curve.
  * r is the rotation of the point in radians.
  * @returns {{x: (number|*), y: (number|*), r: number}}
  */
-function getPointOnCurve(curve, t) {
+function getPointOnCurve(curve, t: number): IPoint {
 	const rX =
 		3 * Math.pow(1 - t, 2) * (curve[1].x - curve[0].x) +
 		6 * (1 - t) * t * (curve[2].x - curve[1].x) +
@@ -232,15 +238,26 @@ export default abstract class Card {
 	public healthColor: string;
 	public width: number;
 	public key: number;
+	public abstract rarityGemCoords: ICoords;
+	public abstract bodyTextColor: string;
+	public abstract nameBannerAsset: string;
+	public abstract dragonAsset: string;
+	public abstract dragonCoords: ICoords;
+	public abstract attackGemAsset: string;
+	public abstract attackGemCoords: ICoords;
+	public abstract healthGemAsset: string;
+	public abstract healthGemCoords: ICoords;
+	public abstract nameBannerCoords: ICoords;
+	public abstract bodyTextSize: {width: number; height: number};
 
-	private callback: Function;
+	private callback: (HTMLCanvasElement) => void;
 	private cacheKey: number;
 	private cardFrameAsset: string;
 	private costGemAsset: string;
 	private rarityGemAsset: string;
 	private multiBannerAsset: string;
 	private watermarkAsset: string;
-	private _propsJson: string;
+	private propsJson: string;
 
 	constructor(sunwell: Sunwell, props) {
 		this.sunwell = sunwell;
@@ -297,38 +314,15 @@ export default abstract class Card {
 		this.bodyText = props.collectionText || props.text || "";
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
-		this._propsJson = JSON.stringify(props);
+		this.propsJson = JSON.stringify(props);
 	}
+
+	public abstract getWatermarkCoords(): ICoords;
 
 	public abstract getCardFrameAsset(cardClass: CardClass): string;
 	public abstract getRarityGemAsset(rarity: Rarity): string;
-	public abstract rarityGemCoords: ICoords;
-	public abstract bodyTextColor: string;
-	public abstract nameBannerAsset: string;
-	public abstract dragonAsset: string;
-	public abstract dragonCoords: ICoords;
-	public abstract attackGemAsset: string;
-	public abstract attackGemCoords: ICoords;
-	public abstract healthGemAsset: string;
-	public abstract healthGemCoords: ICoords;
-	public abstract nameBannerCoords: ICoords;
-	public abstract getWatermarkCoords(): ICoords;
-	public abstract bodyTextSize: {width: number; height: number};
 
-	private checksum(): number {
-		const s = this._propsJson + this.width;
-		const length = s.length;
-		let chk = 0;
-		for (let i = 0; i < length; i++) {
-			const char = s.charCodeAt(i);
-			chk = (chk << 5) - chk + char;
-			chk |= 0;
-		}
-
-		return chk;
-	}
-
-	public render(width: number, canvas, target, callback?: Function): void {
+	public render(width: number, canvas, target, callback?: (HTMLCanvasElement) => void): void {
 		this.width = width;
 		this.canvas = canvas;
 		this.target = target;
@@ -401,55 +395,6 @@ export default abstract class Card {
 	public getRaceText(): string {
 		if (this.race && this.type === CardType.MINION && this.race in RaceNames) {
 			return RaceNames[this.race][this.language];
-		}
-		return "";
-	}
-
-	private getCardFrameClass(): CardClass {
-		switch (this.cardClass) {
-			case CardClass.DREAM:
-				return CardClass.HUNTER;
-			case CardClass.INVALID:
-				return CardClass.NEUTRAL;
-			default:
-				return this.cardClass;
-		}
-	}
-
-	private getRarityGem(): Rarity {
-		if (this.rarity === Rarity.INVALID) {
-			return Rarity.FREE;
-		} else if (this.rarity === Rarity.COMMON && this.set === CardSet.CORE) {
-			return Rarity.FREE;
-		}
-
-		return this.rarity;
-	}
-
-	private getWatermarkAsset(): string {
-		switch (this.set) {
-			case CardSet.EXPERT1:
-				return "set-classic";
-			case CardSet.NAXX:
-				return "set-naxx";
-			case CardSet.GVG:
-				return "set-gvg";
-			case CardSet.BRM:
-				return "set-brm";
-			case CardSet.TGT:
-				return "set-tgt";
-			case CardSet.LOE:
-				return "set-loe";
-			case CardSet.OG:
-				return "set-og";
-			case CardSet.KARA:
-				return "set-kara";
-			case CardSet.GANGS:
-				return "set-gangs";
-			case CardSet.UNGORO:
-				return "set-ungoro";
-			case CardSet.HOF:
-				return "set-hof";
 		}
 		return "";
 	}
@@ -534,7 +479,7 @@ export default abstract class Card {
 			this.drawHealthTexture(ctx, ratio);
 
 			if (this.elite && this.dragonAsset) {
-				let coords = this.dragonCoords;
+				const coords = this.dragonCoords;
 				coords.ratio = ratio;
 				this.drawImage(ctx, this.dragonAsset, coords);
 			}
@@ -580,28 +525,6 @@ export default abstract class Card {
 				this.target.src = cvs.toDataURL();
 			}
 		}
-	}
-
-	private drawImage(ctx, assetKey: string, coords: ICoords): void {
-		const asset = this.sunwell.getAsset(assetKey);
-		if (!asset) {
-			this.sunwell.error("Not drawing asset", assetKey);
-			return;
-		}
-		const ratio = coords.ratio || 1;
-		const width = coords.sWidth || asset.width;
-		const height = coords.sHeight || asset.height;
-		ctx.drawImage(
-			asset,
-			coords.sx || 0,
-			coords.sy || 0,
-			width,
-			height,
-			coords.dx * ratio,
-			coords.dy * ratio,
-			(coords.dWidth || width) * ratio,
-			(coords.dHeight || height) * ratio
-		);
 	}
 
 	public drawCardArt(ctx, ratio: number) {
@@ -840,78 +763,6 @@ export default abstract class Card {
 		this.sunwell.freeBuffer(bufferText);
 	}
 
-	protected getFontMaterial(fontSize: number, bold: boolean, italic: boolean): string {
-		let font = this.sunwell.options.bodyFont;
-		let prefix = "";
-		if (typeof font === "function") {
-			font = font(bold, italic);
-		} else {
-			prefix = (bold ? "bold " : "") + (italic ? "italic " : "");
-		}
-		const fontSizeExtra: string = this.sunwell.platform.bodyFontSizeExtra;
-		return prefix + fontSize + "px" + fontSizeExtra + ' "' + font + '", sans-serif';
-	}
-
-	protected getLineWidth(context, fontSize, line: string): number {
-		const words = line.split(" ");
-
-		let width = 0;
-		let isBold = 0;
-		let isItalic = 0;
-		const getFontMaterial = () => this.getFontMaterial(fontSize, isBold > 0, isItalic > 0);
-		for (const word of words) {
-			const chars = word.split("");
-
-			for (let j = 0; j < chars.length; j++) {
-				const char = chars[j];
-
-				// <b>
-				if (char === "<" && chars[j + 1] === "b" && chars[j + 2] === ">") {
-					isBold++;
-					j += 2;
-					context.font = getFontMaterial();
-					continue;
-				}
-
-				// </b>
-				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "b" && chars[j + 3] === ">") {
-					isBold--;
-					j += 3;
-					context.font = getFontMaterial();
-					continue;
-				}
-
-				// <i>
-				if (char === "<" && chars[j + 1] === "i" && chars[j + 2] === ">") {
-					isItalic++;
-					j += 2;
-					context.font = getFontMaterial();
-					continue;
-				}
-
-				// </i>
-				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "i" && chars[j + 3] === ">") {
-					isItalic--;
-					j += 3;
-					context.font = getFontMaterial();
-					continue;
-				}
-
-				context.fillText(
-					char,
-					width + this.sunwell.options.bodyFontOffset.x,
-					this.sunwell.options.bodyFontOffset.y
-				);
-
-				width += context.measureText(char).width;
-			}
-			const em = context.measureText("M").width;
-			width += 0.275 * em;
-		}
-
-		return width;
-	}
-
 	public drawName(targetCtx, s: number, name: string): void {
 		const buffer = this.sunwell.getBuffer(1024, 200);
 		const ctx = buffer.getContext("2d");
@@ -962,7 +813,7 @@ export default abstract class Card {
 
 		// calculate text width
 		const getCharDimensions = () => {
-			const dimensions_ = [];
+			const dim = [];
 			const em = ctx.measureText("M").width;
 			for (let i = 0; i < name.length; i++) {
 				ctx.save();
@@ -979,13 +830,13 @@ export default abstract class Card {
 						scale.y = 1;
 						break;
 				}
-				dimensions_[i] = {
+				dim[i] = {
 					width: charWidth,
 					scale: scale,
 				};
 				ctx.restore();
 			}
-			return dimensions_;
+			return dim;
 		};
 
 		let dimensions = [];
@@ -1000,9 +851,9 @@ export default abstract class Card {
 		const steps = textWidth / name.length;
 
 		// draw text
-		let p,
-			t,
-			leftPos = 0;
+		let p: IPoint;
+		let t: number;
+		let leftPos = 0;
 		for (let i = 0; i < name.length; i++) {
 			const char = name[i].trim();
 			const dimension = dimensions[i];
@@ -1194,7 +1045,7 @@ export default abstract class Card {
 		if (this.hideStats || !this.healthGemAsset) {
 			return;
 		}
-		let coords = this.healthGemCoords;
+		const coords = this.healthGemCoords;
 		coords.ratio = s;
 
 		this.drawImage(ctx, this.healthGemAsset, coords);
@@ -1205,7 +1056,7 @@ export default abstract class Card {
 			return;
 		}
 
-		let coords = this.attackGemCoords;
+		const coords = this.attackGemCoords;
 		coords.ratio = s;
 		this.drawImage(ctx, this.attackGemAsset, coords);
 	}
@@ -1229,5 +1080,161 @@ export default abstract class Card {
 
 		ctx.globalCompositeOperation = "source-over";
 		ctx.globalAlpha = 1;
+	}
+
+	protected getFontMaterial(fontSize: number, bold: boolean, italic: boolean): string {
+		let font = this.sunwell.options.bodyFont;
+		let prefix = "";
+		if (typeof font === "function") {
+			font = font(bold, italic);
+		} else {
+			prefix = (bold ? "bold " : "") + (italic ? "italic " : "");
+		}
+		const fontSizeExtra: string = this.sunwell.platform.bodyFontSizeExtra;
+		return prefix + fontSize + "px" + fontSizeExtra + ' "' + font + '", sans-serif';
+	}
+
+	protected getLineWidth(context, fontSize, line: string): number {
+		const words = line.split(" ");
+
+		let width = 0;
+		let isBold = 0;
+		let isItalic = 0;
+		const getFontMaterial = () => this.getFontMaterial(fontSize, isBold > 0, isItalic > 0);
+		for (const word of words) {
+			const chars = word.split("");
+
+			for (let j = 0; j < chars.length; j++) {
+				const char = chars[j];
+
+				// <b>
+				if (char === "<" && chars[j + 1] === "b" && chars[j + 2] === ">") {
+					isBold++;
+					j += 2;
+					context.font = getFontMaterial();
+					continue;
+				}
+
+				// </b>
+				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "b" && chars[j + 3] === ">") {
+					isBold--;
+					j += 3;
+					context.font = getFontMaterial();
+					continue;
+				}
+
+				// <i>
+				if (char === "<" && chars[j + 1] === "i" && chars[j + 2] === ">") {
+					isItalic++;
+					j += 2;
+					context.font = getFontMaterial();
+					continue;
+				}
+
+				// </i>
+				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "i" && chars[j + 3] === ">") {
+					isItalic--;
+					j += 3;
+					context.font = getFontMaterial();
+					continue;
+				}
+
+				context.fillText(
+					char,
+					width + this.sunwell.options.bodyFontOffset.x,
+					this.sunwell.options.bodyFontOffset.y
+				);
+
+				width += context.measureText(char).width;
+			}
+			const em = context.measureText("M").width;
+			width += 0.275 * em;
+		}
+
+		return width;
+	}
+
+	private checksum(): number {
+		const s = this.propsJson + this.width;
+		const length = s.length;
+		let chk = 0;
+		for (let i = 0; i < length; i++) {
+			const char = s.charCodeAt(i);
+			chk = (chk << 5) - chk + char;
+			chk |= 0;
+		}
+
+		return chk;
+	}
+
+	private drawImage(ctx, assetKey: string, coords: ICoords): void {
+		const asset = this.sunwell.getAsset(assetKey);
+		if (!asset) {
+			this.sunwell.error("Not drawing asset", assetKey);
+			return;
+		}
+		const ratio = coords.ratio || 1;
+		const width = coords.sWidth || asset.width;
+		const height = coords.sHeight || asset.height;
+		ctx.drawImage(
+			asset,
+			coords.sx || 0,
+			coords.sy || 0,
+			width,
+			height,
+			coords.dx * ratio,
+			coords.dy * ratio,
+			(coords.dWidth || width) * ratio,
+			(coords.dHeight || height) * ratio
+		);
+	}
+
+	private getCardFrameClass(): CardClass {
+		switch (this.cardClass) {
+			case CardClass.DREAM:
+				return CardClass.HUNTER;
+			case CardClass.INVALID:
+				return CardClass.NEUTRAL;
+			default:
+				return this.cardClass;
+		}
+	}
+
+	private getRarityGem(): Rarity {
+		if (this.rarity === Rarity.INVALID) {
+			return Rarity.FREE;
+		} else if (this.rarity === Rarity.COMMON && this.set === CardSet.CORE) {
+			return Rarity.FREE;
+		}
+
+		return this.rarity;
+	}
+
+	private getWatermarkAsset(): string {
+		switch (this.set) {
+			case CardSet.EXPERT1:
+				return "set-classic";
+			case CardSet.NAXX:
+				return "set-naxx";
+			case CardSet.GVG:
+				return "set-gvg";
+			case CardSet.BRM:
+				return "set-brm";
+			case CardSet.TGT:
+				return "set-tgt";
+			case CardSet.LOE:
+				return "set-loe";
+			case CardSet.OG:
+				return "set-og";
+			case CardSet.KARA:
+				return "set-kara";
+			case CardSet.GANGS:
+				return "set-gangs";
+			case CardSet.UNGORO:
+				return "set-ungoro";
+			case CardSet.HOF:
+				return "set-hof";
+		}
+		return "";
 	}
 }

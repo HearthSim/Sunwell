@@ -25,7 +25,6 @@ export default class MinionCard extends Card {
 		dWidth: 167,
 		dHeight: 218,
 	};
-
 	public nameBannerCoords = {
 		sWidth: 608,
 		sHeight: 144,
@@ -34,6 +33,7 @@ export default class MinionCard extends Card {
 		dWidth: 608,
 		dHeight: 144,
 	};
+	public rarityGemCoords = {dx: 327, dy: 607};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-minion-" + CardClass[cardClass].toLowerCase();
@@ -42,8 +42,6 @@ export default class MinionCard extends Card {
 	public getRarityGemAsset(rarity) {
 		return "rarity-minion-" + Rarity[rarity].toLowerCase();
 	}
-
-	public rarityGemCoords = {dx: 327, dy: 607};
 
 	public getWatermarkCoords() {
 		let dy = 735;

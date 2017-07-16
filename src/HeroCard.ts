@@ -26,6 +26,7 @@ export default class HeroCard extends Card {
 		dWidth: 627,
 		dHeight: 156,
 	};
+	public rarityGemCoords = {dx: 327, dy: 607};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-hero-" + CardClass[cardClass].toLowerCase();
@@ -34,8 +35,6 @@ export default class HeroCard extends Card {
 	public getRarityGemAsset(rarity) {
 		return "rarity-hero-" + Rarity[rarity].toLowerCase();
 	}
-
-	public rarityGemCoords = {dx: 327, dy: 607};
 
 	public getWatermarkCoords() {
 		return {

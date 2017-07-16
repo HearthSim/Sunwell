@@ -10,7 +10,7 @@ import MinionCard from "./MinionCard";
 import SpellCard from "./SpellCard";
 import WeaponCard from "./WeaponCard";
 
-interface SunwellOptions {
+interface ISunwellOptions {
 	titleFont: string;
 	bodyFont: string;
 	aspectRatio: number;
@@ -24,18 +24,18 @@ interface SunwellOptions {
 }
 
 export default class Sunwell {
-	public options: SunwellOptions;
+	public options: ISunwellOptions;
 	public assets: {[key: string]: HTMLImageElement};
 	public canvas: HTMLCanvasElement;
 	public target: any;
 	public platform: Platform;
 	public renderCache: {[cacheKey: string]: any};
 
-	private assetListeners: {[path: string]: Function[]};
+	private assetListeners: {[path: string]: Array<(HTMLCanvasElement) => void> };
 	private renderQuery: {[key: string]: Card};
 	private isRendering: boolean;
 
-	constructor(options: SunwellOptions) {
+	constructor(options: ISunwellOptions) {
 		options.titleFont = options.titleFont || "Belwe";
 		options.bodyFont = options.bodyFont || "Franklin Gothic";
 		options.aspectRatio = options.aspectRatio || 1.4397905759;
@@ -80,7 +80,7 @@ export default class Sunwell {
 				_this.platform.loadAsset(
 					assets[path],
 					path,
-					function() {
+					() => {
 						if (assetListeners[path]) {
 							for (const listener of assetListeners[path]) {
 								listener(assets[path]);
@@ -89,7 +89,7 @@ export default class Sunwell {
 						}
 						resolve();
 					},
-					function() {
+					() => {
 						_this.error("Error loading asset:", path);
 						// An asset load error should not reject the promise
 						resolve();
@@ -153,7 +153,7 @@ export default class Sunwell {
 		}
 
 		this.log("Preparing to load assets");
-		const fetches: Promise<{}>[] = [];
+		const fetches: Array<Promise<{}>> = [];
 		for (const texture of texturesToLoad) {
 			fetches.push(this.fetchAsset(texture));
 		}
@@ -199,7 +199,7 @@ export default class Sunwell {
 		this.platform.requestAnimationFrame(() => this.render());
 	}
 
-	public createCard(props, width: number, target, callback?: Function): Card {
+	public createCard(props, width: number, target, callback?: (HTMLCanvasElement) => void): Card {
 		let canvas;
 		const height = Math.round(width * this.options.aspectRatio);
 

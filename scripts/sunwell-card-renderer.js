@@ -7,13 +7,13 @@ const Canvas = require("canvas");
 const Promise = require("promise");
 const Sunwell = require("../dist/sunwell.node");
 
-function renderCard(sunwell, card, path, resolution) {
+function renderCard(sunwell, card, filePath, resolution) {
 	if (!card.type || !card.cardClass) {
 		console.log("Skipping", card.id, "(no card to render)");
 		return;
 	}
 
-	if (card.type != "MINION" && card.type != "SPELL" && card.type != "WEAPON" && card.type != "HERO") {
+	if (card.type !== "MINION" && card.type !== "SPELL" && card.type !== "WEAPON" && card.type !== "HERO") {
 		console.log("Skipping", card.id, "(not a renderable card)");
 		return;
 	}
@@ -24,27 +24,29 @@ function renderCard(sunwell, card, path, resolution) {
 	}
 
 	// Turn the texture into an image object
-	fs.readFile(card.texture, function (err, data) {
-		if (err) throw err;
+	fs.readFile(card.texture, function(err, data) {
+		if (err) {
+			throw err;
+		}
 		card.texture = new Canvas.Image();
 		card.texture.src = data;
 
-		let callback = function (canvas) {
-			let out = fs.createWriteStream(path);
+		let callback = function(canvas) {
+			let out = fs.createWriteStream(filePath);
 			let stream = canvas.pngStream();
-			stream.on("data", (chunk) => {
+			stream.on("data", chunk => {
 				out.write(chunk);
 			});
-			stream.on("end", (chunk) => {
-				console.log("Done rendering", path);
+			stream.on("end", chunk => {
+				console.log("Done rendering", filePath);
 			});
-			stream.on("error", (chunk) => {
-				console.log("Error writing chunk", path);
-			})
+			stream.on("error", chunk => {
+				console.log("Error writing chunk", filePath);
+			});
 		};
 
 		sunwell.createCard(card, resolution, null, callback);
-	})
+	});
 }
 
 function drawFromJSON(sunwell, body, textureDir, outputDir, resolution) {
@@ -53,7 +55,7 @@ function drawFromJSON(sunwell, body, textureDir, outputDir, resolution) {
 }
 
 function drawFromData(sunwell, data, textureDir, outputDir, resolution) {
-	for (i in data) {
+	for (let i in data) {
 		var card = data[i];
 		card.key = i;
 		var renderPath = path.join(outputDir, card.id + ".png");
@@ -69,7 +71,6 @@ function drawFromData(sunwell, data, textureDir, outputDir, resolution) {
 
 const fonts = {
 	"belwe/belwe-extrabold.ttf": {family: "Belwe"},
-	"franklin-gothic/franklingothic-medcd.ttf": {family: "Franklin Gothic"},
 	"franklin-gothic-bold/franklingothic-demicd.ttf": {
 		family: "Franklin Gothic Bold",
 		weight: "bold",
@@ -78,20 +79,21 @@ const fonts = {
 		family: "Franklin Gothic Italic",
 		style: "italic",
 	},
+	"franklin-gothic/franklingothic-medcd.ttf": {family: "Franklin Gothic"},
 };
 
 function main() {
 	var p = new ArgumentParser({
-		"description": "Generate card renders",
+		description: "Generate card renders",
 	});
-	p.addArgument("file", {"nargs": "+"});
-	p.addArgument("--assets-dir", {"defaultValue": path.resolve("..", "src", "assets")});
-	p.addArgument("--font-dir", {"defaultValue": path.resolve("fonts")});
-	p.addArgument("--output-dir", {"defaultValue": path.resolve("out")});
-	p.addArgument("--texture-dir", {"defaultValue": path.resolve("textures")});
-	p.addArgument("--resolution", {"type": "int", "defaultValue": 512});
-	p.addArgument("--only", {"type": "string", "defaultValue": ""});
-	p.addArgument("--debug", {"action": "storeTrue"});
+	p.addArgument("file", {nargs: "+"});
+	p.addArgument("--assets-dir", {defaultValue: path.resolve("..", "src", "assets")});
+	p.addArgument("--font-dir", {defaultValue: path.resolve("fonts")});
+	p.addArgument("--output-dir", {defaultValue: path.resolve("out")});
+	p.addArgument("--texture-dir", {defaultValue: path.resolve("textures")});
+	p.addArgument("--resolution", {type: "int", defaultValue: 512});
+	p.addArgument("--only", {type: "string", defaultValue: ""});
+	p.addArgument("--debug", {action: "storeTrue"});
 	var args = p.parseArgs();
 	var sunwell = new Sunwell({
 		titleFont: "Belwe",
@@ -115,21 +117,20 @@ function main() {
 		}
 	}
 
-	const only = args.only.split(",").map((id) => id.trim());
+	const only = args.only.split(",").map(id => id.trim());
 
 	let outdir = path.resolve(args.output_dir);
 	mkdirp.sync(outdir);
 
-	for (let i in args.file) {
-		let file = args.file[i];
-		fs.readFile(file, function (err, body) {
+	for (let file of args.file) {
+		fs.readFile(file, function(err, body) {
 			if (err) {
 				console.log("Error reading", file, err);
 				return;
 			}
 			let data = JSON.parse(body);
 			if (only.length && only[0].length) {
-				data = data.filter((card) => only.indexOf(card.id) !== -1);
+				data = data.filter(card => only.indexOf(card.id) !== -1);
 			}
 			drawFromData(sunwell, data, path.resolve(args.texture_dir), outdir, args.resolution);
 		});

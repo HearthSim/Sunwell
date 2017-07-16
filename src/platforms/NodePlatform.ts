@@ -18,7 +18,7 @@ export default class NodePlatform implements IPlatform {
 	public freeBuffer(buffer: any): void {}
 
 	public loadAsset(img: any, path: any, loaded: any, error: any): void {
-		fs.readFile(path, function(err, data) {
+		fs.readFile(path, (err, data) => {
 			if (err) {
 				console.log("Error loading asset", path);
 				error();

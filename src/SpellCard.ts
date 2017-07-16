@@ -19,6 +19,7 @@ export default class SpellCard extends Card {
 		dWidth: 646,
 		dHeight: 199,
 	};
+	public rarityGemCoords = {dx: 311, dy: 607};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-spell-" + CardClass[cardClass].toLowerCase();
@@ -27,8 +28,6 @@ export default class SpellCard extends Card {
 	public getRarityGemAsset(rarity) {
 		return "rarity-spell-" + Rarity[rarity].toLowerCase();
 	}
-
-	public rarityGemCoords = {dx: 311, dy: 607};
 
 	public getWatermarkCoords() {
 		return {

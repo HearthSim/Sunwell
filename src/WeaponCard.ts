@@ -25,7 +25,6 @@ export default class WeaponCard extends Card {
 		dWidth: 186,
 		dHeight: 205,
 	};
-
 	public nameBannerCoords = {
 		sWidth: 660,
 		sHeight: 140,
@@ -34,6 +33,7 @@ export default class WeaponCard extends Card {
 		dWidth: 660,
 		dHeight: 140,
 	};
+	public rarityGemCoords = {dx: 311, dy: 607};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-weapon-" + CardClass[cardClass].toLowerCase();
@@ -42,8 +42,6 @@ export default class WeaponCard extends Card {
 	public getRarityGemAsset(rarity) {
 		return "rarity-weapon-" + Rarity[rarity].toLowerCase();
 	}
-
-	public rarityGemCoords = {dx: 311, dy: 607};
 
 	public getWatermarkCoords() {
 		return {
