@@ -227,7 +227,6 @@ export default abstract class Card {
 	public silenced: boolean;
 	public language: string;
 	public titleFont: string;
-	public bodyTextColor: string;
 	public costColor: string;
 	public attackColor: string;
 	public healthColor: string;
@@ -291,7 +290,6 @@ export default abstract class Card {
 		this.attackColor = getNumberStyle(props.costStyle);
 		this.healthColor = getNumberStyle(props.healthStyle);
 		this.bodyText = props.collectionText || props.text || "";
-		this.bodyTextColor = this.type === CardType.WEAPON ? "white" : "black";
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
 		this._propsJson = JSON.stringify(props);
@@ -300,6 +298,7 @@ export default abstract class Card {
 	public abstract getCardFrameAsset(cardClass: CardClass): string;
 	public abstract getRarityGemAsset(rarity: Rarity): string;
 	public abstract rarityGemCoords: ICoords;
+	public abstract bodyTextColor: string;
 	public abstract getNameBannerAsset(): string;
 	public abstract getNameBannerCoords(): ICoords;
 	public abstract getWatermarkCoords(): ICoords;

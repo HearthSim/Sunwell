@@ -2,6 +2,8 @@ import Card from "./Card";
 import {CardClass, Rarity} from "./Enums";
 
 export default class WeaponCard extends Card {
+	public bodyTextColor = "white";
+
 	public getNameBannerAsset() {
 		return "name-banner-weapon";
 	}
