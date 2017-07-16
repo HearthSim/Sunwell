@@ -375,7 +375,7 @@ export default abstract class Card {
 		if (!this.texture) {
 			this.sunwell.log("No card texture specified. Creating empty texture.");
 			return this.sunwell.getBuffer(1024, 1024);
-		} else if (this.texture instanceof this.sunwell.options.platform.Image) {
+		} else if (this.texture instanceof this.sunwell.platform.Image) {
 			return this.texture;
 		} else if (typeof this.texture === "string") {
 			return this.sunwell.assets[this.texture];
@@ -543,7 +543,7 @@ export default abstract class Card {
 			}
 
 			if (this.sunwell.options.cacheSkeleton) {
-				const cacheImage = new this.sunwell.options.platform.Image();
+				const cacheImage = new this.sunwell.platform.Image();
 				cacheImage.src = cvs.toDataURL();
 				this.sunwell.renderCache[this.cacheKey] = cacheImage;
 			}
@@ -842,7 +842,7 @@ export default abstract class Card {
 		} else {
 			prefix = (bold ? "bold " : "") + (italic ? "italic " : "");
 		}
-		const fontSizeExtra: string = this.sunwell.options.platform.bodyFontSizeExtra;
+		const fontSizeExtra: string = this.sunwell.platform.bodyFontSizeExtra;
 		return prefix + fontSize + "px" + fontSizeExtra + ' "' + font + '", sans-serif';
 	}
 

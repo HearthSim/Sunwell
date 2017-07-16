@@ -19,7 +19,6 @@ interface SunwellOptions {
 	bodyFontOffset: {x: number, y: number};
 	bodyLineHeight: number;
 	assetFolder: string;
-	platform: Platform;
 	drawTimeout: number;
 	cacheSkeleton: boolean;
 	debug: boolean;
@@ -31,6 +30,7 @@ export default class Sunwell {
 	public assets: {[key: string]: any};
 	public canvas: HTMLCanvasElement;
 	public target: any;
+	public platform: Platform;
 
 	private assetListeners: {[path: string]: Function[]};
 	private renderQuery: {[key: string]: Card};
@@ -45,11 +45,11 @@ export default class Sunwell {
 		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};
 		options.bodyLineHeight = options.bodyLineHeight || 50;
 		options.assetFolder = options.assetFolder || "/assets/";
-		options.platform = options.platform || new Platform();
 		options.drawTimeout = options.drawTimeout || 5000;
 		options.cacheSkeleton = options.cacheSkeleton || false;
 		options.debug = options.debug || false;
 
+		this.platform = new Platform();
 		this.options = options;
 		this.assets = {};
 		this.assetListeners = {};
@@ -73,14 +73,14 @@ export default class Sunwell {
 		const assetListeners = this.assetListeners;
 		const _this = this;
 
-		return new this.options.platform.Promise(resolve => {
+		return new this.platform.Promise(resolve => {
 			if (assets[path] === undefined) {
-				assets[path] = new _this.options.platform.Image();
+				assets[path] = new _this.platform.Image();
 				assets[path].crossOrigin = "Anonymous";
 				assets[path].loaded = false;
 
 				_this.log("Requesting", path);
-				_this.options.platform.loadAsset(
+				_this.platform.loadAsset(
 					assets[path],
 					path,
 					function() {
@@ -120,11 +120,11 @@ export default class Sunwell {
 	}
 
 	public getBuffer(width: number, height: number, clear?: boolean) {
-		return this.options.platform.getBuffer(width, height, clear);
+		return this.platform.getBuffer(width, height, clear);
 	}
 
 	public freeBuffer(buffer) {
-		return this.options.platform.freeBuffer(buffer);
+		return this.platform.freeBuffer(buffer);
 	}
 
 	public render(): void {
@@ -164,7 +164,7 @@ export default class Sunwell {
 			fetches.push(this.fetchAsset(texture));
 		}
 
-		this.options.platform.Promise
+		this.platform.Promise
 			.all(fetches)
 			.then(() => {
 				const start = Date.now();
@@ -202,7 +202,7 @@ export default class Sunwell {
 
 	public renderTick(): void {
 		this.isRendering = true;
-		this.options.platform.requestAnimationFrame(() => this.render());
+		this.platform.requestAnimationFrame(() => this.render());
 	}
 
 	public createCard(props, width: number, target, callback?: Function): Card {
