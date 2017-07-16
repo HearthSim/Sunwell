@@ -1,4 +1,5 @@
 import Sunwell from "./Sunwell";
+import {CardClass, CardSet, CardType, MultiClassGroup, Race, Rarity} from "./Enums";
 
 function cleanEnum(val: string | number, e) {
 	if (typeof val === "string") {
@@ -180,76 +181,6 @@ function getPointOnCurve(curve, t) {
 	return {x: x, y: y, r: Math.atan2(rY, rX)};
 }
 
-enum CardClass {
-	INVALID = 0,
-	DEATHKNIGHT = 1,
-	DRUID = 2,
-	HUNTER = 3,
-	MAGE = 4,
-	PALADIN = 5,
-	PRIEST = 6,
-	ROGUE = 7,
-	SHAMAN = 8,
-	WARLOCK = 9,
-	WARRIOR = 10,
-	DREAM = 11,
-	NEUTRAL = 12,
-}
-
-enum Race {
-	INVALID = 0,
-	MURLOC = 14,
-	DEMON = 15,
-	MECHANICAL = 17,
-	ELEMENTAL = 18,
-	PET = 20,
-	BEAST = 20,
-	TOTEM = 21,
-	PIRATE = 23,
-	DRAGON = 24,
-}
-
-enum Rarity {
-	INVALID = 0,
-	COMMON = 1,
-	FREE = 2,
-	RARE = 3,
-	EPIC = 4,
-	LEGENDARY = 5,
-}
-
-enum MultiClassGroup {
-	INVALID = 0,
-	GRIMY_GOONS = 1,
-	JADE_LOTUS = 2,
-	KABAL = 3,
-}
-
-enum CardSet {
-	INVALID = 0,
-	CORE = 2,
-	EXPERT1 = 3,
-	HOF = 4,
-	NAXX = 12,
-	GVG = 13,
-	BRM = 14,
-	TGT = 15,
-	LOE = 20,
-	KARA = 23,
-	OG = 21,
-	GANGS = 25,
-	UNGORO = 27,
-}
-
-enum CardType {
-	INVALID = 0,
-	HERO = 3,
-	MINION = 4,
-	SPELL = 5,
-	WEAPON = 7,
-	HERO_POWER = 10,
-}
-
 const RaceNames = {};
 RaceNames[Race.MURLOC] = {enUS: "Murloc"};
 RaceNames[Race.MECHANICAL] = {enUS: "Mech"};
@@ -272,7 +203,7 @@ interface ICoords {
 	ratio?: number;
 }
 
-export abstract class Card {
+export default abstract class Card {
 	public canvas;
 	public target;
 	public sunwell;
@@ -1357,154 +1288,5 @@ export abstract class Card {
 
 		ctx.globalCompositeOperation = "source-over";
 		ctx.globalAlpha = 1;
-	}
-}
-
-export class HeroCard extends Card {
-	public getNameBannerAsset() {
-		return "name-banner-hero";
-	}
-
-	public getNameBannerCoords() {
-		return {
-			sWidth: 627,
-			sHeight: 156,
-			dx: 81,
-			dy: 535,
-			dWidth: 627,
-			dHeight: 156,
-		};
-	}
-
-	public getCardFrameAsset(cardClass) {
-		return "frame-hero-" + CardClass[cardClass].toLowerCase();
-	}
-
-	public getRarityGemAsset(rarity) {
-		return "rarity-hero-" + Rarity[rarity].toLowerCase();
-	}
-
-	public rarityGemCoords = {dx: 327, dy: 607};
-
-	public getWatermarkCoords() {
-		return {
-			dx: 270,
-			dy: 735,
-			dWidth: 256,
-			dHeight: 256,
-		};
-	}
-}
-
-export class MinionCard extends Card {
-	public getNameBannerAsset() {
-		return "name-banner-minion";
-	}
-
-	public getNameBannerCoords() {
-		return {
-			sWidth: 608,
-			sHeight: 144,
-			dx: 94,
-			dy: 546,
-			dWidth: 608,
-			dHeight: 144,
-		};
-	}
-
-	public getCardFrameAsset(cardClass) {
-		return "frame-minion-" + CardClass[cardClass].toLowerCase();
-	}
-
-	public getRarityGemAsset(rarity) {
-		return "rarity-minion-" + Rarity[rarity].toLowerCase();
-	}
-
-	public rarityGemCoords = {dx: 327, dy: 607};
-
-	public getWatermarkCoords() {
-		let dy = 735;
-		if (this.raceText) {
-			dy -= 10; // Shift up
-		}
-
-		return {
-			dx: 270,
-			dy: dy,
-			dWidth: 256,
-			dHeight: 256,
-		};
-	}
-}
-
-export class SpellCard extends Card {
-	public getNameBannerAsset() {
-		return "name-banner-spell";
-	}
-
-	public getNameBannerCoords() {
-		return {
-			sWidth: 646,
-			sHeight: 199,
-			dx: 66,
-			dy: 530,
-			dWidth: 646,
-			dHeight: 199,
-		};
-	}
-
-	public getCardFrameAsset(cardClass) {
-		return "frame-spell-" + CardClass[cardClass].toLowerCase();
-	}
-
-	public getRarityGemAsset(rarity) {
-		return "rarity-spell-" + Rarity[rarity].toLowerCase();
-	}
-
-	public rarityGemCoords = {dx: 311, dy: 607};
-
-	public getWatermarkCoords() {
-		return {
-			dx: 264,
-			dy: 726,
-			dWidth: 256,
-			dHeight: 256,
-		};
-	}
-}
-
-export class WeaponCard extends Card {
-	public getNameBannerAsset() {
-		return "name-banner-weapon";
-	}
-
-	public getNameBannerCoords() {
-		return {
-			sWidth: 660,
-			sHeight: 140,
-			dx: 56,
-			dy: 551,
-			dWidth: 660,
-			dHeight: 140,
-		};
-	}
-
-	public getCardFrameAsset(cardClass) {
-		return "frame-weapon-" + CardClass[cardClass].toLowerCase();
-	}
-
-	public getRarityGemAsset(rarity) {
-		return "rarity-weapon-" + Rarity[rarity].toLowerCase();
-	}
-
-	public rarityGemCoords = {dx: 311, dy: 607};
-
-	public getWatermarkCoords() {
-		return {
-			dx: 264,
-			dy: 735,
-			dWidth: 256,
-			dHeight: 256,
-		};
 	}
 }

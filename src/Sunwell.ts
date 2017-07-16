@@ -4,7 +4,11 @@ import Platform from "./platforms/NodePlatform.ts";
 import Platform from "./platforms/WebPlatform";
 //#endif
 
-import {Card, HeroCard, MinionCard, SpellCard, WeaponCard} from "./Card";
+import Card from "./Card";
+import HeroCard from "./HeroCard";
+import MinionCard from "./MinionCard";
+import SpellCard from "./SpellCard";
+import WeaponCard from "./WeaponCard";
 
 export default class Sunwell {
 	public options;
