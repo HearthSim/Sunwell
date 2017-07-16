@@ -274,7 +274,7 @@ interface Coords {
 	ratio?: number;
 }
 
-export default class Card {
+export abstract class Card {
 	public canvas;
 	public target;
 	public sunwell;
@@ -1448,4 +1448,20 @@ export default class Card {
 		ctx.globalCompositeOperation = "source-over";
 		ctx.globalAlpha = 1;
 	}
+}
+
+export class HeroCard extends Card {
+
+}
+
+export class MinionCard extends Card {
+
+}
+
+export class SpellCard extends Card {
+
+}
+
+export class WeaponCard extends Card {
+
 }

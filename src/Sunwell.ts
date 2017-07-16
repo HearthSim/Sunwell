@@ -4,7 +4,7 @@ import Platform from "./platforms/NodePlatform.ts";
 import Platform from "./platforms/WebPlatform";
 //#endif
 
-import Card from "./Card";
+import {Card, HeroCard, MinionCard, SpellCard, WeaponCard} from "./Card";
 
 export default class Sunwell {
 	public options;
@@ -202,6 +202,18 @@ export default class Sunwell {
 			canvas = this.getBuffer(width, height, true);
 		}
 
-		return new Card(this, props, width, canvas, target, callback);
+		let ctors: {[type: string]: any} = {
+			HERO: HeroCard,
+			MINION: MinionCard,
+			SPELL: SpellCard,
+			WEAPON: WeaponCard,
+		};
+
+		let ctor = ctors[props.type];
+		if (!ctor) {
+			throw new Error("Got an unrenderable card type");
+		}
+
+		return new ctor(this, props, width, canvas, target, callback);
 	}
 }
