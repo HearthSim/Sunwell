@@ -10,13 +10,12 @@ import MinionCard from "./MinionCard";
 import SpellCard from "./SpellCard";
 import WeaponCard from "./WeaponCard";
 
-
 interface SunwellOptions {
 	titleFont: string;
 	bodyFont: string;
 	aspectRatio: number;
 	bodyFontSize: number;
-	bodyFontOffset: {x: number, y: number};
+	bodyFontOffset: {x: number; y: number};
 	bodyLineHeight: number;
 	assetFolder: string;
 	drawTimeout: number;
@@ -24,10 +23,9 @@ interface SunwellOptions {
 	debug: boolean;
 }
 
-
 export default class Sunwell {
 	public options: SunwellOptions;
-	public assets: {[key: string]: any};
+	public assets: {[key: string]: HTMLImageElement};
 	public canvas: HTMLCanvasElement;
 	public target: any;
 	public platform: Platform;
@@ -77,14 +75,12 @@ export default class Sunwell {
 			if (assets[path] === undefined) {
 				assets[path] = new _this.platform.Image();
 				assets[path].crossOrigin = "Anonymous";
-				assets[path].loaded = false;
 
 				_this.log("Requesting", path);
 				_this.platform.loadAsset(
 					assets[path],
 					path,
 					function() {
-						assets[path].loaded = true;
 						if (assetListeners[path]) {
 							for (const listener of assetListeners[path]) {
 								listener(assets[path]);
@@ -99,7 +95,7 @@ export default class Sunwell {
 						resolve();
 					}
 				);
-			} else if (!assets[path].loaded) {
+			} else if (!assets[path].complete) {
 				assetListeners[path] = assetListeners[path] || [];
 				assetListeners[path].push(resolve);
 			} else {
@@ -151,7 +147,7 @@ export default class Sunwell {
 
 		for (const asset of assetsToLoad) {
 			const path = this.getAssetPath(asset);
-			if (!this.assets[path] || !this.assets[path].loaded) {
+			if (!this.assets[path] || !this.assets[path].complete) {
 				texturesToLoad.push(path);
 			}
 		}
@@ -191,7 +187,7 @@ export default class Sunwell {
 			this.error("Missing asset", key, "at", path);
 			return;
 		}
-		if (!asset.loaded) {
+		if (!asset.complete) {
 			this.error("Attempting to getAsset not loaded", asset, path);
 			return;
 		}
