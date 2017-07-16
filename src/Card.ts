@@ -252,7 +252,7 @@ export default abstract class Card {
 		this.cost = props.cost || 0;
 		this.attack = props.attack || 0;
 		this.health = props.health || 0;
-		this.costsHealth = props.costHealth || false;
+		this.costsHealth = props.costsHealth || false;
 		this.hideStats = props.hideStats;
 		this.language = props.language || "enUS";
 		this.name = props.name || "";
