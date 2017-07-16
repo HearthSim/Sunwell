@@ -845,9 +845,8 @@ export default abstract class Card {
 		} else {
 			prefix = (bold ? "bold " : "") + (italic ? "italic " : "");
 		}
-		const material =
-			prefix + fontSize + "px" + this.sunwell.bodyFontSizeExtra + ' "' + font + '", sans-serif';
-		return material;
+		const fontSizeExtra: string = this.sunwell.options.platform.bodyFontSizeExtra;
+		return prefix + fontSize + "px" + fontSizeExtra + ' "' + font + '", sans-serif';
 	}
 
 	protected getLineWidth(context, fontSize, line: string): number {

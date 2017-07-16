@@ -13,7 +13,6 @@ import WeaponCard from "./WeaponCard";
 export default class Sunwell {
 	public options;
 	public assets;
-	public bodyFontSizeExtra;
 	public races;
 	public canvas;
 	public target;
@@ -44,7 +43,6 @@ export default class Sunwell {
 		this.renderQuery = {};
 		this.activeRenders = 0;
 		this.renderCache = {};
-		this.bodyFontSizeExtra = this.options.platform.bodyFontSizeExtra;
 		this.isRendering = false;
 	}
 
