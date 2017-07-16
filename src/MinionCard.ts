@@ -5,6 +5,24 @@ export default class MinionCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 520, height: 290};
 	public nameBannerAsset = "name-banner-minion";
+	public attackGemAsset = "attack-minion";
+	public healthGemAsset = "health";
+	public attackGemCoords = {
+		sWidth: 214,
+		sHeight: 238,
+		dx: 0,
+		dy: 862,
+		dWidth: 214,
+		dHeight: 238,
+	};
+	public healthGemCoords = {
+		sWidth: 167,
+		sHeight: 218,
+		dx: 575,
+		dy: 876,
+		dWidth: 167,
+		dHeight: 218,
+	};
 
 	public getNameBannerCoords() {
 		return {

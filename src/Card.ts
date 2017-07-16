@@ -298,6 +298,10 @@ export default abstract class Card {
 	public abstract rarityGemCoords: ICoords;
 	public abstract bodyTextColor: string;
 	public abstract nameBannerAsset: string;
+	public abstract attackGemAsset: string;
+	public abstract attackGemCoords: ICoords;
+	public abstract healthGemAsset: string;
+	public abstract healthGemCoords: ICoords;
 	public abstract getNameBannerCoords(): ICoords;
 	public abstract getWatermarkCoords(): ICoords;
 	public abstract bodyTextSize: {width: number; height: number};
@@ -335,10 +339,11 @@ export default abstract class Card {
 		}
 
 		if (!this.hideStats) {
-			if (this.type === CardType.MINION) {
-				assetsToLoad.push("attack", "health");
-			} else if (this.type === CardType.WEAPON) {
-				assetsToLoad.push("attack-weapon", "health-weapon");
+			if (this.attackGemAsset) {
+				assetsToLoad.push(this.attackGemAsset);
+			}
+			if (this.healthGemAsset) {
+				assetsToLoad.push(this.healthGemAsset);
 			}
 		}
 
@@ -1187,65 +1192,23 @@ export default abstract class Card {
 	}
 
 	public drawAttackTexture(ctx, s: number): void {
-		if (this.hideStats) {
+		if (this.hideStats || !this.healthGemAsset) {
 			return;
 		}
+		let coords = this.healthGemCoords;
+		coords.ratio = s;
 
-		switch (this.type) {
-			case CardType.MINION:
-				this.drawImage(ctx, "health", {
-					sWidth: 167,
-					sHeight: 218,
-					dx: 575,
-					dy: 876,
-					dWidth: 167,
-					dHeight: 218,
-					ratio: s,
-				});
-				break;
-			case CardType.WEAPON:
-				this.drawImage(ctx, "health-weapon", {
-					sWidth: 301,
-					sHeight: 333,
-					dx: 584,
-					dy: 890,
-					dWidth: 186,
-					dHeight: 205,
-					ratio: s,
-				});
-				break;
-		}
+		this.drawImage(ctx, this.healthGemAsset, coords);
 	}
 
 	public drawHealthTexture(ctx, s: number): void {
-		if (this.hideStats) {
+		if (this.hideStats || !this.attackGemAsset) {
 			return;
 		}
 
-		switch (this.type) {
-			case CardType.MINION:
-				this.drawImage(ctx, "attack", {
-					sWidth: 214,
-					sHeight: 238,
-					dx: 0,
-					dy: 862,
-					dWidth: 214,
-					dHeight: 238,
-					ratio: s,
-				});
-				break;
-			case CardType.WEAPON:
-				this.drawImage(ctx, "attack-weapon", {
-					sWidth: 312,
-					sHeight: 306,
-					dx: 32,
-					dy: 906,
-					dWidth: 187,
-					dHeight: 183,
-					ratio: s,
-				});
-				break;
-		}
+		let coords = this.attackGemCoords;
+		coords.ratio = s;
+		this.drawImage(ctx, this.attackGemAsset, coords);
 	}
 
 	public drawWatermark(ctx, s: number): void {
