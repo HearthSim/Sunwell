@@ -34,6 +34,11 @@ export default class WeaponCard extends Card {
 		dHeight: 140,
 	};
 	public rarityGemCoords = {dx: 311, dy: 607};
+	public nameTextCurve = {
+		pathMiddle: 0.56,
+		maxWidth: 580,
+		curve: [{x: 10, y: 77}, {x: 50, y: 77}, {x: 500, y: 77}, {x: 570, y: 77}],
+	};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-weapon-" + CardClass[cardClass].toLowerCase();

@@ -34,6 +34,11 @@ export default class MinionCard extends Card {
 		dHeight: 144,
 	};
 	public rarityGemCoords = {dx: 327, dy: 607};
+	public nameTextCurve = {
+		pathMiddle: 0.55,
+		maxWidth: 560,
+		curve: [{x: 0, y: 110}, {x: 122, y: 140}, {x: 368, y: 16}, {x: 580, y: 100}],
+	};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-minion-" + CardClass[cardClass].toLowerCase();

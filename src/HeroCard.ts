@@ -27,6 +27,11 @@ export default class HeroCard extends Card {
 		dHeight: 156,
 	};
 	public rarityGemCoords = {dx: 327, dy: 607};
+	public nameTextCurve = {
+		pathMiddle: 0.56,
+		maxWidth: 520,
+		curve: [{x: 0, y: 135}, {x: 220, y: 42}, {x: 350, y: 42}, {x: 570, y: 125}],
+	};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-hero-" + CardClass[cardClass].toLowerCase();

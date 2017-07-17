@@ -249,6 +249,7 @@ export default abstract class Card {
 	public abstract healthGemCoords: ICoords;
 	public abstract nameBannerCoords: ICoords;
 	public abstract bodyTextSize: {width: number; height: number};
+	public abstract nameTextCurve: {pathMiddle: number; maxWidth: number; curve: IPoint[]};
 
 	private callback: (HTMLCanvasElement) => void;
 	private cacheKey: number;
@@ -795,39 +796,15 @@ export default abstract class Card {
 	public drawName(targetCtx, s: number, name: string): void {
 		const buffer = this.sunwell.getBuffer(1024, 200);
 		const ctx = buffer.getContext("2d");
-		let maxWidth: number;
-		let pathMiddle: number;
-		let c: IPoint[];
+		const maxWidth = this.nameTextCurve.maxWidth;
+		const curve = this.nameTextCurve.curve;
 		ctx.save();
-
-		switch (this.type) {
-			case CardType.HERO:
-				pathMiddle = 0.56;
-				maxWidth = 520;
-				c = [{x: 0, y: 135}, {x: 220, y: 42}, {x: 350, y: 42}, {x: 570, y: 125}];
-				break;
-			case CardType.MINION:
-				pathMiddle = 0.55;
-				maxWidth = 560;
-				c = [{x: 0, y: 110}, {x: 122, y: 140}, {x: 368, y: 16}, {x: 580, y: 100}];
-				break;
-			case CardType.SPELL:
-				pathMiddle = 0.49;
-				maxWidth = 560;
-				c = [{x: 10, y: 97}, {x: 212, y: 45}, {x: 368, y: 45}, {x: 570, y: 100}];
-				break;
-			case CardType.WEAPON:
-				pathMiddle = 0.56;
-				maxWidth = 580;
-				c = [{x: 10, y: 77}, {x: 50, y: 77}, {x: 500, y: 77}, {x: 570, y: 77}];
-				break;
-		}
 
 		if (this.sunwell.options.debug) {
 			ctx.strokeStyle = "red";
 			ctx.fillStyle = "red";
-			for (const coord of c) {
-				ctx.fillRect(coord.x - 2, coord.y - 2, 4, 4);
+			for (const point of curve) {
+				ctx.fillRect(point.x - 2, point.y - 2, 4, 4);
 			}
 		}
 
@@ -879,7 +856,7 @@ export default abstract class Card {
 		);
 
 		const textWidth = dimensions.reduce((a, b) => a + b.width, 0) / maxWidth;
-		const begin = pathMiddle - textWidth / 2;
+		const begin = this.nameTextCurve.pathMiddle - textWidth / 2;
 		const steps = textWidth / name.length;
 
 		// draw text
@@ -891,14 +868,14 @@ export default abstract class Card {
 			const dimension = dimensions[i];
 			if (leftPos === 0) {
 				t = begin + steps * i;
-				p = getPointOnCurve(c, t);
+				p = getPointOnCurve(curve, t);
 				leftPos = p.x;
 			} else {
 				t += 0.01;
-				p = getPointOnCurve(c, t);
+				p = getPointOnCurve(curve, t);
 				while (p.x < leftPos) {
 					t += 0.001;
-					p = getPointOnCurve(c, t);
+					p = getPointOnCurve(curve, t);
 				}
 			}
 

@@ -20,6 +20,11 @@ export default class SpellCard extends Card {
 		dHeight: 199,
 	};
 	public rarityGemCoords = {dx: 311, dy: 607};
+	public nameTextCurve = {
+		pathMiddle: 0.49,
+		maxWidth: 560,
+		curve: [{x: 10, y: 97}, {x: 212, y: 45}, {x: 368, y: 45}, {x: 570, y: 100}],
+	};
 
 	public getCardFrameAsset(cardClass) {
 		return "frame-spell-" + CardClass[cardClass].toLowerCase();
