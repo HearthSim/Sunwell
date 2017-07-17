@@ -671,8 +671,6 @@ export default abstract class Card {
 				);
 			}
 
-			const chars = word.split("");
-
 			if (word === "\n") {
 				this.sunwell.log("Manual line break");
 				lineCount++;
@@ -691,11 +689,11 @@ export default abstract class Card {
 
 			justLineBreak = false;
 
-			for (let j = 0; j < chars.length; j++) {
-				const char = chars[j];
+			for (let j = 0; j < word.length; j++) {
+				const char = word[j];
 
 				// <b>
-				if (char === "<" && chars[j + 1] === "b" && chars[j + 2] === ">") {
+				if (char === "<" && word[j + 1] === "b" && word[j + 2] === ">") {
 					isBold++;
 					j += 2;
 					bufferRowCtx.font = getFontMaterial();
@@ -703,7 +701,7 @@ export default abstract class Card {
 				}
 
 				// </b>
-				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "b" && chars[j + 3] === ">") {
+				if (char === "<" && word[j + 1] === "/" && word[j + 2] === "b" && word[j + 3] === ">") {
 					isBold--;
 					j += 3;
 					bufferRowCtx.font = getFontMaterial();
@@ -711,7 +709,7 @@ export default abstract class Card {
 				}
 
 				// <i>
-				if (char === "<" && chars[j + 1] === "i" && chars[j + 2] === ">") {
+				if (char === "<" && word[j + 1] === "i" && word[j + 2] === ">") {
 					isItalic++;
 					j += 2;
 					bufferRowCtx.font = getFontMaterial();
@@ -719,7 +717,7 @@ export default abstract class Card {
 				}
 
 				// </i>
-				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "i" && chars[j + 3] === ">") {
+				if (char === "<" && word[j + 1] === "/" && word[j + 2] === "i" && word[j + 3] === ">") {
 					isItalic--;
 					j += 3;
 					bufferRowCtx.font = getFontMaterial();
@@ -1156,13 +1154,11 @@ export default abstract class Card {
 		let italic = 0;
 
 		for (const word of line.split(" ")) {
-			const chars = word.split("");
-
-			for (let j = 0; j < chars.length; j++) {
-				const char = chars[j];
+			for (let j = 0; j < word.length; j++) {
+				const char = word[j];
 
 				// <b>
-				if (char === "<" && chars[j + 1] === "b" && chars[j + 2] === ">") {
+				if (char === "<" && word[j + 1] === "b" && word[j + 2] === ">") {
 					bold++;
 					j += 2;
 					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
@@ -1170,7 +1166,7 @@ export default abstract class Card {
 				}
 
 				// </b>
-				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "b" && chars[j + 3] === ">") {
+				if (char === "<" && word[j + 1] === "/" && word[j + 2] === "b" && word[j + 3] === ">") {
 					bold--;
 					j += 3;
 					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
@@ -1178,7 +1174,7 @@ export default abstract class Card {
 				}
 
 				// <i>
-				if (char === "<" && chars[j + 1] === "i" && chars[j + 2] === ">") {
+				if (char === "<" && word[j + 1] === "i" && word[j + 2] === ">") {
 					italic++;
 					j += 2;
 					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
@@ -1186,7 +1182,7 @@ export default abstract class Card {
 				}
 
 				// </i>
-				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "i" && chars[j + 3] === ">") {
+				if (char === "<" && word[j + 1] === "/" && word[j + 2] === "i" && word[j + 3] === ">") {
 					italic--;
 					j += 3;
 					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
