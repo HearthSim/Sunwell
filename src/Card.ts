@@ -1125,13 +1125,11 @@ export default abstract class Card {
 		fontSize: number,
 		line: string
 	): number {
-		const words = line.split(" ");
-
 		let width = 0;
-		let isBold = 0;
-		let isItalic = 0;
-		const getFontMaterial = () => this.getFontMaterial(fontSize, isBold > 0, isItalic > 0);
-		for (const word of words) {
+		let bold = 0;
+		let italic = 0;
+
+		for (const word of line.split(" ")) {
 			const chars = word.split("");
 
 			for (let j = 0; j < chars.length; j++) {
@@ -1139,33 +1137,33 @@ export default abstract class Card {
 
 				// <b>
 				if (char === "<" && chars[j + 1] === "b" && chars[j + 2] === ">") {
-					isBold++;
+					bold++;
 					j += 2;
-					context.font = getFontMaterial();
+					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 					continue;
 				}
 
 				// </b>
 				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "b" && chars[j + 3] === ">") {
-					isBold--;
+					bold--;
 					j += 3;
-					context.font = getFontMaterial();
+					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 					continue;
 				}
 
 				// <i>
 				if (char === "<" && chars[j + 1] === "i" && chars[j + 2] === ">") {
-					isItalic++;
+					italic++;
 					j += 2;
-					context.font = getFontMaterial();
+					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 					continue;
 				}
 
 				// </i>
 				if (char === "<" && chars[j + 1] === "/" && chars[j + 2] === "i" && chars[j + 3] === ">") {
-					isItalic--;
+					italic--;
 					j += 3;
-					context.font = getFontMaterial();
+					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 					continue;
 				}
 
@@ -1177,8 +1175,7 @@ export default abstract class Card {
 
 				width += context.measureText(char).width;
 			}
-			const em = context.measureText("M").width;
-			width += 0.275 * em;
+			width += 0.275 * context.measureText("M").width;
 		}
 
 		return width;
