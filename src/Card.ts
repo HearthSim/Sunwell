@@ -15,7 +15,7 @@ function cleanEnum(val: string | number, e) {
 /**
  * Helper function to draw the oval mask for the cards artwork.
  */
-function drawEllipse(
+function drawHalfEllipse(
 	context: CanvasRenderingContext2D,
 	x: number,
 	y: number,
@@ -34,9 +34,14 @@ function drawEllipse(
 	context.moveTo(x, ym);
 	context.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
 	context.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-	context.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-	context.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-	// context.closePath(); // not used correctly, see comments (use to close off open path)
+	// The following two lines complete the bottom half of the ellipse.
+	// We don't need to do that though, because the bottom half is hidden by
+	// the card frame on minion cards. On Hero cards however, we actually do
+	// need that full bottom half, so we keep that half square.
+	// context.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+	// context.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+	context.lineTo(xe, ye);
+	context.lineTo(x, ye);
 	context.stroke();
 }
 
@@ -528,7 +533,7 @@ export default abstract class Card {
 			case CardType.HERO:
 			case CardType.MINION:
 				(dx = 100), (dy = 75), (dWidth = 590), (dHeight = 590);
-				drawEllipse(context, 180 * ratio, dy * ratio, 430 * ratio, dHeight * ratio);
+				drawHalfEllipse(context, 180 * ratio, dy * ratio, 430 * ratio, dHeight * ratio);
 				break;
 			case CardType.SPELL:
 				(dx = 125), (dy = 117), (dWidth = 529), (dHeight = 529);
@@ -537,7 +542,7 @@ export default abstract class Card {
 				break;
 			case CardType.WEAPON:
 				(dx = 150), (dy = 135), (dWidth = 476), (dHeight = 476);
-				drawEllipse(context, dx * ratio, dy * ratio, dWidth * ratio, 468 * ratio);
+				drawHalfEllipse(context, dx * ratio, dy * ratio, dWidth * ratio, 468 * ratio);
 				break;
 		}
 		context.clip();
