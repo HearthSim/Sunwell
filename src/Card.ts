@@ -240,10 +240,9 @@ interface ICoords {
 }
 
 export default abstract class Card {
-	public canvas: HTMLCanvasElement;
 	public target;
-	public sunwell: Sunwell;
 	public texture;
+	public canvas: HTMLCanvasElement;
 	public id: string;
 	public name: string;
 	public bodyText: string;
@@ -291,6 +290,7 @@ export default abstract class Card {
 	private multiBannerAsset: string;
 	private watermarkAsset: string;
 	private propsJson: string;
+	private sunwell: Sunwell;
 
 	constructor(sunwell: Sunwell, props) {
 		this.sunwell = sunwell;
@@ -354,14 +354,12 @@ export default abstract class Card {
 	public abstract getCardFrameAsset(cardClass: CardClass): string;
 	public abstract getRarityGemAsset(rarity: Rarity): string;
 
-	public render(width: number, canvas, target, callback?: (HTMLCanvasElement) => void): void {
+	public initRender(width: number, target, callback?: (HTMLCanvasElement) => void): void {
 		this.width = width;
-		this.canvas = canvas;
 		this.target = target;
 		this.callback = callback;
 		this.cacheKey = this.checksum();
 		this.key = this.cacheKey;
-		this.sunwell.prepareRenderingCard(this);
 	}
 
 	public getAssetsToLoad(): string[] {
@@ -431,8 +429,7 @@ export default abstract class Card {
 		return "";
 	}
 
-	public draw(context: CanvasRenderingContext2D): void {
-		const cvs = this.canvas;
+	public draw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D): void {
 		const ratio = this.width / 764;
 
 		const drawTimeout = setTimeout(() => {
@@ -440,7 +437,7 @@ export default abstract class Card {
 		}, this.sunwell.options.drawTimeout);
 
 		context.save();
-		context.clearRect(0, 0, cvs.width, cvs.height);
+		context.clearRect(0, 0, canvas.width, canvas.height);
 
 		// >>>>> Begin Skeleton drawing
 		if (this.sunwell.renderCache[this.cacheKey]) {
@@ -452,8 +449,8 @@ export default abstract class Card {
 			this.drawImage(context, this.cardFrameAsset, {
 				dx: 0,
 				dy: 0,
-				dWidth: cvs.width,
-				dHeight: cvs.height,
+				dWidth: canvas.width,
+				dHeight: canvas.height,
 			});
 
 			if (this.multiBannerAsset) {
@@ -491,7 +488,7 @@ export default abstract class Card {
 
 			if (this.sunwell.options.cacheSkeleton) {
 				const cacheImage = new this.sunwell.platform.Image();
-				cacheImage.src = cvs.toDataURL();
+				cacheImage.src = canvas.toDataURL();
 				this.sunwell.renderCache[this.cacheKey] = cacheImage;
 			}
 		}
@@ -516,14 +513,14 @@ export default abstract class Card {
 		clearTimeout(drawTimeout);
 
 		if (this.callback) {
-			this.callback(cvs);
+			this.callback(canvas);
 		}
 
 		if (this.target) {
 			if (typeof this.target === "function") {
-				this.target(cvs);
+				this.target(canvas);
 			} else {
-				this.target.src = cvs.toDataURL();
+				this.target.src = canvas.toDataURL();
 			}
 		}
 	}

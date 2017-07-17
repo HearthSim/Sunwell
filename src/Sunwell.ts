@@ -108,17 +108,6 @@ export default class Sunwell {
 		});
 	}
 
-	public prepareRenderingCard(card: Card): void {
-		this.log("Queried render:", card.name);
-		if (this.renderQuery[card.key]) {
-			this.log("Skipping", card.key, "(already queued)");
-		}
-		this.renderQuery[card.key] = card;
-		if (!this.isRendering) {
-			this.renderTick();
-		}
-	}
-
 	public getBuffer(width?: number, height?: number, clear?: boolean): HTMLCanvasElement {
 		return this.platform.getBuffer(width, height, clear);
 	}
@@ -137,8 +126,7 @@ export default class Sunwell {
 		const card = this.renderQuery[first];
 		delete this.renderQuery[first];
 
-		const cvs = card.canvas;
-		const ctx = cvs.getContext("2d");
+		const context = card.canvas.getContext("2d");
 
 		this.log("Preparing assets for", card.name);
 
@@ -166,7 +154,7 @@ export default class Sunwell {
 			.all(fetches)
 			.then(() => {
 				const start = Date.now();
-				card.draw(ctx);
+				card.draw(card.canvas, context);
 				this.log(card, "finished drawing in " + (Date.now() - start) + "ms");
 				// check whether we have more to do
 				this.isRendering = false;
@@ -204,7 +192,7 @@ export default class Sunwell {
 	}
 
 	public createCard(props, width: number, target, callback?: (HTMLCanvasElement) => void): Card {
-		let canvas;
+		let canvas: HTMLCanvasElement;
 		const height = Math.round(width * this.options.aspectRatio);
 
 		if (target && target instanceof HTMLCanvasElement) {
@@ -227,8 +215,20 @@ export default class Sunwell {
 			throw new Error("Got an unrenderable card type");
 		}
 
-		const card = new ctor(this, props);
-		card.render(width, canvas, target, callback);
+		const card: Card = new ctor(this, props);
+		card.canvas = canvas;
+		card.initRender(width, target, callback);
+
+		this.log("Queried render:", card.name);
+		if (this.renderQuery[card.key]) {
+			this.log("Skipping", card.key, "(already queued)");
+		} else {
+			this.renderQuery[card.key] = card;
+			if (!this.isRendering) {
+				this.renderTick();
+			}
+		}
+
 		return card;
 	}
 }
