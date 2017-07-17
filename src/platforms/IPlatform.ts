@@ -3,7 +3,6 @@ interface IPlatform {
 	buffers: any[];
 	Image: any;
 	Promise: any;
-	bodyFontSizeExtra: string;
 	getBuffer(width: number, height: number, clear: boolean): void;
 	freeBuffer(buffer): void;
 	loadAsset(img, url, loaded, error): void;

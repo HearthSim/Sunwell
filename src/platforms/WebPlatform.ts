@@ -4,7 +4,6 @@ export default class WebPlatform implements IPlatform {
 	public name = "WEB";
 	public Image = Image;
 	public Promise = Promise;
-	public bodyFontSizeExtra = "/1em";
 	public buffers = [];
 
 	public getBuffer(width?: number, height?: number, clear?: boolean): HTMLCanvasElement {

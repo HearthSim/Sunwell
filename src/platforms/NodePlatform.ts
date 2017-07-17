@@ -8,8 +8,6 @@ export default class NodePlatform implements IPlatform {
 	public buffers = [];
 	public Image = Canvas.Image;
 	public Promise = Promise;
-	// The notation "16px/1em" is not supported by node-canvas
-	public bodyFontSizeExtra = "";
 
 	public getBuffer(width: number, height: number, clear: boolean): void {
 		return new Canvas(width, height);
