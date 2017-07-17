@@ -331,6 +331,9 @@ export default abstract class Card {
 		if (this.type === CardType.WEAPON && props.durability) {
 			// Weapons alias health to durability
 			this.health = props.durability;
+		} else if (this.type === CardType.HERO && props.armor) {
+			// Hero health gem is Armor
+			this.health = props.armor;
 		}
 
 		this.elite = props.elite || false;
