@@ -21,6 +21,7 @@ env:
 
 script:
   - yarn run build
+  - NODE_ENV=production yarn run build
   - yarn run qa
 
 notifications:
