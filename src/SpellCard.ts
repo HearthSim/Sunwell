@@ -10,7 +10,9 @@ export default class SpellCard extends Card {
 	public attackGemAsset = null;
 	public healthGemAsset = null;
 	public attackGemCoords = null;
+	public attackTextCoords = null;
 	public healthGemCoords = null;
+	public healthTextCoords = null;
 	public nameBannerCoords = {
 		sWidth: 646,
 		sHeight: 199,

@@ -251,6 +251,8 @@ export default abstract class Card {
 	public abstract dragonCoords: ICoords;
 	public abstract attackGemAsset: string;
 	public abstract attackGemCoords: ICoords;
+	public abstract attackTextCoords: IPoint;
+	public abstract healthTextCoords: IPoint;
 	public abstract healthGemAsset: string;
 	public abstract healthGemCoords: ICoords;
 	public abstract nameBannerCoords: ICoords;
@@ -1056,14 +1058,33 @@ export default abstract class Card {
 	}
 
 	public drawStats(context: CanvasRenderingContext2D, ratio: number): void {
-		if (!this.hideStats) {
-			this.drawNumber(context, 116, 170, ratio, this.cost, 175, this.costColor);
+		if (this.hideStats) {
+			return;
+		}
+		this.drawNumber(context, 116, 170, ratio, this.cost, 175, this.costColor);
 
-			if (this.type === CardType.MINION || this.type === CardType.WEAPON) {
-				const attackX = this.type === CardType.MINION ? 128 : 118;
-				this.drawNumber(context, attackX, 994, ratio, this.attack, 160, this.attackColor);
-				this.drawNumber(context, 668, 994, ratio, this.health, 160, this.healthColor);
-			}
+		if (this.attackTextCoords) {
+			this.drawNumber(
+				context,
+				this.attackTextCoords.x,
+				this.attackTextCoords.y,
+				ratio,
+				this.attack,
+				160,
+				this.attackColor
+			);
+		}
+
+		if (this.healthTextCoords) {
+			this.drawNumber(
+				context,
+				this.healthTextCoords.x,
+				this.healthTextCoords.y,
+				ratio,
+				this.health,
+				160,
+				this.healthColor
+			);
 		}
 	}
 

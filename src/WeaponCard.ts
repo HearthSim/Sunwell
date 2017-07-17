@@ -17,6 +17,7 @@ export default class WeaponCard extends Card {
 		dWidth: 187,
 		dHeight: 183,
 	};
+	public attackTextCoords = {x: 118, y: 994};
 	public healthGemCoords = {
 		sWidth: 301,
 		sHeight: 333,
@@ -25,6 +26,7 @@ export default class WeaponCard extends Card {
 		dWidth: 186,
 		dHeight: 205,
 	};
+	public healthTextCoords = {x: 668, y: 994};
 	public nameBannerCoords = {
 		sWidth: 660,
 		sHeight: 140,

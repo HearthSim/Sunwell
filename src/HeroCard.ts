@@ -10,6 +10,7 @@ export default class HeroCard extends Card {
 	public attackGemAsset = null;
 	public healthGemAsset = "armor";
 	public attackGemCoords = null;
+	public attackTextCoords = null;
 	public healthGemCoords = {
 		sWidth: 92,
 		sHeight: 109,
@@ -18,6 +19,7 @@ export default class HeroCard extends Card {
 		dWidth: 147,
 		dHeight: 174,
 	};
+	public healthTextCoords = {x: 668, y: 994};
 	public nameBannerCoords = {
 		sWidth: 627,
 		sHeight: 156,
