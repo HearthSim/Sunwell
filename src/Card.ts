@@ -517,11 +517,7 @@ export default abstract class Card {
 		}
 
 		if (this.target) {
-			if (typeof this.target === "function") {
-				this.target(canvas);
-			} else {
-				this.target.src = canvas.toDataURL();
-			}
+			this.target.src = canvas.toDataURL();
 		}
 	}
 
