@@ -20,7 +20,7 @@ export default class HeroCard extends Card {
 		dWidth: 147,
 		dHeight: 174,
 	};
-	public healthTextCoords = {x: 668, y: 994};
+	public healthTextCoords = {x: 679, y: 1005};
 	public nameBannerCoords = {
 		sWidth: 627,
 		sHeight: 156,
