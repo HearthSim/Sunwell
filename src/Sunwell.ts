@@ -12,7 +12,9 @@ import WeaponCard from "./WeaponCard";
 
 interface ISunwellOptions {
 	titleFont: string;
-	bodyFont: string;
+	bodyFontRegular: string;
+	bodyFontBold: string;
+	bodyFontItalic: string;
 	aspectRatio: number;
 	bodyFontSize: number;
 	bodyFontOffset: {x: number; y: number};
@@ -37,7 +39,9 @@ export default class Sunwell {
 
 	constructor(options: ISunwellOptions) {
 		options.titleFont = options.titleFont || "Belwe";
-		options.bodyFont = options.bodyFont || "Franklin Gothic";
+		options.bodyFontRegular = options.bodyFontRegular || "Franklin Gothic";
+		options.bodyFontBold = options.bodyFontBold || options.bodyFontRegular;
+		options.bodyFontItalic = options.bodyFontItalic || options.bodyFontRegular;
 		options.aspectRatio = options.aspectRatio || 1.4397905759;
 		options.bodyFontSize = options.bodyFontSize || 60;
 		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};

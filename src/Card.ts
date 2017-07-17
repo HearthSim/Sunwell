@@ -1109,12 +1109,17 @@ export default abstract class Card {
 	}
 
 	protected getFontMaterial(fontSize: number, bold: boolean, italic: boolean): string {
-		let font = this.sunwell.options.bodyFont;
+		let font: string;
 		let prefix = "";
-		if (typeof font === "function") {
-			font = font(bold, italic);
+
+		if (bold) {
+			font = this.sunwell.options.bodyFontBold;
+			prefix = "bold ";
+		} else if (italic) {
+			font = this.sunwell.options.bodyFontItalic;
+			prefix = "italic ";
 		} else {
-			prefix = (bold ? "bold " : "") + (italic ? "italic " : "");
+			font = this.sunwell.options.bodyFontRegular;
 		}
 
 		return `${prefix}${fontSize}px/1em "${font}", sans-serif`;

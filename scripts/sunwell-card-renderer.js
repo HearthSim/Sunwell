@@ -102,7 +102,8 @@ function main() {
 	var args = p.parseArgs();
 	var sunwell = new Sunwell({
 		titleFont: "Belwe",
-		bodyFont: (bold, italic) => "Franklin Gothic" + (bold ? " Bold" : italic ? " Italic" : ""),
+		bodyFontBold: "Franklin Gothic Bold",
+		bodyFontItalic: "Franklin Gothic Italic",
 		bodyFontSize: 53,
 		bodyLineHeight: 52.5,
 		bodyFontOffset: {x: 0, y: 40},
