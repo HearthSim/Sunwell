@@ -267,6 +267,8 @@ export default abstract class Card {
 	public healthColor: string;
 	public width: number;
 	public key: number;
+	public abstract baseCardFrameAsset: string;
+	public abstract baseRarityGemAsset: string;
 	public abstract rarityGemCoords: ICoords;
 	public abstract bodyTextColor: string;
 	public abstract nameBannerAsset: string;
@@ -309,26 +311,17 @@ export default abstract class Card {
 		this.name = props.name || "";
 
 		this.multiClassGroup = cleanEnum(props.multiClassGroup, MultiClassGroup) as MultiClassGroup;
-		this.cardClass = cleanEnum(props.cardClass, CardClass) as CardClass;
-		this.set = cleanEnum(props.set, CardSet) as CardSet;
 		this.type = cleanEnum(props.type, CardType) as CardType;
 		this.race = cleanEnum(props.race, Race) as Race;
-		this.rarity = cleanEnum(props.rarity, Rarity) as Rarity;
 
-		this.cardFrameAsset = this.getCardFrameAsset(this.getCardFrameClass());
-		this.rarityGemAsset = this.getRarityGemAsset(this.getRarityGem());
-		this.watermarkAsset = this.getWatermarkAsset();
+		const set = cleanEnum(props.set, CardSet) as CardSet;
+		this.set = this.getCardSet(set);
 
-		if (this.costsHealth) {
-			this.costGemAsset = "health";
-		} else {
-			this.costGemAsset = "cost-mana";
-		}
+		const rarity = cleanEnum(props.rarity, Rarity) as Rarity;
+		this.rarity = this.getRarityGem(rarity, set);
 
-		if (this.multiClassGroup) {
-			const smulti = MultiClassGroup[this.multiClassGroup];
-			this.multiBannerAsset = "multi-" + smulti.toLowerCase();
-		}
+		const cardClass = cleanEnum(props.cardClass, CardClass) as CardClass;
+		this.cardClass = this.getCardFrameClass(cardClass);
 
 		if (this.type === CardType.MINION) {
 			this.raceText = props.raceText || this.getRaceText();
@@ -351,8 +344,6 @@ export default abstract class Card {
 	}
 
 	public abstract getWatermarkCoords(): ICoords;
-	public abstract getCardFrameAsset(cardClass: CardClass): string;
-	public abstract getRarityGemAsset(rarity: Rarity): string;
 
 	public initRender(width: number, target, callback?: (HTMLCanvasElement) => void): void {
 		this.width = width;
@@ -360,6 +351,7 @@ export default abstract class Card {
 		this.callback = callback;
 		this.cacheKey = this.checksum();
 		this.key = this.cacheKey;
+		this.updateAssets();
 	}
 
 	public getAssetsToLoad(): string[] {
@@ -1192,6 +1184,28 @@ export default abstract class Card {
 		return chk;
 	}
 
+	private updateAssets(): void {
+		this.cardFrameAsset = this.baseCardFrameAsset + CardClass[this.cardClass].toLowerCase();
+
+		if (this.rarity) {
+			this.rarityGemAsset = this.baseRarityGemAsset + Rarity[this.rarity].toLowerCase();
+		}
+
+		if (this.costsHealth) {
+			this.costGemAsset = "health";
+		} else {
+			this.costGemAsset = "cost-mana";
+		}
+
+		if (this.multiClassGroup) {
+			this.multiBannerAsset = "multi-" + MultiClassGroup[this.multiClassGroup].toLowerCase();
+		}
+
+		if (this.set) {
+			this.watermarkAsset = "set-" + CardSet[this.set].toLowerCase();
+		}
+	}
+
 	private drawImage(context: CanvasRenderingContext2D, assetKey: string, coords: ICoords): void {
 		const asset = this.sunwell.getAsset(assetKey);
 		if (!asset) {
@@ -1214,52 +1228,47 @@ export default abstract class Card {
 		);
 	}
 
-	private getCardFrameClass(): CardClass {
+	private getCardFrameClass(cardClass: CardClass): CardClass {
 		switch (this.cardClass) {
 			case CardClass.DREAM:
 				return CardClass.HUNTER;
 			case CardClass.INVALID:
 				return CardClass.NEUTRAL;
 			default:
-				return this.cardClass;
+				return cardClass;
 		}
 	}
 
-	private getRarityGem(): Rarity {
-		if (this.rarity === Rarity.INVALID) {
-			return Rarity.FREE;
-		} else if (this.rarity === Rarity.COMMON && this.set === CardSet.CORE) {
-			return Rarity.FREE;
-		}
-
-		return this.rarity;
-	}
-
-	private getWatermarkAsset(): string {
-		switch (this.set) {
+	private getCardSet(set: CardSet): CardSet {
+		switch (set) {
 			case CardSet.EXPERT1:
-				return "set-classic";
 			case CardSet.NAXX:
-				return "set-naxx";
 			case CardSet.GVG:
-				return "set-gvg";
 			case CardSet.BRM:
-				return "set-brm";
 			case CardSet.TGT:
-				return "set-tgt";
 			case CardSet.LOE:
-				return "set-loe";
 			case CardSet.OG:
-				return "set-og";
 			case CardSet.KARA:
-				return "set-kara";
 			case CardSet.GANGS:
-				return "set-gangs";
 			case CardSet.UNGORO:
-				return "set-ungoro";
 			case CardSet.HOF:
-				return "set-hof";
+				return set;
+			default:
+				return null;
 		}
-		return "";
+	}
+
+	private getRarityGem(rarity: Rarity, set: CardSet): Rarity {
+		switch (rarity) {
+			case Rarity.INVALID:
+			case Rarity.FREE:
+				return null;
+			case Rarity.COMMON:
+				if (set === CardSet.CORE) {
+					return null;
+				}
+		}
+
+		return rarity;
 	}
 }

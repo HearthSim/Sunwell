@@ -1,10 +1,11 @@
 import Card from "./Card";
-import {CardClass, Rarity} from "./Enums";
 
 export default class WeaponCard extends Card {
 	public bodyTextColor = "white";
 	public bodyTextSize = {width: 470, height: 250};
+	public baseCardFrameAsset = "frame-weapon-";
 	public nameBannerAsset = "name-banner-weapon";
+	public baseRarityGemAsset = "rarity-weapon-";
 	public dragonAsset = null;
 	public dragonCoords = null;
 	public attackGemAsset = "health-minion";
@@ -41,14 +42,6 @@ export default class WeaponCard extends Card {
 		maxWidth: 580,
 		curve: [{x: 10, y: 77}, {x: 50, y: 77}, {x: 500, y: 77}, {x: 570, y: 77}],
 	};
-
-	public getCardFrameAsset(cardClass) {
-		return "frame-weapon-" + CardClass[cardClass].toLowerCase();
-	}
-
-	public getRarityGemAsset(rarity) {
-		return "rarity-weapon-" + Rarity[rarity].toLowerCase();
-	}
 
 	public getWatermarkCoords() {
 		return {

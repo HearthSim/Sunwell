@@ -1,9 +1,10 @@
 import Card from "./Card";
-import {CardClass, Rarity} from "./Enums";
 
 export default class MinionCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 520, height: 290};
+	public baseCardFrameAsset = "frame-minion-";
+	public baseRarityGemAsset = "rarity-minion-";
 	public nameBannerAsset = "name-banner-minion";
 	public dragonAsset = "elite-minion";
 	public dragonCoords = {dx: 196, dy: 0, dWidth: 529};
@@ -41,14 +42,6 @@ export default class MinionCard extends Card {
 		maxWidth: 560,
 		curve: [{x: 0, y: 110}, {x: 122, y: 140}, {x: 368, y: 16}, {x: 580, y: 100}],
 	};
-
-	public getCardFrameAsset(cardClass) {
-		return "frame-minion-" + CardClass[cardClass].toLowerCase();
-	}
-
-	public getRarityGemAsset(rarity) {
-		return "rarity-minion-" + Rarity[rarity].toLowerCase();
-	}
 
 	public getWatermarkCoords() {
 		let dy = 735;

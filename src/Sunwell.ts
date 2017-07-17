@@ -130,14 +130,13 @@ export default class Sunwell {
 
 		this.log("Preparing assets for", card.name);
 
-		const assetsToLoad = card.getAssetsToLoad();
 		const texturesToLoad: string[] = [];
 
 		if (card.texture && typeof card.texture === "string") {
 			texturesToLoad.push(card.texture);
 		}
 
-		for (const asset of assetsToLoad) {
+		for (const asset of card.getAssetsToLoad()) {
 			const path = this.getAssetPath(asset);
 			if (!this.assets[path] || !this.assets[path].complete) {
 				texturesToLoad.push(path);

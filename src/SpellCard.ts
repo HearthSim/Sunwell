@@ -1,9 +1,10 @@
 import Card from "./Card";
-import {CardClass, Rarity} from "./Enums";
 
 export default class SpellCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 460, height: 290};
+	public baseCardFrameAsset = "frame-spell-";
+	public baseRarityGemAsset = "rarity-spell-";
 	public nameBannerAsset = "name-banner-spell";
 	public dragonAsset = "elite-spell";
 	public dragonCoords = {dx: 201, dy: 70, dWidth: 601};
@@ -27,14 +28,6 @@ export default class SpellCard extends Card {
 		maxWidth: 560,
 		curve: [{x: 10, y: 97}, {x: 212, y: 45}, {x: 368, y: 45}, {x: 570, y: 100}],
 	};
-
-	public getCardFrameAsset(cardClass) {
-		return "frame-spell-" + CardClass[cardClass].toLowerCase();
-	}
-
-	public getRarityGemAsset(rarity) {
-		return "rarity-spell-" + Rarity[rarity].toLowerCase();
-	}
 
 	public getWatermarkCoords() {
 		return {

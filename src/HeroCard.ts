@@ -1,9 +1,10 @@
 import Card from "./Card";
-import {CardClass, Rarity} from "./Enums";
 
 export default class HeroCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 490, height: 290};
+	public baseCardFrameAsset = "frame-hero-";
+	public baseRarityGemAsset = "rarity-hero-";
 	public nameBannerAsset = "name-banner-hero";
 	public dragonAsset = "elite-hero";
 	public dragonCoords = null; // TODO
@@ -34,14 +35,6 @@ export default class HeroCard extends Card {
 		maxWidth: 520,
 		curve: [{x: 0, y: 135}, {x: 220, y: 42}, {x: 350, y: 42}, {x: 570, y: 125}],
 	};
-
-	public getCardFrameAsset(cardClass) {
-		return "frame-hero-" + CardClass[cardClass].toLowerCase();
-	}
-
-	public getRarityGemAsset(rarity) {
-		return "rarity-hero-" + Rarity[rarity].toLowerCase();
-	}
 
 	public getWatermarkCoords() {
 		return {
