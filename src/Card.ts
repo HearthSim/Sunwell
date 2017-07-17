@@ -158,6 +158,30 @@ function finishLine(
 	return [xPos, yPos];
 }
 
+/**
+ * Parses the beginning of a string, looking for a bold or italic tag.
+ */
+function parseNextToken(s: string): {token: string; bold: number; italic: number} {
+	let token: string;
+	if (s[1] === "/") {
+		token = s.slice(0, 4);
+		if (token === "</b>") {
+			return {token: token, bold: -1, italic: 0};
+		} else if (token === "</i>") {
+			return {token: token, bold: 0, italic: -1};
+		}
+	} else {
+		token = s.slice(0, 3);
+		if (token === "<b>") {
+			return {token: token, bold: 1, italic: 0};
+		} else if (token === "<i>") {
+			return {token: token, bold: 0, italic: -1};
+		}
+	}
+
+	return {token: "", bold: 0, italic: 0};
+}
+
 interface IPoint {
 	x: number;
 	y: number;
@@ -560,8 +584,8 @@ export default abstract class Card {
 		const pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g;
 		let xPos = 0;
 		let yPos = 0;
-		let isItalic = 0;
-		let isBold = 0;
+		let italic = 0;
+		let bold = 0;
 		let lineCount = 0;
 		let justLineBreak: boolean;
 		let plurals: RegExpExecArray;
@@ -635,8 +659,7 @@ export default abstract class Card {
 			}
 		}
 
-		const getFontMaterial = () => this.getFontMaterial(fontSize, isBold > 0, isItalic > 0);
-		bufferRowCtx.font = getFontMaterial();
+		bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 
 		bufferRow.height = lineHeight;
 
@@ -692,36 +715,16 @@ export default abstract class Card {
 			for (let j = 0; j < word.length; j++) {
 				const char = word[j];
 
-				// <b>
-				if (char === "<" && word[j + 1] === "b" && word[j + 2] === ">") {
-					isBold++;
-					j += 2;
-					bufferRowCtx.font = getFontMaterial();
-					continue;
-				}
+				if (char === "<") {
+					const pr = parseNextToken(word.slice(j));
 
-				// </b>
-				if (char === "<" && word[j + 1] === "/" && word[j + 2] === "b" && word[j + 3] === ">") {
-					isBold--;
-					j += 3;
-					bufferRowCtx.font = getFontMaterial();
-					continue;
-				}
-
-				// <i>
-				if (char === "<" && word[j + 1] === "i" && word[j + 2] === ">") {
-					isItalic++;
-					j += 2;
-					bufferRowCtx.font = getFontMaterial();
-					continue;
-				}
-
-				// </i>
-				if (char === "<" && word[j + 1] === "/" && word[j + 2] === "i" && word[j + 3] === ">") {
-					isItalic--;
-					j += 3;
-					bufferRowCtx.font = getFontMaterial();
-					continue;
+					if (pr.token) {
+						j += pr.token.length - 1;
+						bold += pr.bold;
+						italic += pr.italic;
+						bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
+						continue;
+					}
 				}
 
 				bufferRowCtx.fillText(
@@ -1157,36 +1160,16 @@ export default abstract class Card {
 			for (let j = 0; j < word.length; j++) {
 				const char = word[j];
 
-				// <b>
-				if (char === "<" && word[j + 1] === "b" && word[j + 2] === ">") {
-					bold++;
-					j += 2;
-					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-					continue;
-				}
+				if (char === "<") {
+					const pr = parseNextToken(word.slice(j));
 
-				// </b>
-				if (char === "<" && word[j + 1] === "/" && word[j + 2] === "b" && word[j + 3] === ">") {
-					bold--;
-					j += 3;
-					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-					continue;
-				}
-
-				// <i>
-				if (char === "<" && word[j + 1] === "i" && word[j + 2] === ">") {
-					italic++;
-					j += 2;
-					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-					continue;
-				}
-
-				// </i>
-				if (char === "<" && word[j + 1] === "/" && word[j + 2] === "i" && word[j + 3] === ">") {
-					italic--;
-					j += 3;
-					context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-					continue;
+					if (pr.token) {
+						j += pr.token.length - 1;
+						bold += pr.bold;
+						italic += pr.italic;
+						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
+						continue;
+					}
 				}
 
 				context.fillText(
