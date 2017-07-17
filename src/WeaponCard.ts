@@ -8,7 +8,7 @@ export default class WeaponCard extends Card {
 	public baseRarityGemAsset = "rarity-weapon-";
 	public dragonAsset = null;
 	public dragonCoords = null;
-	public attackGemAsset = "health-minion";
+	public attackGemAsset = "attack-weapon";
 	public healthGemAsset = "durability";
 	public attackGemCoords = {
 		sWidth: 312,
