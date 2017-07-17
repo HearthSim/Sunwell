@@ -438,38 +438,7 @@ export default abstract class Card {
 				});
 			}
 
-			if (this.costsHealth) {
-				context.drawImage(
-					this.sunwell.getAsset(this.costGemAsset),
-					0,
-					0,
-					167,
-					218,
-					24 * ratio,
-					62 * ratio,
-					167 * ratio,
-					218 * ratio
-				);
-				context.save();
-				context.shadowBlur = 50 * ratio;
-				context.shadowColor = "#FF7275";
-				context.shadowOffsetX = 1000;
-				context.globalAlpha = 0.5;
-				context.drawImage(
-					this.sunwell.getAsset(this.costGemAsset),
-					0,
-					0,
-					167,
-					218,
-					24 * ratio - 1000,
-					62 * ratio,
-					167 * ratio,
-					218 * ratio
-				);
-				context.restore();
-			} else {
-				this.drawImage(context, this.costGemAsset, {dx: 24, dy: 82, ratio: ratio});
-			}
+			this.drawCostGem(context, ratio);
 
 			if (this.rarityGemAsset) {
 				this.drawRarityGem(context, ratio);
@@ -1043,6 +1012,41 @@ export default abstract class Card {
 		);
 
 		this.sunwell.freeBuffer(buffer);
+	}
+
+	public drawCostGem(context: CanvasRenderingContext2D, ratio: number): void {
+		if (this.costsHealth) {
+			context.drawImage(
+				this.sunwell.getAsset(this.costGemAsset),
+				0,
+				0,
+				167,
+				218,
+				24 * ratio,
+				62 * ratio,
+				167 * ratio,
+				218 * ratio
+			);
+			context.save();
+			context.shadowBlur = 50 * ratio;
+			context.shadowColor = "#FF7275";
+			context.shadowOffsetX = 1000;
+			context.globalAlpha = 0.5;
+			context.drawImage(
+				this.sunwell.getAsset(this.costGemAsset),
+				0,
+				0,
+				167,
+				218,
+				24 * ratio - 1000,
+				62 * ratio,
+				167 * ratio,
+				218 * ratio
+			);
+			context.restore();
+		} else {
+			this.drawImage(context, this.costGemAsset, {dx: 24, dy: 82, ratio: ratio});
+		}
 	}
 
 	public drawRarityGem(context: CanvasRenderingContext2D, ratio: number): void {
