@@ -78,7 +78,6 @@ export default class Sunwell {
 		return new this.platform.Promise(resolve => {
 			if (assets[path] === undefined) {
 				assets[path] = new sw.platform.Image();
-				assets[path].crossOrigin = "Anonymous";
 
 				sw.log("Requesting", path);
 				sw.platform.loadAsset(

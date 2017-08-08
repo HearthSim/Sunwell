@@ -42,6 +42,7 @@ export default class WebPlatform implements IPlatform {
 	}
 
 	public loadAsset(img: any, url: any, loaded: any, error: any): void {
+		img.crossOrigin = "Anonymous";
 		img.addEventListener("load", loaded);
 		img.addEventListener("error", error);
 		img.src = url;
