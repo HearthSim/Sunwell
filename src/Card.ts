@@ -1259,6 +1259,7 @@ export default abstract class Card {
 			case CardSet.KARA:
 			case CardSet.GANGS:
 			case CardSet.UNGORO:
+			case CardSet.ICECROWN:
 			case CardSet.HOF:
 				return set;
 			default:
