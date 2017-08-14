@@ -294,6 +294,7 @@ export default abstract class Card {
 	public width: number;
 	public key: number;
 	public abstract baseCardFrameAsset: string;
+	public abstract baseCardFrameCoords: ICoords;
 	public abstract baseRarityGemAsset: string;
 	public abstract rarityGemCoords: ICoords;
 	public abstract bodyTextColor: string;
@@ -469,11 +470,7 @@ export default abstract class Card {
 		} else {
 			this.drawCardArt(context, ratio);
 
-			this.drawImage(context, this.cardFrameAsset, {
-				dx: 70,
-				dy: 89,
-				ratio: ratio,
-			});
+			this.drawFrameTexture(context, ratio);
 
 			if (this.multiBannerAsset) {
 				this.drawImage(context, this.multiBannerAsset, {
@@ -1101,6 +1098,12 @@ export default abstract class Card {
 		const coords = this.attackGemCoords;
 		coords.ratio = ratio;
 		this.drawImage(context, this.attackGemAsset, coords);
+	}
+
+	public drawFrameTexture(context: CanvasRenderingContext2D, ratio: number): void {
+		const coords = this.baseCardFrameCoords;
+		coords.ratio = ratio;
+		this.drawImage(context, this.cardFrameAsset, coords);
 	}
 
 	public drawWatermark(context: CanvasRenderingContext2D, ratio: number): void {

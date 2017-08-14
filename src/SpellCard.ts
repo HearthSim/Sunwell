@@ -4,10 +4,23 @@ export default class SpellCard extends Card {
 	public bodyTextColor = "black";
 	public bodyTextSize = {width: 460, height: 290};
 	public baseCardFrameAsset = "frame-spell-";
+	public baseCardFrameCoords = {
+		dx: 70,
+		dy: 133,
+		dWidth: 527,
+		dHeight: 746
+	}
 	public baseRarityGemAsset = "rarity-spell-";
 	public nameBannerAsset = "name-banner-spell";
 	public dragonAsset = "elite-spell";
-	public dragonCoords = {dx: 201, dy: 70, dWidth: 601};
+	public dragonCoords = {
+		sWidth: 476,
+		sHeight: 259,
+		dx: 185,
+		dy: 91,
+		dWidth: 476,
+		dHeight: 259,
+	};
 	public attackGemAsset = null;
 	public healthGemAsset = null;
 	public attackGemCoords = null;
@@ -15,14 +28,21 @@ export default class SpellCard extends Card {
 	public healthGemCoords = null;
 	public healthTextCoords = null;
 	public nameBannerCoords = {
-		sWidth: 646,
-		sHeight: 199,
-		dx: 66,
-		dy: 530,
-		dWidth: 646,
-		dHeight: 199,
+		sWidth: 507,
+		sHeight: 155,
+		dx: 80,
+		dy: 457,
+		dWidth: 507,
+		dHeight: 155,
 	};
-	public rarityGemCoords = {dx: 311, dy: 607};
+	public rarityGemCoords = {
+		sWidth: 116,
+		sHeight: 77,
+		dx: 272,
+		dy: 541,
+		dWidth: 116,
+		dHeight: 77
+	};
 	public nameTextCurve = {
 		pathMiddle: 0.49,
 		maxWidth: 560,
@@ -51,10 +71,10 @@ export default class SpellCard extends Card {
 
 	public getWatermarkCoords() {
 		return {
-			dx: 264,
-			dy: 726,
-			dWidth: 256,
-			dHeight: 256,
+			dx: 231,
+			dy: 618,
+			dWidth: 210,
+			dHeight: 210,
 		};
 	}
 }
