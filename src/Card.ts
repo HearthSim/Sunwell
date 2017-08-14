@@ -453,7 +453,7 @@ export default abstract class Card {
 	}
 
 	public draw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D): void {
-		const ratio = this.width / 764;
+		const ratio = this.width / 670;
 
 		const drawTimeout = setTimeout(() => {
 			this.sunwell.error("Drawing timed out", this.name);
@@ -470,16 +470,15 @@ export default abstract class Card {
 			this.drawCardArt(context, ratio);
 
 			this.drawImage(context, this.cardFrameAsset, {
-				dx: 0,
-				dy: 0,
-				dWidth: canvas.width,
-				dHeight: canvas.height,
+				dx: 70,
+				dy: 89,
+				ratio: ratio,
 			});
 
 			if (this.multiBannerAsset) {
 				this.drawImage(context, this.multiBannerAsset, {
-					dx: 17,
-					dy: 88,
+					dx: 50,
+					dy: 119,
 					ratio: ratio,
 				});
 			}
@@ -493,7 +492,7 @@ export default abstract class Card {
 			this.drawNameBanner(context, ratio);
 
 			if (this.raceText) {
-				this.drawImage(context, "race-banner", {dx: 125, dy: 937, ratio: ratio});
+				this.drawImage(context, "race-banner", {dx: 129, dy: 791, ratio: ratio});
 			}
 
 			this.drawAttackTexture(context, ratio);
@@ -551,7 +550,7 @@ export default abstract class Card {
 		drawPolygon(context, this.artClipPolygon, ratio)
 		context.clip();
 		context.fillStyle = "grey";
-		context.fillRect(0, 0, 765 * ratio, 1100 * ratio);
+		context.fillRect(0, 0, 670 * ratio, 1000 * ratio);
 		context.drawImage(
 			t,
 			0,
@@ -1045,7 +1044,7 @@ export default abstract class Card {
 			);
 			context.restore();
 		} else {
-			this.drawImage(context, this.costGemAsset, {dx: 24, dy: 82, ratio: ratio});
+			this.drawImage(context, this.costGemAsset, {dx: 47, dy: 105, ratio: ratio});
 		}
 	}
 
@@ -1092,7 +1091,6 @@ export default abstract class Card {
 		}
 		const coords = this.healthGemCoords;
 		coords.ratio = ratio;
-
 		this.drawImage(context, this.healthGemAsset, coords);
 	}
 
@@ -1100,7 +1098,6 @@ export default abstract class Card {
 		if (this.hideStats || !this.attackGemAsset) {
 			return;
 		}
-
 		const coords = this.attackGemCoords;
 		coords.ratio = ratio;
 		this.drawImage(context, this.attackGemAsset, coords);

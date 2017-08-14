@@ -7,36 +7,43 @@ export default class MinionCard extends Card {
 	public baseRarityGemAsset = "rarity-minion-";
 	public nameBannerAsset = "name-banner-minion";
 	public dragonAsset = "elite-minion";
-	public dragonCoords = {dx: 196, dy: 0, dWidth: 529};
+	public dragonCoords =  {
+		sWidth: 436,
+		sHeight: 325,
+		dx: 188,
+		dy: 52,
+		dWidth: 436,
+		dHeight: 325,
+	};
 	public attackGemAsset = "attack-minion";
 	public healthGemAsset = "health";
 	public attackGemCoords = {
-		sWidth: 214,
-		sHeight: 238,
-		dx: 0,
-		dy: 862,
-		dWidth: 214,
-		dHeight: 238,
+		sWidth: 154,
+		sHeight: 173,
+		dx: 36,
+		dy: 721,
+		dWidth: 154,
+		dHeight: 173,
 	};
 	public attackTextCoords = {x: 128, y: 994};
 	public healthGemCoords = {
-		sWidth: 167,
-		sHeight: 218,
-		dx: 575,
-		dy: 876,
-		dWidth: 167,
-		dHeight: 218,
+		sWidth: 109,
+		sHeight: 164,
+		dx: 504,
+		dy: 728,
+		dWidth: 109,
+		dHeight: 164,
 	};
 	public healthTextCoords = {x: 668, y: 994};
 	public nameBannerCoords = {
-		sWidth: 608,
-		sHeight: 144,
-		dx: 94,
-		dy: 546,
-		dWidth: 608,
-		dHeight: 144,
+		sWidth: 485,
+		sHeight: 113,
+		dx: 96,
+		dy: 469,
+		dWidth: 485,
+		dHeight: 113,
 	};
-	public rarityGemCoords = {dx: 327, dy: 607};
+	public rarityGemCoords = {dx: 263, dy: 532};
 	public nameTextCurve = {
 		pathMiddle: 0.55,
 		maxWidth: 560,
@@ -74,16 +81,16 @@ export default class MinionCard extends Card {
 	];
 
 	public getWatermarkCoords() {
-		let dy = 735;
+		let dy = 604;
 		if (this.raceText) {
-			dy -= 10; // Shift up
+			dy -= 16; // Shift up
 		}
 
 		return {
-			dx: 270,
+			dx: 231,
 			dy: dy,
-			dWidth: 256,
-			dHeight: 256,
+			dWidth: 225,
+			dHeight: 225,
 		};
 	}
 }

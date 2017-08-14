@@ -42,7 +42,7 @@ export default class Sunwell {
 		options.bodyFontRegular = options.bodyFontRegular || "Franklin Gothic";
 		options.bodyFontBold = options.bodyFontBold || options.bodyFontRegular;
 		options.bodyFontItalic = options.bodyFontItalic || options.bodyFontRegular;
-		options.aspectRatio = options.aspectRatio || 1.4397905759;
+		options.aspectRatio = options.aspectRatio || 1.492537;
 		options.bodyFontSize = options.bodyFontSize || 60;
 		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};
 		options.bodyLineHeight = options.bodyLineHeight || 50;
