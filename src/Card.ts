@@ -778,7 +778,7 @@ export default abstract class Card {
 			}
 		}
 
-		textContext.lineWidth = 13;
+		textContext.lineWidth = 10;
 		textContext.strokeStyle = "black";
 		textContext.lineCap = "round";
 		textContext.lineJoin = "round";
@@ -858,7 +858,7 @@ export default abstract class Card {
 				textContext.rotate(p.r);
 
 				// shadow
-				textContext.lineWidth = 10 * (fontSize / 50);
+				textContext.lineWidth = 9 * (fontSize / 50);
 				textContext.strokeStyle = "black";
 				textContext.fillStyle = "black";
 				textContext.fillText(char, 0, 0);
@@ -931,7 +931,7 @@ export default abstract class Card {
 		bufferCtx.textBaseline = "hanging";
 
 		for (const cnum of n) {
-			bufferCtx.lineWidth = 13;
+			bufferCtx.lineWidth = 10;
 			bufferCtx.strokeStyle = "black";
 			bufferCtx.fillStyle = "black";
 			bufferCtx.fillText(cnum, tX, 10);
@@ -968,8 +968,10 @@ export default abstract class Card {
 		const bufferCtx = buffer.getContext("2d");
 		let x = 10;
 		const text = raceText.split("");
+		const textSize = 40;
+		const textCoord = {x: 337, y: 830};
 
-		bufferCtx.font = "45px " + this.titleFont;
+		bufferCtx.font = textSize + "px " + this.titleFont;
 		bufferCtx.lineCap = "round";
 		bufferCtx.lineJoin = "round";
 		bufferCtx.textBaseline = "hanging";
@@ -977,7 +979,7 @@ export default abstract class Card {
 
 		const xWidth = bufferCtx.measureText("x").width;
 		for (const char of text) {
-			bufferCtx.lineWidth = 8;
+			bufferCtx.lineWidth = 7;
 			bufferCtx.strokeStyle = "black";
 			bufferCtx.fillStyle = "black";
 			bufferCtx.fillText(char, x, 10);
@@ -1001,8 +1003,8 @@ export default abstract class Card {
 			b.y,
 			b.w,
 			b.h,
-			(394 - b.w / 2) * ratio,
-			(1001 - b.h / 2) * ratio,
+			(textCoord.x - b.w / 2) * ratio,
+			(textCoord.y - b.h / 2) * ratio,
 			b.w * ratio,
 			b.h * ratio
 		);
@@ -1052,10 +1054,23 @@ export default abstract class Card {
 	}
 
 	public drawStats(context: CanvasRenderingContext2D, ratio: number): void {
+		const costCoords = {x: 115, y: 174};
+		const costTextSize = 130;
+		const statTextSize = 124;
+
 		if (this.hideStats) {
 			return;
 		}
-		this.drawNumber(context, 116, 170, ratio, this.cost, 175, this.costColor);
+
+		this.drawNumber(
+			context,
+			costCoords.x,
+			costCoords.y,
+			ratio,
+			this.cost,
+			costTextSize,
+			this.costColor
+		);
 
 		if (this.attackTextCoords) {
 			this.drawNumber(
@@ -1064,7 +1079,7 @@ export default abstract class Card {
 				this.attackTextCoords.y,
 				ratio,
 				this.attack,
-				160,
+				statTextSize,
 				this.attackColor
 			);
 		}
@@ -1076,7 +1091,7 @@ export default abstract class Card {
 				this.healthTextCoords.y,
 				ratio,
 				this.health,
-				160,
+				statTextSize,
 				this.healthColor
 			);
 		}

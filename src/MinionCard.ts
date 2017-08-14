@@ -33,7 +33,7 @@ export default class MinionCard extends Card {
 		dWidth: 154,
 		dHeight: 173,
 	};
-	public attackTextCoords = {x: 128, y: 994};
+	public attackTextCoords = {x: 125, y: 824};
 	public healthGemCoords = {
 		sWidth: 109,
 		sHeight: 164,
@@ -42,7 +42,7 @@ export default class MinionCard extends Card {
 		dWidth: 109,
 		dHeight: 164,
 	};
-	public healthTextCoords = {x: 668, y: 994};
+	public healthTextCoords = {x: 556, y: 825};
 	public nameBannerCoords = {
 		sWidth: 485,
 		sHeight: 113,
