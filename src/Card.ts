@@ -46,6 +46,27 @@ function drawHalfEllipse(
 }
 
 /**
+ * Helper function to draw a polygon from a list of points.
+ */
+function drawPolygon(
+	context: CanvasRenderingContext2D,
+	points: IPoint[],
+	ratio: number
+): void {
+	if (points.length < 3)
+		return;
+	context.beginPath();
+	// move to start point
+	context.moveTo(points[0].x * ratio, points[0].y * ratio);
+	// draw the lines starting at index 1
+	points.slice(1).forEach(pt => {
+		context.lineTo(pt.x * ratio, pt.y * ratio);
+	});
+	context.closePath();
+	context.stroke();
+}
+
+/**
  * Get the bounding box of a canvas content.
  * @returns {{x: *, y: *, maxX: (number|*|w), maxY: *, w: number, h: number}}
  */
@@ -288,6 +309,8 @@ export default abstract class Card {
 	public abstract nameBannerCoords: ICoords;
 	public abstract bodyTextSize: {width: number; height: number};
 	public abstract nameTextCurve: {pathMiddle: number; maxWidth: number; curve: IPoint[]};
+	public abstract artClipPolygon: IPoint[];
+	public abstract artCoords: ICoords;
 
 	private callback: (HTMLCanvasElement) => void;
 	private cacheKey: number;
@@ -522,29 +545,10 @@ export default abstract class Card {
 	}
 
 	public drawCardArt(context, ratio: number) {
-		let dx: number;
-		let dy: number;
-		let dWidth: number;
-		let dHeight: number;
 		const t = this.getCardArtTexture();
 
 		context.save();
-		switch (this.type) {
-			case CardType.HERO:
-			case CardType.MINION:
-				(dx = 100), (dy = 75), (dWidth = 590), (dHeight = 590);
-				drawHalfEllipse(context, 180 * ratio, dy * ratio, 430 * ratio, dHeight * ratio);
-				break;
-			case CardType.SPELL:
-				(dx = 125), (dy = 117), (dWidth = 529), (dHeight = 529);
-				context.beginPath();
-				context.rect(dx * ratio, 165 * ratio, dWidth * ratio, 434 * ratio);
-				break;
-			case CardType.WEAPON:
-				(dx = 150), (dy = 135), (dWidth = 476), (dHeight = 476);
-				drawHalfEllipse(context, dx * ratio, dy * ratio, dWidth * ratio, 468 * ratio);
-				break;
-		}
+		drawPolygon(context, this.artClipPolygon, ratio)
 		context.clip();
 		context.fillStyle = "grey";
 		context.fillRect(0, 0, 765 * ratio, 1100 * ratio);
@@ -554,10 +558,10 @@ export default abstract class Card {
 			0,
 			t.width,
 			t.height,
-			dx * ratio,
-			dy * ratio,
-			dWidth * ratio,
-			dHeight * ratio
+			this.artCoords.dx * ratio,
+			this.artCoords.dy * ratio,
+			this.artCoords.dWidth * ratio,
+			this.artCoords.dHeight * ratio
 		);
 		context.restore();
 	}

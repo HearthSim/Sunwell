@@ -42,6 +42,36 @@ export default class WeaponCard extends Card {
 		maxWidth: 580,
 		curve: [{x: 10, y: 77}, {x: 50, y: 77}, {x: 500, y: 77}, {x: 570, y: 77}],
 	};
+	public artCoords = {
+		sWidth: 384,
+		sHeight: 384,
+		dx: 152,
+		dy: 135,
+		dWidth: 384,
+		dHeight: 384,
+	};
+	public artClipPolygon = [
+		{x: 352, y: 139},
+		{x: 418, y: 155},
+		{x: 469, y: 188},
+		{x: 497, y: 222},
+		{x: 523, y: 267},
+		{x: 533, y: 315},
+		{x: 531, y: 366},
+		{x: 514, y: 420},
+		{x: 485, y: 461},
+		{x: 444, y: 496},
+		{x: 375, y: 515},
+		{x: 309, y: 515},
+		{x: 236, y: 484},
+		{x: 192, y: 434},
+		{x: 160, y: 371},
+		{x: 158, y: 303},
+		{x: 173, y: 246},
+		{x: 203, y: 201},
+		{x: 242, y: 167},
+		{x: 287, y: 148},
+	];
 
 	public getWatermarkCoords() {
 		return {
