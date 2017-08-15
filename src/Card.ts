@@ -764,18 +764,29 @@ export default abstract class Card {
 	}
 
 	public drawName(context: CanvasRenderingContext2D, ratio: number, name: string): void {
-		const buffer = this.sunwell.getBuffer(1024, 200, true);
+		// define a box to contain the curved text
+		const boxDims = {width: 460, height: 160};
+		const boxBottomCenter = {x: 335, y: 612};
+		// create a new buffer to draw onto
+		const buffer = this.sunwell.getBuffer(boxDims.width * 2, boxDims.height);
 		const textContext = buffer.getContext("2d");
 		const maxWidth = this.nameTextCurve.maxWidth;
 		const curve = this.nameTextCurve.curve;
 		textContext.save();
 
 		if (this.sunwell.options.debug) {
-			textContext.strokeStyle = "red";
+			textContext.strokeStyle = "blue";
 			textContext.fillStyle = "red";
+			// draw the curve
+			textContext.beginPath();
+			textContext.moveTo(curve[0].x, curve[0].y);
+			textContext.bezierCurveTo(curve[1].x, curve[1].y, curve[2].x, curve[2].y, curve[3].x, curve[3].y);
+			textContext.stroke();
+			// draw the curves points
 			for (const point of curve) {
-				textContext.fillRect(point.x - 2, point.y - 2, 4, 4);
+				textContext.fillRect(point.x - 4, point.y - 4, 8, 8);
 			}
+			textContext.restore();
 		}
 
 		textContext.lineWidth = 10;
@@ -813,8 +824,8 @@ export default abstract class Card {
 			return dim;
 		};
 
+		let fontSize = 45;
 		let dimensions = [];
-		let fontSize = 55;
 		do {
 			fontSize -= 1;
 			textContext.font = fontSize + "px " + this.titleFont;
@@ -879,12 +890,12 @@ export default abstract class Card {
 		const coords: ICoords = {
 			sx: 0,
 			sy: 0,
-			sWidth: 580,
-			sHeight: 200,
-			dx: (395 - 580 / 2) * ratio,
-			dy: (725 - 200) * ratio,
-			dWidth: 580 * ratio,
-			dHeight: 200 * ratio,
+			sWidth: boxDims.width,
+			sHeight: boxDims.height,
+			dx: (boxBottomCenter.x - boxDims.width / 2) * ratio,
+			dy: (boxBottomCenter.y - boxDims.height) * ratio,
+			dWidth: boxDims.width * ratio,
+			dHeight: boxDims.height * ratio,
 		};
 		context.drawImage(
 			buffer,

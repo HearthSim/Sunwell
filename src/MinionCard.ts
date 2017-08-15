@@ -54,8 +54,8 @@ export default class MinionCard extends Card {
 	public rarityGemCoords = {dx: 263, dy: 532};
 	public nameTextCurve = {
 		pathMiddle: 0.55,
-		maxWidth: 560,
-		curve: [{x: 0, y: 110}, {x: 122, y: 140}, {x: 368, y: 16}, {x: 580, y: 100}],
+		maxWidth: 450,
+		curve: [{x: 0, y: 88}, {x: 98, y: 112}, {x: 294, y: 13}, {x: 460, y: 80}],
 	};
 	public artCoords = {
 		sWidth: 461,

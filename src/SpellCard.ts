@@ -45,8 +45,8 @@ export default class SpellCard extends Card {
 	};
 	public nameTextCurve = {
 		pathMiddle: 0.49,
-		maxWidth: 560,
-		curve: [{x: 10, y: 97}, {x: 212, y: 45}, {x: 368, y: 45}, {x: 570, y: 100}],
+		maxWidth: 450,
+		curve: [{x: 10, y: 78}, {x: 170, y: 36}, {x: 294, y: 36}, {x: 450, y: 80}],
 	};
 	public artCoords = {
 		sWidth: 418,
