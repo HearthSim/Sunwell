@@ -764,7 +764,7 @@ export default abstract class Card {
 	}
 
 	public drawName(context: CanvasRenderingContext2D, ratio: number, name: string): void {
-		const buffer = this.sunwell.getBuffer(1024, 200);
+		const buffer = this.sunwell.getBuffer(1024, 200, true);
 		const textContext = buffer.getContext("2d");
 		const maxWidth = this.nameTextCurve.maxWidth;
 		const curve = this.nameTextCurve.curve;
@@ -919,7 +919,7 @@ export default abstract class Card {
 		size: number,
 		color: string
 	): void {
-		const buffer = this.sunwell.getBuffer(256, 256);
+		const buffer = this.sunwell.getBuffer(256, 256, true);
 		const bufferCtx = buffer.getContext("2d");
 		const n = num.toString().split("");
 		let tX = 10;
@@ -964,7 +964,7 @@ export default abstract class Card {
 	}
 
 	public drawRaceText(context, ratio: number, raceText: string): void {
-		const buffer = this.sunwell.getBuffer(300, 60);
+		const buffer = this.sunwell.getBuffer(300, 60, true);
 		const bufferCtx = buffer.getContext("2d");
 		let x = 10;
 		const text = raceText.split("");
