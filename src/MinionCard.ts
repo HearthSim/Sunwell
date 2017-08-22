@@ -2,7 +2,14 @@ import Card from "./Card";
 
 export default class MinionCard extends Card {
 	public bodyTextColor = "black";
-	public bodyTextSize = {width: 520, height: 290};
+	public bodyTextCoords = {
+		dx: 130,
+		dy: 622,
+		dWidth: 408,
+		dHeight: 176,
+		sWidth: 408,
+		sHeight: 176,
+	};
 	public baseCardFrameAsset = "frame-minion-";
 	public baseCardFrameCoords = {
 		sWidth: 528,

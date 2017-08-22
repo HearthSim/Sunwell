@@ -2,7 +2,14 @@ import Card from "./Card";
 
 export default class SpellCard extends Card {
 	public bodyTextColor = "black";
-	public bodyTextSize = {width: 460, height: 290};
+	public bodyTextCoords = {
+		dx: 144,
+		dy: 630,
+		dWidth: 378,
+		dHeight: 168,
+		sWidth: 378,
+		sHeight: 168,
+	};
 	public baseCardFrameAsset = "frame-spell-";
 	public baseCardFrameCoords = {
 		dx: 70,

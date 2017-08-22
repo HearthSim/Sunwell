@@ -308,7 +308,7 @@ export default abstract class Card {
 	public abstract healthGemAsset: string;
 	public abstract healthGemCoords: ICoords;
 	public abstract nameBannerCoords: ICoords;
-	public abstract bodyTextSize: {width: number; height: number};
+	public abstract bodyTextCoords: ICoords;
 	public abstract nameTextCurve: {pathMiddle: number; maxWidth: number; curve: IPoint[]};
 	public abstract artClipPolygon: IPoint[];
 	public abstract artCoords: ICoords;
@@ -583,6 +583,27 @@ export default abstract class Card {
 		let justLineBreak: boolean;
 		let plurals: RegExpExecArray;
 		let pBodyText: string;
+		// size of the description text box
+		const bodyWidth = this.bodyTextCoords.dWidth;
+		const bodyHeight = this.bodyTextCoords.dHeight;
+		// center of description box (x, y)
+		const centerLeft = this.bodyTextCoords.dx + bodyWidth / 2;
+		const centerTop = this.bodyTextCoords.dy + bodyHeight / 2;
+
+		// draw the text box in debug mode
+		if (this.sunwell.options.debug) {
+			context.save();
+			context.strokeStyle = "red";
+			context.beginPath();
+			context.rect(
+				(centerLeft - bodyWidth / 2) * s,
+				(centerTop - bodyHeight / 2) * s,
+				bodyWidth * s,
+				bodyHeight * s);
+			context.closePath();
+			context.stroke();
+			context.restore();
+		}
 
 		pBodyText = bodyText;
 		while ((plurals = pluralRegex.exec(bodyText)) !== null) {
@@ -593,21 +614,15 @@ export default abstract class Card {
 		}
 		bodyText = pBodyText;
 		this.sunwell.log("Rendering body", bodyText);
-
-		const centerLeft = 390;
-		const centerTop = 860;
 		const words = bodyText
 			.replace(/[\$#_]/g, "")
 			.replace(/\n/g, " \n ")
 			.replace(/ +/g, " ")
 			.split(/ /g);
 
-		const bufferText = this.sunwell.getBuffer(this.bodyTextSize.width, this.bodyTextSize.height);
+		const bufferText = this.sunwell.getBuffer(bodyWidth, bodyHeight, true);
 		const bufferTextCtx = bufferText.getContext("2d");
-
-		const bufferRow = this.sunwell.getBuffer();
-		const bufferRowCtx = bufferRow.getContext("2d");
-		bufferRow.width = bufferText.width;
+		bufferTextCtx.fillStyle = this.bodyTextColor;
 
 		let fontSize = this.sunwell.options.bodyFontSize;
 		let lineHeight = this.sunwell.options.bodyLineHeight;
@@ -618,6 +633,8 @@ export default abstract class Card {
 		this.sunwell.log("counting length of " + cleanText);
 		this.sunwell.log("Length is " + totalLength);
 
+		const bufferRow = this.sunwell.getBuffer(bufferText.width, lineHeight, true);
+		const bufferRowCtx = bufferRow.getContext("2d");
 		bufferRowCtx.fillStyle = this.bodyTextColor;
 		// bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
 
@@ -653,7 +670,6 @@ export default abstract class Card {
 		}
 
 		bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-
 		bufferRow.height = lineHeight;
 
 		if (forceSmallerFirstLine || (totalLength >= 75 && this.type === CardType.SPELL)) {
@@ -698,6 +714,7 @@ export default abstract class Card {
 					yPos,
 					bufferText.width
 				);
+
 				justLineBreak = true;
 				smallerFirstLine = false;
 				continue;
@@ -715,10 +732,16 @@ export default abstract class Card {
 						j += pr.token.length - 1;
 						bold += pr.bold;
 						italic += pr.italic;
-						bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 						continue;
 					}
 				}
+
+				// TODO investigate why the following two properites are being reset, for web
+				// likely something to do with getLineWidth()
+				bufferRowCtx.fillStyle = this.bodyTextColor;
+				// move to here from pr.token block above,
+				// text without markup ends up being default font otherwise
+				bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 
 				bufferRowCtx.fillText(
 					char,
@@ -768,13 +791,14 @@ export default abstract class Card {
 		const boxDims = {width: 460, height: 160};
 		const boxBottomCenter = {x: 335, y: 612};
 		// create a new buffer to draw onto
-		const buffer = this.sunwell.getBuffer(boxDims.width * 2, boxDims.height);
+		const buffer = this.sunwell.getBuffer(boxDims.width * 2, boxDims.height, true);
 		const textContext = buffer.getContext("2d");
 		const maxWidth = this.nameTextCurve.maxWidth;
 		const curve = this.nameTextCurve.curve;
 		textContext.save();
 
 		if (this.sunwell.options.debug) {
+			textContext.lineWidth = 2;
 			textContext.strokeStyle = "blue";
 			textContext.fillStyle = "red";
 			// draw the curve
@@ -782,7 +806,7 @@ export default abstract class Card {
 			textContext.moveTo(curve[0].x, curve[0].y);
 			textContext.bezierCurveTo(curve[1].x, curve[1].y, curve[2].x, curve[2].y, curve[3].x, curve[3].y);
 			textContext.stroke();
-			// draw the curves points
+			// draw the control points
 			for (const point of curve) {
 				textContext.fillRect(point.x - 4, point.y - 4, 8, 8);
 			}

@@ -2,7 +2,14 @@ import Card from "./Card";
 
 export default class WeaponCard extends Card {
 	public bodyTextColor = "white";
-	public bodyTextSize = {width: 470, height: 250};
+	public bodyTextCoords = {
+		dx: 146,
+		dy: 628,
+		dWidth: 388,
+		dHeight: 168,
+		sWidth: 388,
+		sHeight: 168,
+	};
 	public baseCardFrameAsset = "frame-weapon-";
 	public baseCardFrameCoords = {
 		sWidth: 527,
