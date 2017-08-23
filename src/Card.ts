@@ -53,8 +53,9 @@ function drawPolygon(
 	points: IPoint[],
 	ratio: number
 ): void {
-	if (points.length < 3)
+	if (points.length < 3) {
 		return;
+	}
 	context.beginPath();
 	// move to start point
 	context.moveTo(points[0].x * ratio, points[0].y * ratio);
@@ -525,7 +526,7 @@ export default abstract class Card {
 		this.drawBodyText(context, ratio, false, this.bodyText);
 
 		if (this.silenced) {
-			this.drawImage(context, "silence-x", {dx: 200, dy: 660, ratio: ratio});
+			this.drawImage(context, "silence-x", {dx: 166, dy: 584, ratio: ratio});
 		}
 
 		context.restore();
@@ -1048,38 +1049,12 @@ export default abstract class Card {
 	}
 
 	public drawCostGem(context: CanvasRenderingContext2D, ratio: number): void {
+		const pt = {x: 47, y: 105};
 		if (this.costsHealth) {
-			context.drawImage(
-				this.sunwell.getAsset(this.costGemAsset),
-				0,
-				0,
-				167,
-				218,
-				24 * ratio,
-				62 * ratio,
-				167 * ratio,
-				218 * ratio
-			);
-			context.save();
-			context.shadowBlur = 50 * ratio;
-			context.shadowColor = "#FF7275";
-			context.shadowOffsetX = 1000;
-			context.globalAlpha = 0.5;
-			context.drawImage(
-				this.sunwell.getAsset(this.costGemAsset),
-				0,
-				0,
-				167,
-				218,
-				24 * ratio - 1000,
-				62 * ratio,
-				167 * ratio,
-				218 * ratio
-			);
-			context.restore();
-		} else {
-			this.drawImage(context, this.costGemAsset, {dx: 47, dy: 105, ratio: ratio});
+			pt.x = 43;
+			pt.y = 58;
 		}
+		this.drawImage(context, this.costGemAsset, {dx: pt.x, dy: pt.y, ratio: ratio});
 	}
 
 	public drawRarityGem(context: CanvasRenderingContext2D, ratio: number): void {
@@ -1254,7 +1229,7 @@ export default abstract class Card {
 		}
 
 		if (this.costsHealth) {
-			this.costGemAsset = "health";
+			this.costGemAsset = "cost-health";
 		} else {
 			this.costGemAsset = "cost-mana";
 		}
