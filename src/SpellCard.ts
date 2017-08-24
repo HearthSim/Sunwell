@@ -1,6 +1,7 @@
 import Card from "./Card";
 
 export default class SpellCard extends Card {
+	public premium = false;
 	public bodyTextColor = "black";
 	public bodyTextCoords = {
 		dx: 144,
@@ -10,6 +11,8 @@ export default class SpellCard extends Card {
 		sWidth: 378,
 		sHeight: 168,
 	};
+	public cardFoundationAsset = null;
+	public cardFoundationCoords = null;
 	public baseCardFrameAsset = "frame-spell-";
 	public baseCardFrameCoords = {
 		dx: 70,
@@ -42,6 +45,9 @@ export default class SpellCard extends Card {
 		dWidth: 507,
 		dHeight: 155,
 	};
+	public raceBannerAsset = null;
+	public raceBannerCoords = null;
+	public raceTextCoords = null;
 	public rarityGemCoords = {
 		sWidth: 116,
 		sHeight: 77,

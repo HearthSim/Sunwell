@@ -10,6 +10,7 @@ import HeroPowerCard from "./HeroPowerCard";
 import MinionCard from "./MinionCard";
 import MinionCardPremium from "./MinionCardPremium";
 import SpellCard from "./SpellCard";
+import SpellCardPremium from "./SpellCardPremium";
 import WeaponCard from "./WeaponCard";
 
 interface ISunwellOptions {
@@ -206,7 +207,7 @@ export default class Sunwell {
 		const ctors: {[type: string]: any} = {
 			HERO: HeroCard,
 			MINION: premium ? MinionCardPremium : MinionCard,
-			SPELL: SpellCard,
+			SPELL: premium ? SpellCardPremium : SpellCard,
 			WEAPON: WeaponCard,
 			HERO_POWER: HeroPowerCard,
 		};
