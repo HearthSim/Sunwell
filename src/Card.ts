@@ -294,6 +294,7 @@ export default abstract class Card {
 	public healthColor: string;
 	public width: number;
 	public key: number;
+	public friendly: boolean;
 	public abstract baseCardFrameAsset: string;
 	public abstract baseCardFrameCoords: ICoords;
 	public abstract baseRarityGemAsset: string;
@@ -366,6 +367,7 @@ export default abstract class Card {
 			this.health = props.armor;
 		}
 
+		this.friendly = props.friendly || true;
 		this.elite = props.elite || false;
 		this.costColor = getNumberStyle(props.costStyle);
 		this.attackColor = getNumberStyle(props.costStyle);
@@ -388,7 +390,15 @@ export default abstract class Card {
 	}
 
 	public getAssetsToLoad(): string[] {
-		const assetsToLoad: string[] = [this.cardFrameAsset, this.nameBannerAsset, this.costGemAsset];
+		const assetsToLoad: string[] = [this.cardFrameAsset];
+
+		if (this.costGemAsset) {
+			assetsToLoad.push(this.costGemAsset);
+		}
+
+		if (this.nameBannerAsset) {
+			assetsToLoad.push(this.nameBannerAsset);
+		}
 
 		if (!this.hideStats) {
 			if (this.attackGemAsset) {
@@ -481,13 +491,17 @@ export default abstract class Card {
 				});
 			}
 
-			this.drawCostGem(context, ratio);
+			if (this.costGemAsset) {
+				this.drawCostGem(context, ratio);
+			}
 
 			if (this.rarityGemAsset) {
 				this.drawRarityGem(context, ratio);
 			}
 
-			this.drawNameBanner(context, ratio);
+			if (this.nameBannerAsset) {
+				this.drawNameBanner(context, ratio);
+			}
 
 			if (this.raceText) {
 				this.drawImage(context, "race-banner", {dx: 129, dy: 791, ratio: ratio});
@@ -1072,6 +1086,11 @@ export default abstract class Card {
 			return;
 		}
 
+		if (this.type === CardType.HERO_POWER) {
+			this.drawNumber(context, 338, 124, ratio, this.cost, 116, "white");
+			return;
+		}
+
 		this.drawNumber(
 			context,
 			costCoords.x,
@@ -1135,7 +1154,9 @@ export default abstract class Card {
 		const coords = this.getWatermarkCoords();
 		coords.ratio = ratio;
 
-		if (this.type === CardType.MINION || this.type === CardType.HERO) {
+		if (this.type === CardType.HERO_POWER) {
+			return;
+		} else if (this.type === CardType.MINION || this.type === CardType.HERO) {
 			context.globalCompositeOperation = "multiply";
 			context.globalAlpha = 0.6;
 		} else if (this.type === CardType.SPELL) {
@@ -1222,13 +1243,19 @@ export default abstract class Card {
 	}
 
 	private updateAssets(): void {
-		this.cardFrameAsset = this.baseCardFrameAsset + CardClass[this.cardClass].toLowerCase();
+		if (this.type === CardType.HERO_POWER) {
+			this.cardFrameAsset = this.baseCardFrameAsset + (this.friendly ? "player" : "opponent");
+		} else {
+			this.cardFrameAsset = this.baseCardFrameAsset + CardClass[this.cardClass].toLowerCase();
+		}
 
 		if (this.rarity) {
 			this.rarityGemAsset = this.baseRarityGemAsset + Rarity[this.rarity].toLowerCase();
 		}
 
-		if (this.costsHealth) {
+		if (this.type === CardType.HERO_POWER) {
+			this.costGemAsset = null;
+		} else if (this.costsHealth) {
 			this.costGemAsset = "cost-health";
 		} else {
 			this.costGemAsset = "cost-mana";
