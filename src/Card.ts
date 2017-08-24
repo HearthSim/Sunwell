@@ -314,6 +314,12 @@ export default abstract class Card {
 	public abstract nameTextCurve: {pathMiddle: number; maxWidth: number; curve: IPoint[]};
 	public abstract artClipPolygon: IPoint[];
 	public abstract artCoords: ICoords;
+	public abstract cardFoundationAsset: string;
+	public abstract cardFoundationCoords: ICoords;
+	public abstract raceBannerAsset: string;
+	public abstract raceBannerCoords: ICoords;
+	public abstract raceTextCoords: ICoords;
+	public abstract premium: boolean;
 
 	private callback: (HTMLCanvasElement) => void;
 	private cacheKey: number;
@@ -392,6 +398,10 @@ export default abstract class Card {
 	public getAssetsToLoad(): string[] {
 		const assetsToLoad: string[] = [this.cardFrameAsset];
 
+		if (this.cardFoundationAsset) {
+			assetsToLoad.push(this.cardFoundationAsset);
+		}
+
 		if (this.costGemAsset) {
 			assetsToLoad.push(this.costGemAsset);
 		}
@@ -413,7 +423,7 @@ export default abstract class Card {
 			assetsToLoad.push(this.dragonAsset);
 		}
 		if (this.raceText) {
-			assetsToLoad.push("race-banner");
+			assetsToLoad.push(this.raceBannerAsset);
 		}
 		if (this.silenced) {
 			assetsToLoad.push("silence-x");
@@ -481,6 +491,10 @@ export default abstract class Card {
 		} else {
 			this.drawCardArt(context, ratio);
 
+			if (this.cardFoundationAsset) {
+				this.drawCardFoundationAsset(context, ratio);
+			}
+
 			this.drawFrameTexture(context, ratio);
 
 			if (this.multiBannerAsset) {
@@ -504,7 +518,7 @@ export default abstract class Card {
 			}
 
 			if (this.raceText) {
-				this.drawImage(context, "race-banner", {dx: 129, dy: 791, ratio: ratio});
+				this.drawRaceBanner(context, ratio);
 			}
 
 			this.drawAttackTexture(context, ratio);
@@ -956,6 +970,12 @@ export default abstract class Card {
 		this.drawImage(context, this.nameBannerAsset, coords);
 	}
 
+	public drawRaceBanner(context: CanvasRenderingContext2D, ratio: number) {
+		const coords = this.raceBannerCoords;
+		coords.ratio = ratio;
+		this.drawImage(context, this.raceBannerAsset, coords);
+	}
+
 	/**
 	 * Renders a given number to the defined position.
 	 * The x/y position should be the position on an unscaled card.
@@ -1019,7 +1039,6 @@ export default abstract class Card {
 		let x = 10;
 		const text = raceText.split("");
 		const textSize = 40;
-		const textCoord = {x: 337, y: 830};
 
 		bufferCtx.font = textSize + "px " + this.titleFont;
 		bufferCtx.lineCap = "round";
@@ -1053,8 +1072,8 @@ export default abstract class Card {
 			b.y,
 			b.w,
 			b.h,
-			(textCoord.x - b.w / 2) * ratio,
-			(textCoord.y - b.h / 2) * ratio,
+			(this.raceTextCoords.dx - b.w / 2) * ratio,
+			(this.raceTextCoords.dy - b.h / 2) * ratio,
 			b.w * ratio,
 			b.h * ratio
 		);
@@ -1150,6 +1169,12 @@ export default abstract class Card {
 		this.drawImage(context, this.cardFrameAsset, coords);
 	}
 
+	public drawCardFoundationAsset(context: CanvasRenderingContext2D, ratio: number): void {
+		const coords = this.cardFoundationCoords;
+		coords.ratio = ratio;
+		this.drawImage(context, this.cardFoundationAsset, coords);
+	}
+
 	public drawWatermark(context: CanvasRenderingContext2D, ratio: number): void {
 		const coords = this.getWatermarkCoords();
 		coords.ratio = ratio;
@@ -1230,7 +1255,7 @@ export default abstract class Card {
 	}
 
 	private checksum(): number {
-		const s = this.propsJson + this.width;
+		const s = this.propsJson + this.width + this.premium;
 		const length = s.length;
 		let chk = 0;
 		for (let i = 0; i < length; i++) {

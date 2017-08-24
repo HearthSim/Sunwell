@@ -8,6 +8,7 @@ import Card from "./Card";
 import HeroCard from "./HeroCard";
 import HeroPowerCard from "./HeroPowerCard";
 import MinionCard from "./MinionCard";
+import MinionCardPremium from "./MinionCardPremium";
 import SpellCard from "./SpellCard";
 import WeaponCard from "./WeaponCard";
 
@@ -190,7 +191,7 @@ export default class Sunwell {
 		this.platform.requestAnimationFrame(() => this.render());
 	}
 
-	public createCard(props, width: number, target, callback?: (HTMLCanvasElement) => void): Card {
+	public createCard(props, width: number, premium: boolean, target, callback?: (HTMLCanvasElement) => void): Card {
 		let canvas: HTMLCanvasElement;
 		const height = Math.round(width * this.options.aspectRatio);
 
@@ -204,7 +205,7 @@ export default class Sunwell {
 
 		const ctors: {[type: string]: any} = {
 			HERO: HeroCard,
-			MINION: MinionCard,
+			MINION: premium ? MinionCardPremium : MinionCard,
 			SPELL: SpellCard,
 			WEAPON: WeaponCard,
 			HERO_POWER: HeroPowerCard,

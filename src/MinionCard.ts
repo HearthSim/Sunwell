@@ -1,6 +1,7 @@
 import Card from "./Card";
 
 export default class MinionCard extends Card {
+	public premium = false;
 	public bodyTextColor = "black";
 	public bodyTextCoords = {
 		dx: 130,
@@ -10,6 +11,8 @@ export default class MinionCard extends Card {
 		sWidth: 408,
 		sHeight: 176,
 	};
+	public cardFoundationAsset = null;
+	public cardFoundationCoords = null;
 	public baseCardFrameAsset = "frame-minion-";
 	public baseCardFrameCoords = {
 		sWidth: 528,
@@ -58,6 +61,16 @@ export default class MinionCard extends Card {
 		dWidth: 485,
 		dHeight: 113,
 	};
+	public raceBannerAsset = "race-banner";
+	public raceBannerCoords = {
+		dx: 129,
+		dy: 791,
+		dWidth: 408,
+		dHeight: 69,
+		sWidth: 408,
+		sHeight: 69,
+	};
+	public raceTextCoords = {dx: 337, dy: 831};
 	public rarityGemCoords = {dx: 263, dy: 532};
 	public nameTextCurve = {
 		pathMiddle: 0.55,
