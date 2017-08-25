@@ -6,6 +6,7 @@ import Platform from "./platforms/WebPlatform";
 
 import Card from "./Card";
 import HeroCard from "./HeroCard";
+import HeroCardPremium from "./HeroCardPremium";
 import HeroPowerCard from "./HeroPowerCard";
 import MinionCard from "./MinionCard";
 import MinionCardPremium from "./MinionCardPremium";
@@ -206,7 +207,7 @@ export default class Sunwell {
 		}
 
 		const ctors: {[type: string]: any} = {
-			HERO: HeroCard,
+			HERO: premium ? HeroCardPremium : HeroCard,
 			MINION: premium ? MinionCardPremium : MinionCard,
 			SPELL: premium ? SpellCardPremium : SpellCard,
 			WEAPON: premium ? WeaponCardPremium : WeaponCard,
