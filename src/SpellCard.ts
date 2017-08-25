@@ -19,7 +19,7 @@ export default class SpellCard extends Card {
 		dy: 133,
 		dWidth: 527,
 		dHeight: 746
-	}
+	};
 	public baseRarityGemAsset = "rarity-spell-";
 	public nameBannerAsset = "name-banner-spell";
 	public dragonAsset = "elite-spell";
@@ -84,8 +84,8 @@ export default class SpellCard extends Card {
 
 	public getWatermarkCoords() {
 		return {
-			dx: 231,
-			dy: 618,
+			dx: 232,
+			dy: 612,
 			dWidth: 210,
 			dHeight: 210,
 		};

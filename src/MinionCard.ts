@@ -70,7 +70,7 @@ export default class MinionCard extends Card {
 		sWidth: 408,
 		sHeight: 69,
 	};
-	public raceTextCoords = {dx: 337, dy: 831};
+	public raceTextCoords = {dx: 337, dy: 829};
 	public rarityGemCoords = {dx: 263, dy: 532};
 	public nameTextCurve = {
 		pathMiddle: 0.55,
@@ -111,7 +111,7 @@ export default class MinionCard extends Card {
 	public getWatermarkCoords() {
 		let dy = 604;
 		if (this.raceText) {
-			dy -= 16; // Shift up
+			dy -= 10; // Shift up
 		}
 
 		return {

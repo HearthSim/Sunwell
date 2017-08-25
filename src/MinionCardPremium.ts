@@ -44,5 +44,5 @@ export default class MinionCardPremium extends MinionCard {
 		sWidth: 408,
 		sHeight: 81,
 	};
-	public raceTextCoords = {dx: 347, dy: 827};
+	public raceTextCoords = {dx: 347, dy: 826};
 }

@@ -254,6 +254,9 @@ RaceNames[Race.PIRATE] = {enUS: "Pirate"};
 RaceNames[Race.DRAGON] = {enUS: "Dragon"};
 RaceNames[Race.TOTEM] = {enUS: "Totem"};
 
+const ReferenceWidth = 670;
+const ReferenceHeight = 1000;
+
 interface ICoords {
 	sx?: number;
 	sy?: number;
@@ -480,7 +483,7 @@ export default abstract class Card {
 	}
 
 	public draw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D): void {
-		const ratio = this.width / 670;
+		const ratio = this.width / ReferenceWidth;
 
 		const drawTimeout = setTimeout(() => {
 			this.sunwell.error("Drawing timed out", this.name);
@@ -578,10 +581,10 @@ export default abstract class Card {
 		const t = this.getCardArtTexture();
 
 		context.save();
-		drawPolygon(context, this.artClipPolygon, ratio)
+		drawPolygon(context, this.artClipPolygon, ratio);
 		context.clip();
 		context.fillStyle = "grey";
-		context.fillRect(0, 0, 670 * ratio, 1000 * ratio);
+		context.fillRect(0, 0, ReferenceWidth * ratio, ReferenceHeight * ratio);
 		context.drawImage(
 			t,
 			0,
@@ -1184,7 +1187,7 @@ export default abstract class Card {
 
 		if (this.type === CardType.HERO_POWER) {
 			return;
-		} else if (this.type === CardType.MINION || this.type === CardType.HERO) {
+		} else if (this.premium || this.type === CardType.MINION || this.type === CardType.HERO) {
 			context.globalCompositeOperation = "multiply";
 			context.globalAlpha = 0.6;
 		} else if (this.type === CardType.SPELL) {

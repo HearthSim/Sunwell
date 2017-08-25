@@ -3,6 +3,14 @@ import SpellCard from "./SpellCard";
 export default class SpellCardPremium extends SpellCard {
 	public premium = true;
 	public bodyTextColor = "white";
+	public bodyTextCoords = {
+		dx: 152,
+		dy: 634,
+		dWidth: 366,
+		dHeight: 168,
+		sWidth: 366,
+		sHeight: 168,
+	};
 	public cardFoundationAsset = "base-spell-premium";
 	public cardFoundationCoords = {
 		dx: 52,
