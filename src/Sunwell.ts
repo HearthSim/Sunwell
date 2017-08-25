@@ -12,6 +12,7 @@ import MinionCardPremium from "./MinionCardPremium";
 import SpellCard from "./SpellCard";
 import SpellCardPremium from "./SpellCardPremium";
 import WeaponCard from "./WeaponCard";
+import WeaponCardPremium from "./WeaponCardPremium";
 
 interface ISunwellOptions {
 	titleFont: string;
@@ -208,7 +209,7 @@ export default class Sunwell {
 			HERO: HeroCard,
 			MINION: premium ? MinionCardPremium : MinionCard,
 			SPELL: premium ? SpellCardPremium : SpellCard,
-			WEAPON: WeaponCard,
+			WEAPON: premium ? WeaponCardPremium : WeaponCard,
 			HERO_POWER: HeroPowerCard,
 		};
 

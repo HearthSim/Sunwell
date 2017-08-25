@@ -1,6 +1,7 @@
 import Card from "./Card";
 
 export default class WeaponCard extends Card {
+	public premium = false;
 	public bodyTextColor = "white";
 	public bodyTextCoords = {
 		dx: 146,
@@ -10,6 +11,8 @@ export default class WeaponCard extends Card {
 		sWidth: 388,
 		sHeight: 168,
 	};
+	public cardFoundationAsset = null;
+	public cardFoundationCoords = null;
 	public baseCardFrameAsset = "frame-weapon-";
 	public baseCardFrameCoords = {
 		sWidth: 527,
@@ -21,8 +24,15 @@ export default class WeaponCard extends Card {
 	};
 	public nameBannerAsset = "name-banner-weapon";
 	public baseRarityGemAsset = "rarity-weapon-";
-	public dragonAsset = null;
-	public dragonCoords = null;
+	public dragonAsset = "elite-weapon";
+	public dragonCoords = {
+		dx: 184,
+		dy: 89,
+		dWidth: 455,
+		dHeight: 315,
+		sWidth: 455,
+		sHeight: 315,
+	};
 	public attackGemAsset = "attack-weapon";
 	public healthGemAsset = "durability";
 	public attackGemCoords = {
@@ -59,6 +69,9 @@ export default class WeaponCard extends Card {
 		dWidth: 96,
 		dHeight: 90,
 	};
+	public raceBannerAsset = null;
+	public raceBannerCoords = null;
+	public raceTextCoords = null;
 	public nameTextCurve = {
 		pathMiddle: 0.56,
 		maxWidth: 450,
