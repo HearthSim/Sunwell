@@ -294,7 +294,8 @@ export default abstract class Card {
 	public healthColor: string;
 	public width: number;
 	public key: number;
-	public friendly: boolean;
+	public opposing: boolean;
+	public costTextCoords: IPoint;
 	public abstract baseCardFrameAsset: string;
 	public abstract baseCardFrameCoords: ICoords;
 	public abstract baseRarityGemAsset: string;
@@ -373,7 +374,11 @@ export default abstract class Card {
 			this.health = props.armor;
 		}
 
-		this.friendly = props.friendly || true;
+		// This only needs to change for HeroPower
+		this.costTextCoords = {x: 115, y: 174};
+		// Sets the player or opponent HeroPower texture
+		this.opposing = props.opposing || false;
+
 		this.elite = props.elite || false;
 		this.costColor = getNumberStyle(props.costStyle);
 		this.attackColor = getNumberStyle(props.costStyle);
@@ -1097,7 +1102,6 @@ export default abstract class Card {
 	}
 
 	public drawStats(context: CanvasRenderingContext2D, ratio: number): void {
-		const costCoords = {x: 115, y: 174};
 		const costTextSize = 130;
 		const statTextSize = 124;
 
@@ -1105,20 +1109,19 @@ export default abstract class Card {
 			return;
 		}
 
-		if (this.type === CardType.HERO_POWER) {
-			this.drawNumber(context, 338, 124, ratio, this.cost, 116, "white");
-			return;
-		}
-
 		this.drawNumber(
 			context,
-			costCoords.x,
-			costCoords.y,
+			this.costTextCoords.x,
+			this.costTextCoords.y,
 			ratio,
 			this.cost,
 			costTextSize,
 			this.costColor
 		);
+
+		if (this.type === CardType.HERO_POWER) {
+			return;
+		}
 
 		if (this.attackTextCoords) {
 			this.drawNumber(
@@ -1269,7 +1272,7 @@ export default abstract class Card {
 
 	private updateAssets(): void {
 		if (this.type === CardType.HERO_POWER) {
-			this.cardFrameAsset = this.baseCardFrameAsset + (this.friendly ? "player" : "opponent");
+			this.cardFrameAsset = this.baseCardFrameAsset + (this.opposing ? "opponent" : "player");
 		} else {
 			this.cardFrameAsset = this.baseCardFrameAsset + CardClass[this.cardClass].toLowerCase();
 		}

@@ -1,6 +1,7 @@
 import Card from "./Card";
 
 export default class HeroPowerCard extends Card {
+	public premium = false;
 	public bodyTextColor = "black";
 	public bodyTextCoords = {
 		dx: 144,
@@ -10,6 +11,8 @@ export default class HeroPowerCard extends Card {
 		sWidth: 380,
 		sHeight: 174,
 	};
+	public cardFoundationAsset = null;
+	public cardFoundationCoords = null;
 	public baseCardFrameAsset = "hero-power-";
 	public baseCardFrameCoords = {
 		sWidth: 564,
@@ -19,6 +22,7 @@ export default class HeroPowerCard extends Card {
 		dWidth: 564,
 		dHeight: 841,
 	};
+	public costTextCoords = {x: 338, y: 124};
 	public baseRarityGemAsset = null;
 	public nameBannerAsset = null;
 	public dragonAsset = null;
@@ -31,6 +35,9 @@ export default class HeroPowerCard extends Card {
 	public healthTextCoords = null;
 	public nameBannerCoords = null;
 	public rarityGemCoords = null;
+	public raceBannerAsset = null;
+	public raceBannerCoords = null;
+	public raceTextCoords = null;
 	public nameTextCurve = {
 		pathMiddle: 0.54,
 		maxWidth: 440,

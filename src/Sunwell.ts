@@ -8,6 +8,7 @@ import Card from "./Card";
 import HeroCard from "./HeroCard";
 import HeroCardPremium from "./HeroCardPremium";
 import HeroPowerCard from "./HeroPowerCard";
+import HeroPowerCardPremium from "./HeroPowerCardPremium";
 import MinionCard from "./MinionCard";
 import MinionCardPremium from "./MinionCardPremium";
 import SpellCard from "./SpellCard";
@@ -211,7 +212,7 @@ export default class Sunwell {
 			MINION: premium ? MinionCardPremium : MinionCard,
 			SPELL: premium ? SpellCardPremium : SpellCard,
 			WEAPON: premium ? WeaponCardPremium : WeaponCard,
-			HERO_POWER: HeroPowerCard,
+			HERO_POWER: premium ? HeroPowerCardPremium : HeroPowerCard,
 		};
 
 		const ctor = ctors[props.type];
