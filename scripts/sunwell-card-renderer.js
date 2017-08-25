@@ -7,7 +7,7 @@ const Canvas = require("canvas");
 const Promise = require("promise");
 const Sunwell = require("../dist/sunwell.node");
 
-function renderCard(sunwell, card, filePath, resolution) {
+function renderCard(sunwell, card, filePath, resolution, premium) {
 	if (!card.type || !card.cardClass) {
 		console.log("Skipping", card.id, "(no card to render)");
 		return;
@@ -49,8 +49,7 @@ function renderCard(sunwell, card, filePath, resolution) {
 				console.log("Error writing chunk", filePath);
 			});
 		};
-
-		sunwell.createCard(card, resolution, null, callback);
+		sunwell.createCard(card, resolution, premium, null, callback);
 	});
 }
 
@@ -59,17 +58,18 @@ function drawFromJSON(sunwell, body, textureDir, outputDir, resolution) {
 	drawFromData(sunwell, data, textureDir, outputDir, resolution);
 }
 
-function drawFromData(sunwell, data, textureDir, outputDir, resolution) {
+function drawFromData(sunwell, data, textureDir, outputDir, resolution, premium) {
 	for (let i in data) {
 		var card = data[i];
 		card.key = i;
-		var renderPath = path.join(outputDir, card.id + ".png");
+		var renderName = card.id + (premium ? "_premium" : "") + ".png";
+		var renderPath = path.join(outputDir, renderName);
 		var textureName = card.id + ".jpg";
 		var texturePath = path.join(textureDir, textureName);
 
 		if (!fs.existsSync(renderPath)) {
 			card.texture = texturePath;
-			renderCard(sunwell, card, renderPath, resolution);
+			renderCard(sunwell, card, renderPath, resolution, premium);
 		}
 	}
 }
@@ -97,6 +97,7 @@ function main() {
 	p.addArgument("--output-dir", {defaultValue: path.resolve("out")});
 	p.addArgument("--texture-dir", {defaultValue: path.resolve("textures")});
 	p.addArgument("--resolution", {type: "int", defaultValue: 512});
+	p.addArgument("--premium", {action: "storeTrue"});
 	p.addArgument("--only", {type: "string", defaultValue: ""});
 	p.addArgument("--debug", {action: "storeTrue"});
 	var args = p.parseArgs();
@@ -105,8 +106,8 @@ function main() {
 		bodyFontBold: "Franklin Gothic Bold",
 		bodyFontItalic: "Franklin Gothic Italic",
 		bodyFontSize: 38,
-		bodyLineHeight: 42,
-		bodyFontOffset: {x: 0, y: 40},
+		bodyLineHeight: 40,
+		bodyFontOffset: {x: 0, y: 26},
 		assetFolder: path.resolve(args.assets_dir) + "/",
 		debug: args.debug,
 		// platform: new NodePlatform(),
@@ -138,7 +139,7 @@ function main() {
 			if (only.length && only[0].length) {
 				data = data.filter(card => only.indexOf(card.id) !== -1);
 			}
-			drawFromData(sunwell, data, path.resolve(args.texture_dir), outdir, args.resolution);
+			drawFromData(sunwell, data, path.resolve(args.texture_dir), outdir, args.resolution, args.premium);
 		});
 	}
 }
