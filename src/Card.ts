@@ -1280,7 +1280,7 @@ export default abstract class Card {
 			this.cardFrameAsset = this.baseCardFrameAsset + CardClass[this.cardClass].toLowerCase();
 		}
 
-		if (this.rarity) {
+		if (this.rarity && this.baseRarityGemAsset) {
 			this.rarityGemAsset = this.baseRarityGemAsset + Rarity[this.rarity].toLowerCase();
 		}
 
