@@ -1151,7 +1151,7 @@ export default abstract class Card {
 		}
 	}
 
-	public drawAttackTexture(context: CanvasRenderingContext2D, ratio: number): void {
+	public drawHealthTexture(context: CanvasRenderingContext2D, ratio: number): void {
 		if (this.hideStats || !this.healthGemAsset) {
 			return;
 		}
@@ -1160,7 +1160,7 @@ export default abstract class Card {
 		this.drawImage(context, this.healthGemAsset, coords);
 	}
 
-	public drawHealthTexture(context: CanvasRenderingContext2D, ratio: number): void {
+	public drawAttackTexture(context: CanvasRenderingContext2D, ratio: number): void {
 		if (this.hideStats || !this.attackGemAsset) {
 			return;
 		}
