@@ -17,7 +17,8 @@ function renderCard(sunwell, card, filePath, resolution, premium) {
 		card.type !== "MINION" &&
 		card.type !== "SPELL" &&
 		card.type !== "WEAPON" &&
-		card.type !== "HERO"
+		card.type !== "HERO" &&
+		card.type !== "HERO_POWER"
 	) {
 		console.log("Skipping", card.id, "(not a renderable card)");
 		return;
