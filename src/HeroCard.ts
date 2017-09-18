@@ -1,4 +1,6 @@
 import Card from "./Card";
+import { CardType } from "./Enums";
+import Sunwell from "./Sunwell";
 
 export default class HeroCard extends Card {
 	public premium = false;
@@ -101,6 +103,22 @@ export default class HeroCard extends Card {
 		{x: 262, y: 160},
 		{x: 291, y: 145},
 	];
+
+	constructor(sunwell: Sunwell, props) {
+		super(sunwell, props);
+		if (this.type === CardType.HERO && !props.armor) {
+			this.healthGemAsset = "health";
+			this.healthGemCoords = {
+				sWidth: 109,
+				sHeight: 164,
+				dx: 504,
+				dy: 728,
+				dWidth: 109,
+				dHeight: 164,
+			};
+			this.healthTextCoords = {x: 556, y: 825};
+		}
+	}
 
 	public getWatermarkCoords() {
 		return {
