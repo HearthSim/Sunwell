@@ -13,11 +13,13 @@ const ExternalModulesList = [].concat(
 const PLATFORM = ["web", "cdn", "node"].includes(process.env.PLATFORM) ? process.env.PLATFORM : "node";
 const PRODUCTION = process.env.NODE_ENV === "production";
 export default {
-	entry: "src/Sunwell.ts",
-	format: PLATFORM == "cdn" ? "iife" : "cjs",
-	dest: `dist/sunwell.${PLATFORM}${PRODUCTION ? ".min" : ""}.js`,
+	input: "src/Sunwell.ts",
+	output: {
+		format: PLATFORM == "cdn" ? "iife" : "cjs",
+		file: `dist/sunwell.${PLATFORM}${PRODUCTION ? ".min" : ""}.js`,
+	},
 	external: ExternalModulesList,
-	moduleName: "Sunwell",
+	name: "Sunwell",
 	plugins: [
 		jscc({
 			values: {
