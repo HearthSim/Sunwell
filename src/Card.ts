@@ -1324,7 +1324,7 @@ export default abstract class Card {
 	}
 
 	private getCardFrameClass(cardClass: CardClass): CardClass {
-		switch (this.cardClass) {
+		switch (cardClass) {
 			case CardClass.DREAM:
 				return CardClass.HUNTER;
 			case CardClass.INVALID:
