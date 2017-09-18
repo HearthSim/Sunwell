@@ -359,7 +359,7 @@ export default abstract class Card {
 		this.set = this.getCardSet(set);
 
 		const rarity = cleanEnum(props.rarity, Rarity) as Rarity;
-		this.rarity = this.getRarityGem(rarity, set);
+		this.rarity = this.getRarityGem(rarity, set, this.type);
 
 		const cardClass = cleanEnum(props.cardClass, CardClass) as CardClass;
 		this.cardClass = this.getCardFrameClass(cardClass);
@@ -1354,11 +1354,11 @@ export default abstract class Card {
 		}
 	}
 
-	private getRarityGem(rarity: Rarity, set: CardSet): Rarity {
+	private getRarityGem(rarity: Rarity, set: CardSet, type?: CardType): Rarity {
 		switch (rarity) {
 			case Rarity.INVALID:
 			case Rarity.FREE:
-				return null;
+				return type === CardType.HERO ? Rarity.COMMON : null;
 			case Rarity.COMMON:
 				if (set === CardSet.CORE) {
 					return null;
