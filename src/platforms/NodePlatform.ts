@@ -10,7 +10,7 @@ export default class NodePlatform implements IPlatform {
 	public Promise = Promise;
 
 	public getBuffer(width: number, height: number, clear: boolean): void {
-		return new Canvas(width, height);
+		return Canvas.createCanvas(width, height);
 	}
 
 	public freeBuffer(buffer: any): void {
