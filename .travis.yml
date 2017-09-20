@@ -16,6 +16,9 @@ addons:
     packages:
       - g++-6
       - libgif-dev
+      - libcairo2-dev
+      - libjpeg8-dev
+      - libpango1.0-dev
 
 env:
   - CXX=g++-6
