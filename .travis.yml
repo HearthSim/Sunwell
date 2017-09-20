@@ -6,7 +6,8 @@ node_js:
   - "8"
 
 cache:
-  yarn: true
+  - yarn
+  - pip
 
 addons:
   apt:
@@ -18,6 +19,21 @@ addons:
 
 env:
   - CXX=g++-6
+
+jobs:
+  include:
+    - stage: deploy
+      if: branch = master AND type = push
+      node_js: 8
+      install:
+      - npm install yarn
+      - yarn --pure-lockfile
+      - pip install --user awscli
+      script:
+      - yarn run build
+      - NODE_ENV=production yarn run build
+      - cp -r assets/ dist/
+      - aws s3 sync --delete dist/ s3://$S3_DEFAULT_BUCKET/branches/$TRAVIS_BRANCH/
 
 script:
   - yarn run build
