@@ -1,16 +1,6 @@
 import {CardClass, CardSet, CardType, MultiClassGroup, Race, Rarity} from "./Enums";
+import {cleanEnum} from "./helpers";
 import Sunwell from "./Sunwell";
-
-function cleanEnum(val: string | number, e) {
-	if (typeof val === "string") {
-		if (val in e) {
-			return e[val];
-		} else {
-			return e.INVALID;
-		}
-	}
-	return val || 0;
-}
 
 /**
  * Helper function to draw the oval mask for the cards artwork.
