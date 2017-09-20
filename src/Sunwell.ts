@@ -5,6 +5,8 @@ import Platform from "./platforms/WebPlatform";
 //#endif
 
 import Card from "./Card";
+import {CardType} from "./Enums";
+import {cleanEnum} from "./helpers";
 import HeroCard from "./HeroCard";
 import HeroCardPremium from "./HeroCardPremium";
 import HeroPowerCard from "./HeroPowerCard";
@@ -207,17 +209,18 @@ export default class Sunwell {
 			canvas = this.getBuffer(width, height, true);
 		}
 
-		const ctors: {[type: string]: any} = {
-			HERO: premium ? HeroCardPremium : HeroCard,
-			MINION: premium ? MinionCardPremium : MinionCard,
-			SPELL: premium ? SpellCardPremium : SpellCard,
-			WEAPON: premium ? WeaponCardPremium : WeaponCard,
-			HERO_POWER: premium ? HeroPowerCardPremium : HeroPowerCard,
-		};
+		const ctors: {[type: number]: any} = {};
+		ctors[CardType.HERO] = premium ? HeroCardPremium : HeroCard;
+		ctors[CardType.MINION] = premium ? MinionCardPremium : MinionCard;
+		ctors[CardType.SPELL] = premium ? SpellCardPremium : SpellCard;
+		ctors[CardType.WEAPON] = premium ? WeaponCardPremium : WeaponCard;
+		ctors[CardType.HERO_POWER] = premium ? HeroPowerCardPremium : HeroPowerCard;
 
-		const ctor = ctors[props.type];
+		const type = cleanEnum(props.type, CardType);
+
+		const ctor = ctors[type];
 		if (!ctor) {
-			throw new Error("Got an unrenderable card type");
+			throw new Error(`Got an unrenderable card type: ${type}`);
 		}
 
 		const card: Card = new ctor(this, props);
