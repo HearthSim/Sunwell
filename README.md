@@ -10,7 +10,7 @@ A high quality Hearthstone card renderer in TypeScript.
 
 The latest, minified version of Sunwell is available here:
 
-https://sunwell.hearthsim.net/branches/master/sunwell.js
+https://sunwell.hearthsim.net/branches/master/sunwell.cdn.min.js
 
 
 ## Requirements
