@@ -53,7 +53,7 @@ export default class SpellCardPremium extends SpellCard {
 	};
 	public nameBannerAsset = "name-banner-spell-premium";
 	public dragonAsset = "elite-spell-premium";
-	public dragonCoords =  {
+	public dragonCoords = {
 		dx: 185,
 		dy: 91,
 		sWidth: 476,

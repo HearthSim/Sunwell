@@ -1,5 +1,5 @@
 import Card from "./Card";
-import { CardType } from "./Enums";
+import {CardType} from "./Enums";
 import Sunwell from "./Sunwell";
 
 export default class HeroCard extends Card {

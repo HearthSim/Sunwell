@@ -25,7 +25,7 @@ export default class MinionCard extends Card {
 	public baseRarityGemAsset = "rarity-minion-";
 	public nameBannerAsset = "name-banner-minion";
 	public dragonAsset = "elite-minion";
-	public dragonCoords =  {
+	public dragonCoords = {
 		sWidth: 436,
 		sHeight: 325,
 		dx: 188,

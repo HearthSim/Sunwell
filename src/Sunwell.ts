@@ -41,7 +41,9 @@ export default class Sunwell {
 	public platform: Platform;
 	public renderCache: {[cacheKey: string]: any};
 
-	private assetListeners: {[path: string]: Array<(HTMLCanvasElement) => void>};
+	private assetListeners: {
+		[path: string]: Array<(HTMLCanvasElement) => void>;
+	};
 	private renderQuery: {[key: string]: Card};
 	private isRendering: boolean;
 
@@ -156,8 +158,7 @@ export default class Sunwell {
 			fetches.push(this.fetchAsset(texture));
 		}
 
-		this.platform.Promise
-			.all(fetches)
+		this.platform.Promise.all(fetches)
 			.then(() => {
 				const start = Date.now();
 				card.draw(card.canvas, context);
@@ -197,7 +198,13 @@ export default class Sunwell {
 		this.platform.requestAnimationFrame(() => this.render());
 	}
 
-	public createCard(props, width: number, premium: boolean, target, callback?: (HTMLCanvasElement) => void): Card {
+	public createCard(
+		props,
+		width: number,
+		premium: boolean,
+		target,
+		callback?: (HTMLCanvasElement) => void
+	): Card {
 		let canvas: HTMLCanvasElement;
 		const height = Math.round(width * this.options.aspectRatio);
 

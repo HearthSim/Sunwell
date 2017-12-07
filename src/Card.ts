@@ -38,11 +38,7 @@ function drawHalfEllipse(
 /**
  * Helper function to draw a polygon from a list of points.
  */
-function drawPolygon(
-	context: CanvasRenderingContext2D,
-	points: IPoint[],
-	ratio: number
-): void {
+function drawPolygon(context: CanvasRenderingContext2D, points: IPoint[], ratio: number): void {
 	if (points.length < 3) {
 		return;
 	}
@@ -305,7 +301,11 @@ export default abstract class Card {
 	public abstract healthGemCoords: ICoords;
 	public abstract nameBannerCoords: ICoords;
 	public abstract bodyTextCoords: ICoords;
-	public abstract nameTextCurve: {pathMiddle: number; maxWidth: number; curve: IPoint[]};
+	public abstract nameTextCurve: {
+		pathMiddle: number;
+		maxWidth: number;
+		curve: IPoint[];
+	};
 	public abstract artClipPolygon: IPoint[];
 	public abstract artCoords: ICoords;
 	public abstract cardFoundationAsset: string;
@@ -626,7 +626,8 @@ export default abstract class Card {
 				(centerLeft - bodyWidth / 2) * s,
 				(centerTop - bodyHeight / 2) * s,
 				bodyWidth * s,
-				bodyHeight * s);
+				bodyHeight * s
+			);
 			context.closePath();
 			context.stroke();
 			context.restore();
@@ -831,7 +832,14 @@ export default abstract class Card {
 			// draw the curve
 			textContext.beginPath();
 			textContext.moveTo(curve[0].x, curve[0].y);
-			textContext.bezierCurveTo(curve[1].x, curve[1].y, curve[2].x, curve[2].y, curve[3].x, curve[3].y);
+			textContext.bezierCurveTo(
+				curve[1].x,
+				curve[1].y,
+				curve[2].x,
+				curve[2].y,
+				curve[3].x,
+				curve[3].y
+			);
 			textContext.stroke();
 			// draw the control points
 			for (const point of curve) {
@@ -1085,7 +1093,11 @@ export default abstract class Card {
 			pt.x = 43;
 			pt.y = 58;
 		}
-		this.drawImage(context, this.costGemAsset, {dx: pt.x, dy: pt.y, ratio: ratio});
+		this.drawImage(context, this.costGemAsset, {
+			dx: pt.x,
+			dy: pt.y,
+			ratio: ratio,
+		});
 	}
 
 	public drawRarityGem(context: CanvasRenderingContext2D, ratio: number): void {

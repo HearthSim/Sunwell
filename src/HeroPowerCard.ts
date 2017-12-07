@@ -26,7 +26,7 @@ export default class HeroPowerCard extends Card {
 	public baseRarityGemAsset = null;
 	public nameBannerAsset = null;
 	public dragonAsset = null;
-	public dragonCoords =  null;
+	public dragonCoords = null;
 	public attackGemAsset = null;
 	public healthGemAsset = null;
 	public attackGemCoords = null;
