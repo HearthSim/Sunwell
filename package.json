@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@types/node": "^8.0.13",
-    "prettier": "^1.5.3",
+    "prettier": "^1.9.1",
     "request": "^2.81.0",
     "rollup": "^0.50.0",
     "rollup-plugin-cleanup": "^1.0.1",
