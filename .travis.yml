@@ -28,7 +28,7 @@ env:
 jobs:
   include:
     - stage: deploy
-      if: branch = master AND type = push
+      if: type = push
       node_js: 9
       install:
       - npm install yarn
