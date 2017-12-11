@@ -14,7 +14,7 @@
   "contributors": [
     "Benedict Etzel <benedict@hearthsim.net>"
   ],
-  "main": "dist/Sunwell.js",
+  "main": "dist/sunwell.node.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HearthSim/Sunwell.git"
