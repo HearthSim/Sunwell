@@ -1,5 +1,6 @@
 /src/
-/card-renderer/
+/tests/
+/assets/
 yarn.lock
 .travis.yml
 /webpack.config.js
