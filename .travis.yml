@@ -31,7 +31,6 @@ jobs:
       if: type = push
       node_js: 9
       install:
-      - npm install yarn
       - yarn --pure-lockfile
       - pip install --user awscli
       script:
