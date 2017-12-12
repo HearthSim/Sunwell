@@ -1210,7 +1210,10 @@ export default abstract class Card {
 		let font: string;
 		let prefix = "";
 
-		if (bold) {
+		if (bold && italic) {
+			font = this.sunwell.options.bodyFontBoldItalic;
+			prefix = "bold italic ";
+		} else if (bold) {
 			font = this.sunwell.options.bodyFontBold;
 			prefix = "bold ";
 		} else if (italic) {

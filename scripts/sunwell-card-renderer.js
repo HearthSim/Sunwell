@@ -106,6 +106,7 @@ function main() {
 		titleFont: "Belwe",
 		bodyFontBold: "Franklin Gothic Bold",
 		bodyFontItalic: "Franklin Gothic Italic",
+		bodyFontBoldItalic: "Franklin Gothic Bold Italic",
 		bodyFontSize: 38,
 		bodyLineHeight: 40,
 		bodyFontOffset: {x: 0, y: 26},

@@ -23,6 +23,7 @@ interface ISunwellOptions {
 	bodyFontRegular: string;
 	bodyFontBold: string;
 	bodyFontItalic: string;
+	bodyFontBoldItalic: string;
 	aspectRatio: number;
 	bodyFontSize: number;
 	bodyFontOffset: {x: number; y: number};
@@ -52,6 +53,7 @@ export default class Sunwell {
 		options.bodyFontRegular = options.bodyFontRegular || "Franklin Gothic";
 		options.bodyFontBold = options.bodyFontBold || options.bodyFontRegular;
 		options.bodyFontItalic = options.bodyFontItalic || options.bodyFontRegular;
+		options.bodyFontBoldItalic = options.bodyFontBoldItalic || options.bodyFontRegular;
 		options.aspectRatio = options.aspectRatio || 1.492537;
 		options.bodyFontSize = options.bodyFontSize || 60;
 		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};
