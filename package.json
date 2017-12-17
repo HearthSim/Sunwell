@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "argparse": "^1.0.9",
-    "canvas": "^2.0.0-alpha.5",
+    "canvas": "^2.0.0-alpha.8",
     "mkdirp": "^0.5.1",
     "promise": "^8.0.1"
   },
