@@ -28,6 +28,7 @@ interface ISunwellOptions {
 	bodyFontSize: number;
 	bodyFontOffset: {x: number; y: number};
 	bodyLineHeight: number;
+	bodyLineStyle: string;
 	assetFolder: string;
 	drawTimeout: number;
 	cacheSkeleton: boolean;
@@ -58,6 +59,7 @@ export default class Sunwell {
 		options.bodyFontSize = options.bodyFontSize || 60;
 		options.bodyFontOffset = options.bodyFontOffset || {x: 0, y: 0};
 		options.bodyLineHeight = options.bodyLineHeight || 50;
+		options.bodyLineStyle = options.bodyLineStyle || "1em";
 		options.assetFolder = options.assetFolder || "/assets/";
 		options.drawTimeout = options.drawTimeout || 5000;
 		options.cacheSkeleton = options.cacheSkeleton || false;

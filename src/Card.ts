@@ -1206,24 +1206,27 @@ export default abstract class Card {
 		context.globalAlpha = 1;
 	}
 
-	protected getFontMaterial(fontSize: number, bold: boolean, italic: boolean): string {
+	protected getFontMaterial(size: number, bold: boolean, italic: boolean): string {
 		let font: string;
-		let prefix = "";
+		const weight = bold ? "bold" : "";
+		const style = italic ? "italic" : "";
+		let fontSize = `${size}px`;
+
+		if (this.sunwell.options.bodyLineStyle !== "") {
+			fontSize = `${fontSize}/${this.sunwell.options.bodyLineStyle}`;
+		}
 
 		if (bold && italic) {
 			font = this.sunwell.options.bodyFontBoldItalic;
-			prefix = "bold italic ";
 		} else if (bold) {
 			font = this.sunwell.options.bodyFontBold;
-			prefix = "bold ";
 		} else if (italic) {
 			font = this.sunwell.options.bodyFontItalic;
-			prefix = "italic ";
 		} else {
 			font = this.sunwell.options.bodyFontRegular;
 		}
 
-		return `${prefix}${fontSize}px/1em "${font}", sans-serif`;
+		return [weight, style, fontSize, `"${font}", sans-serif`].join(" ");
 	}
 
 	protected getLineWidth(
