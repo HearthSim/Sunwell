@@ -58,6 +58,7 @@ export enum CardSet {
 	GANGS = 25,
 	UNGORO = 27,
 	ICECROWN = 1001,
+	LOOTAPALOOZA = 1004,
 }
 
 export enum CardType {
