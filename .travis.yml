@@ -5,9 +5,7 @@ node_js:
   - 6
   - "node"
 
-cache:
-  - yarn
-  - pip
+cache: yarn
 
 addons:
   apt:
@@ -27,15 +25,15 @@ jobs:
   include:
     - stage: deploy
       if: type = push
-      node_js: 9
+      node_js: "node"
       install:
-      - yarn --pure-lockfile
-      - pip install --user awscli
+        - yarn --pure-lockfile
+
       script:
-      - yarn run build
-      - NODE_ENV=production yarn run build
-      - cp -r assets/ dist/
-      - aws s3 sync --delete dist/ s3://$S3_DEFAULT_BUCKET/branches/$TRAVIS_BRANCH/
+        - yarn run build
+        - NODE_ENV=production yarn run build
+        - cp -r assets/ dist/
+
       deploy:
         provider: npm
         email: $NPM_EMAIL
@@ -51,9 +49,6 @@ script:
   - yarn run qa
 
 notifications:
-  email:
-    on_failure: always
-    on_success: change
   irc:
     channels:
       - "chat.freenode.net#hearthsim-commits"
