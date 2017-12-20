@@ -26,12 +26,12 @@ export default class WeaponCard extends Card {
 	public baseRarityGemAsset = "rarity-weapon-";
 	public dragonAsset = "elite-weapon";
 	public dragonCoords = {
-		dx: 184,
-		dy: 89,
-		dWidth: 455,
-		dHeight: 315,
-		sWidth: 455,
-		sHeight: 315,
+		dx: 199,
+		dy: 62,
+		dWidth: 420,
+		dHeight: 247,
+		sWidth: 420,
+		sHeight: 247,
 	};
 	public attackGemAsset = "attack-weapon";
 	public healthGemAsset = "durability";

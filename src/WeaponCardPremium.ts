@@ -25,11 +25,11 @@ export default class WeaponCardPremium extends WeaponCard {
 	public healthGemAsset = "durability-premium";
 	public dragonAsset = "elite-weapon-premium";
 	public dragonCoords = {
-		dx: 164,
-		dy: 69,
-		dWidth: 489,
-		dHeight: 334,
-		sWidth: 489,
-		sHeight: 334,
+		dx: 197,
+		dy: 63,
+		dWidth: 420,
+		dHeight: 247,
+		sWidth: 420,
+		sHeight: 247,
 	};
 }
