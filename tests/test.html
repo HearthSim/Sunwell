@@ -5,6 +5,10 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="../fonts/belwe/stylesheet.css">
+	<link rel="stylesheet" href="../fonts/franklin-gothic/stylesheet.css">
+	<link rel="stylesheet" href="../fonts/franklin-gothic-bold/stylesheet.css">
+	<link rel="stylesheet" href="../fonts/franklin-gothic-italic/stylesheet.css">
 	<title>Document</title>
 </head>
 
@@ -14,6 +18,14 @@
 	<script>
 		let sunwell = new Sunwell({
 			assetFolder: '../assets/',
+			titleFont: "belwe_fsextrabold",
+			bodyFontRegular: "franklin_gothic_fsMdCn",
+			bodyFontItalic: "franklin_gothic_fsMdCnIt",
+			bodyFontBold: "franklin_gothic_fsDemiCn",
+			bodyFontBoldItalic: "franklin_gothic_fsDemiCn",
+			bodyFontSize: 38,
+			bodyLineHeight: 40,
+			bodyFontOffset: {x: 0, y: 26},
 			debug: true
 		});
 		let cardCanvas = document.getElementById('cardCanvas')
@@ -38,8 +50,8 @@
 			"rarity": "LEGENDARY",
 			"set": "EXPERT1",
 			"type": "MINION",
-			"texture": "../textures/EX1_609.jpg"
-		}, 200, cardCanvas, function() {
+			"texture": "../textures/EX1_116.jpg"
+		}, 512, false, cardCanvas, function() {
 			console.log('done')
 		});
 	</script>
