@@ -59,7 +59,7 @@ function drawFromJSON(sunwell, body, textureDir, outputDir, resolution) {
 	drawFromData(sunwell, data, textureDir, outputDir, resolution);
 }
 
-function drawFromData(sunwell, data, textureDir, outputDir, resolution, premium) {
+function drawFromData(sunwell, data, textureDir, outputDir, resolution, premium, overwrite) {
 	for (let i in data) {
 		var card = data[i];
 		card.key = i;
@@ -68,7 +68,7 @@ function drawFromData(sunwell, data, textureDir, outputDir, resolution, premium)
 		var textureName = card.id + ".jpg";
 		var texturePath = path.join(textureDir, textureName);
 
-		if (!fs.existsSync(renderPath)) {
+		if (!fs.existsSync(renderPath) || overwrite) {
 			card.texture = texturePath;
 			renderCard(sunwell, card, renderPath, resolution, premium);
 		}
@@ -99,6 +99,7 @@ function main() {
 	p.addArgument("--texture-dir", {defaultValue: path.resolve("textures")});
 	p.addArgument("--resolution", {type: "int", defaultValue: 512});
 	p.addArgument("--premium", {action: "storeTrue"});
+	p.addArgument("--overwrite", {action: "storeTrue"});
 	p.addArgument("--only", {type: "string", defaultValue: ""});
 	p.addArgument("--debug", {action: "storeTrue"});
 	var args = p.parseArgs();
@@ -141,7 +142,8 @@ function main() {
 			if (only.length && only[0].length) {
 				data = data.filter(card => only.indexOf(card.id) !== -1);
 			}
-			drawFromData(sunwell, data, path.resolve(args.texture_dir), outdir, args.resolution, args.premium);
+			drawFromData(sunwell, data, path.resolve(args.texture_dir), outdir,
+				args.resolution, args.premium, args.overwrite);
 		});
 	}
 }
