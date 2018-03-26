@@ -624,8 +624,6 @@ export default abstract class Card {
 		const totalLength = bodyText.replace(/<\/*.>/g, "").length;
 		let smallerFirstLine = false;
 
-		const cleanText = bodyText.replace(/<\/*.>/g, "");
-		this.sunwell.log("counting length of " + cleanText);
 		this.sunwell.log("Length is " + totalLength);
 
 		const bufferRow = this.sunwell.getBuffer(bufferText.width, lineHeight, true);
