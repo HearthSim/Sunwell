@@ -1,5 +1,4 @@
 import Card from "./Card";
-import {CardType} from "./Enums";
 import Sunwell from "./Sunwell";
 
 export default class HeroCard extends Card {
@@ -106,7 +105,7 @@ export default class HeroCard extends Card {
 
 	constructor(sunwell: Sunwell, props) {
 		super(sunwell, props);
-		if (this.type === CardType.HERO && !props.armor) {
+		if (!props.armor) {
 			this.healthGemAsset = "health";
 			this.healthGemCoords = {
 				sWidth: 109,
