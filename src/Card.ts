@@ -2,6 +2,11 @@ import {CardClass, CardSet, CardType, MultiClassGroup, Race, Rarity} from "./Enu
 import {cleanEnum} from "./helpers";
 import Sunwell from "./Sunwell";
 
+const CTRL_BOLD_START = "\x11";
+const CTRL_BOLD_END = "\x12";
+const CTRL_ITALIC_START = "\x13";
+const CTRL_ITALIC_END = "\x14";
+
 /**
  * Helper function to draw a polygon from a list of points.
  */
@@ -136,30 +141,6 @@ function finishLine(
 	bufferRowCtx.clearRect(0, 0, bufferRow.width, bufferRow.height);
 
 	return [xPos, yPos];
-}
-
-/**
- * Parses the beginning of a string, looking for a bold or italic tag.
- */
-function parseNextToken(s: string): {token: string; bold: number; italic: number} {
-	let token: string;
-	if (s[1] === "/") {
-		token = s.slice(0, 4);
-		if (token === "</b>") {
-			return {token: token, bold: -1, italic: 0};
-		} else if (token === "</i>") {
-			return {token: token, bold: 0, italic: -1};
-		}
-	} else {
-		token = s.slice(0, 3);
-		if (token === "<b>") {
-			return {token: token, bold: 1, italic: 0};
-		} else if (token === "<i>") {
-			return {token: token, bold: 0, italic: -1};
-		}
-	}
-
-	return {token: "", bold: 0, italic: 0};
 }
 
 interface IPoint {
@@ -600,7 +581,13 @@ export default abstract class Card {
 			context.restore();
 		}
 
-		pBodyText = bodyText;
+		// Replace HTML tags with control characters
+		pBodyText = bodyText
+			.replace("<b>", CTRL_BOLD_START)
+			.replace("</b>", CTRL_BOLD_END)
+			.replace("<i>", CTRL_ITALIC_START)
+			.replace("</i>", CTRL_ITALIC_END);
+
 		while ((plurals = pluralRegex.exec(bodyText)) !== null) {
 			pBodyText = pBodyText.replace(
 				plurals[0],
@@ -621,10 +608,8 @@ export default abstract class Card {
 
 		let fontSize = this.sunwell.options.bodyFontSize;
 		let lineHeight = this.sunwell.options.bodyLineHeight;
-		const totalLength = bodyText.replace(/<\/*.>/g, "").length;
-		let smallerFirstLine = false;
-
-		this.sunwell.log("Length is " + totalLength);
+		const totalLength = bodyText.length;
+		this.sunwell.log("Length of text is " + totalLength);
 
 		const bufferRow = this.sunwell.getBuffer(bufferText.width, lineHeight, true);
 		const bufferRowCtx = bufferRow.getContext("2d");
@@ -665,6 +650,7 @@ export default abstract class Card {
 		bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 		bufferRow.height = lineHeight;
 
+		let smallerFirstLine = false;
 		if (forceSmallerFirstLine || (totalLength >= 75 && this.type === CardType.SPELL)) {
 			smallerFirstLine = true;
 		}
@@ -715,18 +701,20 @@ export default abstract class Card {
 
 			justLineBreak = false;
 
-			for (let j = 0; j < word.length; j++) {
-				const char = word[j];
-
-				if (char === "<") {
-					const pr = parseNextToken(word.slice(j));
-
-					if (pr.token) {
-						j += pr.token.length - 1;
-						bold += pr.bold;
-						italic += pr.italic;
+			for (const char of word) {
+				switch (char) {
+					case CTRL_BOLD_START:
+						bold += 1;
 						continue;
-					}
+					case CTRL_BOLD_END:
+						bold -= 1;
+						continue;
+					case CTRL_ITALIC_START:
+						italic += 1;
+						continue;
+					case CTRL_ITALIC_END:
+						italic -= 1;
+						continue;
 				}
 
 				// TODO investigate why the following two properites are being reset, for web
@@ -1204,19 +1192,24 @@ export default abstract class Card {
 		let italic = 0;
 
 		for (const word of line.split(" ")) {
-			for (let j = 0; j < word.length; j++) {
-				const char = word[j];
-
-				if (char === "<") {
-					const pr = parseNextToken(word.slice(j));
-
-					if (pr.token) {
-						j += pr.token.length - 1;
-						bold += pr.bold;
-						italic += pr.italic;
+			for (const char of word) {
+				switch (char) {
+					case CTRL_BOLD_START:
+						bold += 1;
 						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
 						continue;
-					}
+					case CTRL_BOLD_END:
+						bold -= 1;
+						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
+						continue;
+					case CTRL_ITALIC_START:
+						italic += 1;
+						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
+						continue;
+					case CTRL_ITALIC_END:
+						italic -= 1;
+						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
+						continue;
 				}
 
 				context.fillText(
