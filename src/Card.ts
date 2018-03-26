@@ -1,3 +1,4 @@
+import LineBreaker from "linebreak";
 import {CardClass, CardSet, CardType, MultiClassGroup, Race, Rarity} from "./Enums";
 import {cleanEnum} from "./helpers";
 import Sunwell from "./Sunwell";
@@ -596,11 +597,15 @@ export default abstract class Card {
 		}
 		bodyText = pBodyText;
 		this.sunwell.log("Rendering body", bodyText);
-		const words = bodyText
-			.replace(/[\$#_]/g, "")
-			.replace(/\n/g, " \n ")
-			.replace(/ +/g, " ")
-			.split(/ /g);
+
+		const words = [];
+		const breaker = new LineBreaker(bodyText);
+		let last = 0;
+		let bk;
+		while ((bk = breaker.nextBreak())) {
+			words.push(bodyText.slice(last, bk.position));
+			last = bk.position;
+		}
 
 		const bufferText = this.sunwell.getBuffer(bodyWidth, bodyHeight, true);
 		const bufferTextCtx = bufferText.getContext("2d");

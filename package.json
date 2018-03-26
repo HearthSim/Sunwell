@@ -47,6 +47,7 @@
   "dependencies": {
     "argparse": "^1.0.9",
     "canvas": "^2.0.0-alpha.12",
+    "linebreak": "^0.3.0",
     "mkdirp": "^0.5.1",
     "promise": "^8.0.1"
   },
