@@ -10,14 +10,14 @@ const ExternalModulesList = [].concat(
 	Object.keys(require("./package.json").dependencies)
 );
 
-const PLATFORM = ["web", "cdn", "node"].includes(process.env.PLATFORM)
+const PLATFORM = ["web", "node"].includes(process.env.PLATFORM)
 	? process.env.PLATFORM
 	: "node";
 const PRODUCTION = process.env.NODE_ENV === "production";
 export default {
 	input: "src/Sunwell.ts",
 	output: {
-		format: PLATFORM == "cdn" ? "iife" : "cjs",
+		format: "cjs",
 		file: `dist/sunwell.${PLATFORM}${PRODUCTION ? ".min" : ""}.js`,
 	},
 	external: ExternalModulesList,

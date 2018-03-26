@@ -21,7 +21,7 @@
   },
   "scripts": {
     "prepublishOnly": "yarn build",
-    "build": "rollup -c && PLATFORM=web rollup -c  && PLATFORM=cdn rollup -c",
+    "build": "rollup -c && PLATFORM=web rollup -c",
     "format": "prettier --write \"{src/**/*.ts,*.js}\"",
     "qa": "tslint src/*.ts src/**/*.ts",
     "dev": "tsc --watch"
