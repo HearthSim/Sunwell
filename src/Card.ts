@@ -3,39 +3,6 @@ import {cleanEnum} from "./helpers";
 import Sunwell from "./Sunwell";
 
 /**
- * Helper function to draw the oval mask for the cards artwork.
- */
-function drawHalfEllipse(
-	context: CanvasRenderingContext2D,
-	x: number,
-	y: number,
-	w: number,
-	h: number
-): void {
-	const kappa = 0.5522848;
-	const ox = w / 2 * kappa; // control point offset horizontal
-	const oy = h / 2 * kappa; // control point offset vertical
-	const xe = x + w; // x-end
-	const ye = y + h; // y-end
-	const xm = x + w / 2; // x-middle
-	const ym = y + h / 2; // y-middle
-
-	context.beginPath();
-	context.moveTo(x, ym);
-	context.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-	context.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-	// The following two lines complete the bottom half of the ellipse.
-	// We don't need to do that though, because the bottom half is hidden by
-	// the card frame on minion cards. On Hero cards however, we actually do
-	// need that full bottom half, so we keep that half square.
-	// context.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-	// context.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-	context.lineTo(xe, ye);
-	context.lineTo(x, ye);
-	context.stroke();
-}
-
-/**
  * Helper function to draw a polygon from a list of points.
  */
 function drawPolygon(context: CanvasRenderingContext2D, points: IPoint[], ratio: number): void {
