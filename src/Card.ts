@@ -1,5 +1,6 @@
 import LineBreaker from "linebreak";
 import CardDef from "./CardDef";
+import CardFrame from "./Components/CardFrame";
 import RaceBanner from "./Components/RaceBanner";
 import RarityGem from "./Components/RarityGem";
 import {CardClass, CardSet, CardType, MultiClassGroup, Rarity} from "./Enums";
@@ -41,6 +42,7 @@ export default abstract class Card {
 	public key: number;
 	public opposing: boolean;
 	public costTextCoords: IPoint;
+	public cardFrame: CardFrame;
 	public raceBanner: RaceBanner;
 	public rarityGem: RarityGem;
 	public abstract baseCardFrameAsset: string;
@@ -72,7 +74,6 @@ export default abstract class Card {
 
 	private callback: (HTMLCanvasElement) => void;
 	private cacheKey: number;
-	private cardFrameAsset: string;
 	private costGemAsset: string;
 	private multiBannerAsset: string;
 	private watermarkAsset: string;
@@ -102,9 +103,9 @@ export default abstract class Card {
 		this.texture = props.texture;
 		this.propsJson = JSON.stringify(props);
 
+		this.cardFrame = new CardFrame(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
 
-		this.cardFrameAsset = this.getCardFrameAsset();
 		this.watermarkAsset = this.getWatermarkAsset();
 
 		if (this.cardDef.type === CardType.HERO_POWER) {
@@ -132,7 +133,6 @@ export default abstract class Card {
 
 	public getAssetsToLoad(): string[] {
 		const assetsToCheck = [
-			this.cardFrameAsset,
 			this.cardFoundationAsset,
 			this.costGemAsset,
 			this.nameBannerAsset,
@@ -163,6 +163,7 @@ export default abstract class Card {
 			assetsToLoad.push(...this.raceBanner.assets());
 		}
 
+		assetsToLoad.push(...this.cardFrame.assets());
 		assetsToLoad.push(...this.rarityGem.assets());
 
 		if (this.cardDef.silenced) {
@@ -219,7 +220,7 @@ export default abstract class Card {
 				this.drawCardFoundationAsset(context, ratio);
 			}
 
-			this.drawFrameTexture(context, ratio);
+			this.cardFrame.render(context, ratio);
 
 			if (this.multiBannerAsset) {
 				this.sunwell.drawImage(context, this.multiBannerAsset, {
@@ -811,12 +812,6 @@ export default abstract class Card {
 		const coords = this.attackGemCoords;
 		coords.ratio = ratio;
 		this.sunwell.drawImage(context, this.attackGemAsset, coords);
-	}
-
-	public drawFrameTexture(context: CanvasRenderingContext2D, ratio: number): void {
-		const coords = this.baseCardFrameCoords;
-		coords.ratio = ratio;
-		this.sunwell.drawImage(context, this.cardFrameAsset, coords);
 	}
 
 	public drawCardFoundationAsset(context: CanvasRenderingContext2D, ratio: number): void {
