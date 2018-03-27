@@ -1,3 +1,15 @@
+import {CardClass, CardSet, CardType, Race, Rarity} from "./Enums";
+
+const RaceNames = {};
+RaceNames[Race.MURLOC] = {enUS: "Murloc"};
+RaceNames[Race.MECHANICAL] = {enUS: "Mech"};
+RaceNames[Race.ELEMENTAL] = {enUS: "Elemental"};
+RaceNames[Race.BEAST] = {enUS: "Beast"};
+RaceNames[Race.DEMON] = {enUS: "Demon"};
+RaceNames[Race.PIRATE] = {enUS: "Pirate"};
+RaceNames[Race.DRAGON] = {enUS: "Dragon"};
+RaceNames[Race.TOTEM] = {enUS: "Totem"};
+
 export interface IPoint {
 	x: number;
 	y: number;
@@ -208,4 +220,35 @@ export function getCharDimensions(text: string, textContext) {
 		textContext.restore();
 	}
 	return dim;
+}
+
+export function getCardFrameClass(cardClass: CardClass) {
+	switch (cardClass) {
+		case CardClass.DREAM:
+			return CardClass.HUNTER;
+		case CardClass.INVALID:
+			return CardClass.NEUTRAL;
+		default:
+			return cardClass;
+	}
+}
+
+export function getRaceText(race: Race, cardType: CardType, language: string): string {
+	if (cardType === CardType.MINION && race in RaceNames) {
+		return RaceNames[race][language] || "";
+	}
+	return "";
+}
+
+export function getRarityGem(rarity: Rarity, set: CardSet, type?: CardType): Rarity {
+	switch (rarity) {
+		case Rarity.INVALID:
+		case Rarity.FREE:
+			return type === CardType.HERO ? Rarity.COMMON : null;
+		case Rarity.COMMON:
+			if (set === CardSet.CORE) {
+				return null;
+			}
+	}
+	return rarity;
 }

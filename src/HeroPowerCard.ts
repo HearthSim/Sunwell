@@ -72,4 +72,12 @@ export default class HeroPowerCard extends Card {
 			dHeight: 0,
 		};
 	}
+
+	public getCardFrameAsset(): string {
+		return this.baseCardFrameAsset + (this.opposing ? "opponent" : "player");
+	}
+
+	public getRarityGemAsset(): string {
+		return "";
+	}
 }

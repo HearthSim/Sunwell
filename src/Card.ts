@@ -1,13 +1,16 @@
 import LineBreaker from "linebreak";
-import {CardClass, CardSet, CardType, MultiClassGroup, Race, Rarity} from "./Enums";
+import CardDef from "./CardDef";
+import {CardClass, CardSet, CardType, MultiClassGroup, Rarity} from "./Enums";
 import {
-	cleanEnum,
 	contextBoundingBox,
 	drawPolygon,
 	finishLine,
+	getCardFrameClass,
 	getCharDimensions,
 	getNumberStyle,
 	getPointOnCurve,
+	getRaceText,
+	getRarityGem,
 	IPoint,
 } from "./helpers";
 import Sunwell from "./Sunwell";
@@ -16,16 +19,6 @@ const CTRL_BOLD_START = "\x11";
 const CTRL_BOLD_END = "\x12";
 const CTRL_ITALIC_START = "\x13";
 const CTRL_ITALIC_END = "\x14";
-
-const RaceNames = {};
-RaceNames[Race.MURLOC] = {enUS: "Murloc"};
-RaceNames[Race.MECHANICAL] = {enUS: "Mech"};
-RaceNames[Race.ELEMENTAL] = {enUS: "Elemental"};
-RaceNames[Race.BEAST] = {enUS: "Beast"};
-RaceNames[Race.DEMON] = {enUS: "Demon"};
-RaceNames[Race.PIRATE] = {enUS: "Pirate"};
-RaceNames[Race.DRAGON] = {enUS: "Dragon"};
-RaceNames[Race.TOTEM] = {enUS: "Totem"};
 
 const ReferenceWidth = 670;
 const ReferenceHeight = 1000;
@@ -43,26 +36,12 @@ interface ICoords {
 }
 
 export default abstract class Card {
+	public cardDef: CardDef;
 	public target;
 	public texture;
 	public canvas: HTMLCanvasElement;
-	public id: string;
-	public name: string;
 	public bodyText: string;
 	public raceText: string;
-	public cost: number;
-	public attack: number;
-	public health: number;
-	public cardClass: CardClass;
-	public rarity: Rarity;
-	public race: Race;
-	public set: CardSet;
-	public multiClassGroup: MultiClassGroup;
-	public hideStats: boolean;
-	public type: CardType;
-	public elite: boolean;
-	public costsHealth: boolean;
-	public silenced: boolean;
 	public language: string;
 	public titleFont: string;
 	public costColor: string;
@@ -114,59 +93,42 @@ export default abstract class Card {
 
 	constructor(sunwell: Sunwell, props) {
 		this.sunwell = sunwell;
-
 		if (!props) {
 			throw new Error("No card properties given");
 		}
 
-		this.type = props.type;
-		this.cost = props.cost || 0;
-		this.attack = props.attack || 0;
-		this.health = props.health || 0;
-		this.costsHealth = props.costsHealth || false;
-		this.hideStats = props.hideStats;
+		this.cardDef = new CardDef(props);
 		this.language = props.language || "enUS";
-		this.name = props.name || "";
-
-		this.multiClassGroup = cleanEnum(props.multiClassGroup, MultiClassGroup) as MultiClassGroup;
-		this.type = cleanEnum(props.type, CardType) as CardType;
-		this.race = cleanEnum(props.race, Race) as Race;
-
-		const set = cleanEnum(props.set, CardSet) as CardSet;
-		this.set = this.getCardSet(set);
-
-		const rarity = cleanEnum(props.rarity, Rarity) as Rarity;
-		this.rarity = this.getRarityGem(rarity, set, this.type);
-
-		const cardClass = cleanEnum(props.cardClass, CardClass) as CardClass;
-		this.cardClass = this.getCardFrameClass(cardClass);
-
-		if (this.type === CardType.MINION) {
-			this.raceText = props.raceText || this.getRaceText();
-			this.silenced = props.silenced || false;
-		}
-
-		if (this.type === CardType.WEAPON && props.durability) {
-			// Weapons alias health to durability
-			this.health = props.durability;
-		} else if (this.type === CardType.HERO && props.armor) {
-			// Hero health gem is Armor
-			this.health = props.armor;
-		}
 
 		// This only needs to change for HeroPower
 		this.costTextCoords = {x: 115, y: 174};
 		// Sets the player or opponent HeroPower texture
 		this.opposing = props.opposing || false;
 
-		this.elite = props.elite || false;
+		this.bodyText = this.cardDef.collectionText || this.cardDef.text;
+		this.raceText = getRaceText(this.cardDef.race, this.cardDef.type, this.language);
 		this.costColor = getNumberStyle(props.costStyle);
 		this.attackColor = getNumberStyle(props.costStyle);
 		this.healthColor = getNumberStyle(props.healthStyle);
-		this.bodyText = props.collectionText || props.text || "";
 		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
 		this.propsJson = JSON.stringify(props);
+
+		this.cardFrameAsset = this.getCardFrameAsset();
+		this.rarityGemAsset = this.getRarityGemAsset();
+		this.watermarkAsset = this.getWatermarkAsset();
+
+		if (this.cardDef.type === CardType.HERO_POWER) {
+			this.costGemAsset = null;
+		} else if (this.cardDef.costsHealth) {
+			this.costGemAsset = "cost-health";
+		} else {
+			this.costGemAsset = "cost-mana";
+		}
+		if (this.cardDef.multiClassGroup) {
+			this.multiBannerAsset =
+				"multi-" + MultiClassGroup[this.cardDef.multiClassGroup].toLowerCase();
+		}
 	}
 
 	public abstract getWatermarkCoords(): ICoords;
@@ -177,25 +139,26 @@ export default abstract class Card {
 		this.callback = callback;
 		this.cacheKey = this.checksum();
 		this.key = this.cacheKey;
-		this.updateAssets();
 	}
 
 	public getAssetsToLoad(): string[] {
-		const assetsToLoad: string[] = [this.cardFrameAsset];
-
-		if (this.cardFoundationAsset) {
-			assetsToLoad.push(this.cardFoundationAsset);
+		const assetsToCheck = [
+			this.cardFrameAsset,
+			this.cardFoundationAsset,
+			this.costGemAsset,
+			this.nameBannerAsset,
+			this.multiBannerAsset,
+			this.rarityGemAsset,
+			this.watermarkAsset,
+		];
+		const assetsToLoad: string[] = [];
+		for (const asset of assetsToCheck) {
+			if (asset) {
+				assetsToLoad.push(asset);
+			}
 		}
 
-		if (this.costGemAsset) {
-			assetsToLoad.push(this.costGemAsset);
-		}
-
-		if (this.nameBannerAsset) {
-			assetsToLoad.push(this.nameBannerAsset);
-		}
-
-		if (!this.hideStats) {
+		if (!this.cardDef.hideStats) {
 			if (this.attackGemAsset) {
 				assetsToLoad.push(this.attackGemAsset);
 			}
@@ -204,23 +167,14 @@ export default abstract class Card {
 			}
 		}
 
-		if (this.elite && this.dragonAsset) {
+		if (this.cardDef.elite && this.dragonAsset) {
 			assetsToLoad.push(this.dragonAsset);
 		}
 		if (this.raceText) {
 			assetsToLoad.push(this.raceBannerAsset);
 		}
-		if (this.silenced) {
+		if (this.cardDef.silenced) {
 			assetsToLoad.push("silence-x");
-		}
-		if (this.multiBannerAsset) {
-			assetsToLoad.push(this.multiBannerAsset);
-		}
-		if (this.rarityGemAsset) {
-			assetsToLoad.push(this.rarityGemAsset);
-		}
-		if (this.watermarkAsset) {
-			assetsToLoad.push(this.watermarkAsset);
 		}
 
 		return assetsToLoad;
@@ -252,18 +206,11 @@ export default abstract class Card {
 		}
 	}
 
-	public getRaceText(): string {
-		if (this.race && this.type === CardType.MINION && this.race in RaceNames) {
-			return RaceNames[this.race][this.language];
-		}
-		return "";
-	}
-
 	public draw(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D): void {
 		const ratio = this.width / ReferenceWidth;
 
 		const drawTimeout = setTimeout(() => {
-			this.sunwell.error("Drawing timed out", this.name);
+			this.sunwell.error("Drawing timed out", this.cardDef.name);
 		}, this.sunwell.options.drawTimeout);
 
 		context.save();
@@ -309,7 +256,7 @@ export default abstract class Card {
 			this.drawAttackTexture(context, ratio);
 			this.drawHealthTexture(context, ratio);
 
-			if (this.elite && this.dragonAsset) {
+			if (this.cardDef.elite && this.dragonAsset) {
 				const coords = this.dragonCoords;
 				coords.ratio = ratio;
 				this.drawImage(context, this.dragonAsset, coords);
@@ -328,7 +275,7 @@ export default abstract class Card {
 
 		// <<<<<<<< Finished Skeleton drawing
 
-		this.drawName(context, ratio, this.name);
+		this.drawName(context, ratio, this.cardDef.name);
 
 		this.drawStats(context, ratio);
 
@@ -338,7 +285,7 @@ export default abstract class Card {
 
 		this.drawBodyText(context, ratio, false, this.bodyText);
 
-		if (this.silenced) {
+		if (this.cardDef.silenced) {
 			this.drawImage(context, "silence-x", {dx: 166, dy: 584, ratio: ratio});
 		}
 
@@ -494,7 +441,7 @@ export default abstract class Card {
 		bufferRow.height = lineHeight;
 
 		let smallerFirstLine = false;
-		if (forceSmallerFirstLine || (totalLength >= 75 && this.type === CardType.SPELL)) {
+		if (forceSmallerFirstLine || (totalLength >= 75 && this.cardDef.type === CardType.SPELL)) {
 			smallerFirstLine = true;
 		}
 
@@ -584,7 +531,7 @@ export default abstract class Card {
 
 		this.sunwell.freeBuffer(bufferRow);
 
-		if (this.type === CardType.SPELL && lineCount === 4) {
+		if (this.cardDef.type === CardType.SPELL && lineCount === 4) {
 			if (!smallerFirstLine && !forceSmallerFirstLine) {
 				this.drawBodyText(context, s, true, this.bodyText);
 				return;
@@ -858,7 +805,7 @@ export default abstract class Card {
 
 	public drawCostGem(context: CanvasRenderingContext2D, ratio: number): void {
 		const pt = {x: 47, y: 105};
-		if (this.costsHealth) {
+		if (this.cardDef.costsHealth) {
 			pt.x = 43;
 			pt.y = 58;
 		}
@@ -879,7 +826,7 @@ export default abstract class Card {
 		const costTextSize = 130;
 		const statTextSize = 124;
 
-		if (this.hideStats) {
+		if (this.cardDef.hideStats) {
 			return;
 		}
 
@@ -888,12 +835,12 @@ export default abstract class Card {
 			this.costTextCoords.x,
 			this.costTextCoords.y,
 			ratio,
-			this.cost,
+			this.cardDef.cost,
 			costTextSize,
 			this.costColor
 		);
 
-		if (this.type === CardType.HERO_POWER) {
+		if (this.cardDef.type === CardType.HERO_POWER) {
 			return;
 		}
 
@@ -903,7 +850,7 @@ export default abstract class Card {
 				this.attackTextCoords.x,
 				this.attackTextCoords.y,
 				ratio,
-				this.attack,
+				this.cardDef.attack,
 				statTextSize,
 				this.attackColor
 			);
@@ -915,7 +862,7 @@ export default abstract class Card {
 				this.healthTextCoords.x,
 				this.healthTextCoords.y,
 				ratio,
-				this.health,
+				this.cardDef.health,
 				statTextSize,
 				this.healthColor
 			);
@@ -923,7 +870,7 @@ export default abstract class Card {
 	}
 
 	public drawHealthTexture(context: CanvasRenderingContext2D, ratio: number): void {
-		if (this.hideStats || !this.healthGemAsset) {
+		if (this.cardDef.hideStats || !this.healthGemAsset) {
 			return;
 		}
 		const coords = this.healthGemCoords;
@@ -932,7 +879,7 @@ export default abstract class Card {
 	}
 
 	public drawAttackTexture(context: CanvasRenderingContext2D, ratio: number): void {
-		if (this.hideStats || !this.attackGemAsset) {
+		if (this.cardDef.hideStats || !this.attackGemAsset) {
 			return;
 		}
 		const coords = this.attackGemCoords;
@@ -956,15 +903,19 @@ export default abstract class Card {
 		const coords = this.getWatermarkCoords();
 		coords.ratio = ratio;
 
-		if (this.type === CardType.HERO_POWER) {
+		if (this.cardDef.type === CardType.HERO_POWER) {
 			return;
-		} else if (this.premium || this.type === CardType.MINION || this.type === CardType.HERO) {
+		} else if (
+			this.premium ||
+			this.cardDef.type === CardType.MINION ||
+			this.cardDef.type === CardType.HERO
+		) {
 			context.globalCompositeOperation = "multiply";
 			context.globalAlpha = 0.6;
-		} else if (this.type === CardType.SPELL) {
+		} else if (this.cardDef.type === CardType.SPELL) {
 			context.globalCompositeOperation = "multiply";
 			context.globalAlpha = 0.7;
-		} else if (this.type === CardType.WEAPON) {
+		} else if (this.cardDef.type === CardType.WEAPON) {
 			context.globalCompositeOperation = "lighten";
 			context.globalAlpha = 0.1;
 		}
@@ -973,6 +924,40 @@ export default abstract class Card {
 
 		context.globalCompositeOperation = "source-over";
 		context.globalAlpha = 1;
+	}
+
+	public getCardFrameAsset(): string {
+		const cardClass = getCardFrameClass(this.cardDef.cardClass);
+		return this.baseCardFrameAsset + CardClass[cardClass].toLowerCase();
+	}
+
+	public getRarityGemAsset(): string {
+		const rarity = getRarityGem(this.cardDef.rarity, this.cardDef.cardSet, this.cardDef.type);
+		if (rarity) {
+			return this.baseRarityGemAsset + Rarity[rarity].toLowerCase();
+		}
+		return "";
+	}
+
+	public getWatermarkAsset(): string {
+		switch (this.cardDef.cardSet) {
+			case CardSet.EXPERT1:
+			case CardSet.NAXX:
+			case CardSet.GVG:
+			case CardSet.BRM:
+			case CardSet.TGT:
+			case CardSet.LOE:
+			case CardSet.OG:
+			case CardSet.KARA:
+			case CardSet.GANGS:
+			case CardSet.UNGORO:
+			case CardSet.ICECROWN:
+			case CardSet.HOF:
+			case CardSet.LOOTAPALOOZA:
+				return "set-" + CardSet[this.cardDef.cardSet].toLowerCase();
+			default:
+				return "";
+		}
 	}
 
 	protected getFontMaterial(size: number, bold: boolean, italic: boolean): string {
@@ -1055,34 +1040,6 @@ export default abstract class Card {
 		return chk;
 	}
 
-	private updateAssets(): void {
-		if (this.type === CardType.HERO_POWER) {
-			this.cardFrameAsset = this.baseCardFrameAsset + (this.opposing ? "opponent" : "player");
-		} else {
-			this.cardFrameAsset = this.baseCardFrameAsset + CardClass[this.cardClass].toLowerCase();
-		}
-
-		if (this.rarity && this.baseRarityGemAsset) {
-			this.rarityGemAsset = this.baseRarityGemAsset + Rarity[this.rarity].toLowerCase();
-		}
-
-		if (this.type === CardType.HERO_POWER) {
-			this.costGemAsset = null;
-		} else if (this.costsHealth) {
-			this.costGemAsset = "cost-health";
-		} else {
-			this.costGemAsset = "cost-mana";
-		}
-
-		if (this.multiClassGroup) {
-			this.multiBannerAsset = "multi-" + MultiClassGroup[this.multiClassGroup].toLowerCase();
-		}
-
-		if (this.set) {
-			this.watermarkAsset = "set-" + CardSet[this.set].toLowerCase();
-		}
-	}
-
 	private drawImage(context: CanvasRenderingContext2D, assetKey: string, coords: ICoords): void {
 		const asset = this.sunwell.getAsset(assetKey);
 		if (!asset) {
@@ -1103,51 +1060,5 @@ export default abstract class Card {
 			(coords.dWidth || width) * ratio,
 			(coords.dHeight || height) * ratio
 		);
-	}
-
-	private getCardFrameClass(cardClass: CardClass): CardClass {
-		switch (cardClass) {
-			case CardClass.DREAM:
-				return CardClass.HUNTER;
-			case CardClass.INVALID:
-				return CardClass.NEUTRAL;
-			default:
-				return cardClass;
-		}
-	}
-
-	private getCardSet(set: CardSet): CardSet {
-		switch (set) {
-			case CardSet.EXPERT1:
-			case CardSet.NAXX:
-			case CardSet.GVG:
-			case CardSet.BRM:
-			case CardSet.TGT:
-			case CardSet.LOE:
-			case CardSet.OG:
-			case CardSet.KARA:
-			case CardSet.GANGS:
-			case CardSet.UNGORO:
-			case CardSet.ICECROWN:
-			case CardSet.HOF:
-			case CardSet.LOOTAPALOOZA:
-				return set;
-			default:
-				return null;
-		}
-	}
-
-	private getRarityGem(rarity: Rarity, set: CardSet, type?: CardType): Rarity {
-		switch (rarity) {
-			case Rarity.INVALID:
-			case Rarity.FREE:
-				return type === CardType.HERO ? Rarity.COMMON : null;
-			case Rarity.COMMON:
-				if (set === CardSet.CORE) {
-					return null;
-				}
-		}
-
-		return rarity;
 	}
 }
