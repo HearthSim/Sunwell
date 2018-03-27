@@ -11,6 +11,7 @@ import HeroCard from "./HeroCard";
 import HeroCardPremium from "./HeroCardPremium";
 import HeroPowerCard from "./HeroPowerCard";
 import HeroPowerCardPremium from "./HeroPowerCardPremium";
+import {ICoords} from "./interfaces";
 import MinionCard from "./MinionCard";
 import MinionCardPremium from "./MinionCardPremium";
 import SpellCard from "./SpellCard";
@@ -82,6 +83,28 @@ export default class Sunwell {
 
 	public error(...args: any[]): void {
 		console.log.apply("[ERROR]", arguments);
+	}
+
+	public drawImage(context: CanvasRenderingContext2D, assetKey: string, coords: ICoords): void {
+		const asset = this.getAsset(assetKey);
+		if (!asset) {
+			this.error("Not drawing asset", assetKey);
+			return;
+		}
+		const ratio = coords.ratio || 1;
+		const width = coords.sWidth || asset.width;
+		const height = coords.sHeight || asset.height;
+		context.drawImage(
+			asset,
+			coords.sx || 0,
+			coords.sy || 0,
+			width,
+			height,
+			coords.dx * ratio,
+			coords.dy * ratio,
+			(coords.dWidth || width) * ratio,
+			(coords.dHeight || height) * ratio
+		);
 	}
 
 	public fetchAsset(path: string) {

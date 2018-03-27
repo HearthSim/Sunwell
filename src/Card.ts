@@ -218,7 +218,7 @@ export default abstract class Card {
 			this.drawFrameTexture(context, ratio);
 
 			if (this.multiBannerAsset) {
-				this.drawImage(context, this.multiBannerAsset, {
+				this.sunwell.drawImage(context, this.multiBannerAsset, {
 					dx: 50,
 					dy: 119,
 					ratio: ratio,
@@ -247,7 +247,7 @@ export default abstract class Card {
 			if (this.cardDef.elite && this.dragonAsset) {
 				const coords = this.dragonCoords;
 				coords.ratio = ratio;
-				this.drawImage(context, this.dragonAsset, coords);
+				this.sunwell.drawImage(context, this.dragonAsset, coords);
 			}
 
 			if (this.watermarkAsset) {
@@ -274,7 +274,7 @@ export default abstract class Card {
 		this.drawBodyText(context, ratio, false, this.bodyText);
 
 		if (this.cardDef.silenced) {
-			this.drawImage(context, "silence-x", {dx: 166, dy: 584, ratio: ratio});
+			this.sunwell.drawImage(context, "silence-x", {dx: 166, dy: 584, ratio: ratio});
 		}
 
 		context.restore();
@@ -677,7 +677,7 @@ export default abstract class Card {
 	public drawNameBanner(context: CanvasRenderingContext2D, ratio: number) {
 		const coords = this.nameBannerCoords;
 		coords.ratio = ratio;
-		this.drawImage(context, this.nameBannerAsset, coords);
+		this.sunwell.drawImage(context, this.nameBannerAsset, coords);
 	}
 
 	public drawRaceBanner(context: CanvasRenderingContext2D, ratio: number) {
@@ -797,7 +797,7 @@ export default abstract class Card {
 			pt.x = 43;
 			pt.y = 58;
 		}
-		this.drawImage(context, this.costGemAsset, {
+		this.sunwell.drawImage(context, this.costGemAsset, {
 			dx: pt.x,
 			dy: pt.y,
 			ratio: ratio,
@@ -807,7 +807,7 @@ export default abstract class Card {
 	public drawRarityGem(context: CanvasRenderingContext2D, ratio: number): void {
 		const coords = this.rarityGemCoords;
 		coords.ratio = ratio;
-		this.drawImage(context, this.rarityGemAsset, coords);
+		this.sunwell.drawImage(context, this.rarityGemAsset, coords);
 	}
 
 	public drawStats(context: CanvasRenderingContext2D, ratio: number): void {
@@ -863,7 +863,7 @@ export default abstract class Card {
 		}
 		const coords = this.healthGemCoords;
 		coords.ratio = ratio;
-		this.drawImage(context, this.healthGemAsset, coords);
+		this.sunwell.drawImage(context, this.healthGemAsset, coords);
 	}
 
 	public drawAttackTexture(context: CanvasRenderingContext2D, ratio: number): void {
@@ -872,19 +872,19 @@ export default abstract class Card {
 		}
 		const coords = this.attackGemCoords;
 		coords.ratio = ratio;
-		this.drawImage(context, this.attackGemAsset, coords);
+		this.sunwell.drawImage(context, this.attackGemAsset, coords);
 	}
 
 	public drawFrameTexture(context: CanvasRenderingContext2D, ratio: number): void {
 		const coords = this.baseCardFrameCoords;
 		coords.ratio = ratio;
-		this.drawImage(context, this.cardFrameAsset, coords);
+		this.sunwell.drawImage(context, this.cardFrameAsset, coords);
 	}
 
 	public drawCardFoundationAsset(context: CanvasRenderingContext2D, ratio: number): void {
 		const coords = this.cardFoundationCoords;
 		coords.ratio = ratio;
-		this.drawImage(context, this.cardFoundationAsset, coords);
+		this.sunwell.drawImage(context, this.cardFoundationAsset, coords);
 	}
 
 	public drawWatermark(context: CanvasRenderingContext2D, ratio: number): void {
@@ -908,7 +908,7 @@ export default abstract class Card {
 			context.globalAlpha = 0.1;
 		}
 
-		this.drawImage(context, this.watermarkAsset, coords);
+		this.sunwell.drawImage(context, this.watermarkAsset, coords);
 
 		context.globalCompositeOperation = "source-over";
 		context.globalAlpha = 1;
@@ -1026,27 +1026,5 @@ export default abstract class Card {
 		}
 
 		return chk;
-	}
-
-	private drawImage(context: CanvasRenderingContext2D, assetKey: string, coords: ICoords): void {
-		const asset = this.sunwell.getAsset(assetKey);
-		if (!asset) {
-			this.sunwell.error("Not drawing asset", assetKey);
-			return;
-		}
-		const ratio = coords.ratio || 1;
-		const width = coords.sWidth || asset.width;
-		const height = coords.sHeight || asset.height;
-		context.drawImage(
-			asset,
-			coords.sx || 0,
-			coords.sy || 0,
-			width,
-			height,
-			coords.dx * ratio,
-			coords.dy * ratio,
-			(coords.dWidth || width) * ratio,
-			(coords.dHeight || height) * ratio
-		);
 	}
 }
