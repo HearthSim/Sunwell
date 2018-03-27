@@ -35,9 +35,6 @@ export default class HeroPowerCard extends Card {
 	public healthTextCoords = null;
 	public nameBannerCoords = null;
 	public rarityGemCoords = null;
-	public raceBannerAsset = null;
-	public raceBannerCoords = null;
-	public raceTextCoords = null;
 	public nameTextCurve = {
 		pathMiddle: 0.54,
 		maxWidth: 440,

@@ -56,9 +56,6 @@ export default class HeroCard extends Card {
 		dHeight: 122,
 	};
 	public rarityGemCoords = {dx: 311, dy: 529};
-	public raceBannerAsset = null;
-	public raceBannerCoords = null;
-	public raceTextCoords = null;
 	public nameTextCurve = {
 		pathMiddle: 0.5,
 		maxWidth: 420,

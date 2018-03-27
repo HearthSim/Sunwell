@@ -69,9 +69,6 @@ export default class WeaponCard extends Card {
 		dWidth: 96,
 		dHeight: 90,
 	};
-	public raceBannerAsset = null;
-	public raceBannerCoords = null;
-	public raceTextCoords = null;
 	public nameTextCurve = {
 		pathMiddle: 0.56,
 		maxWidth: 450,

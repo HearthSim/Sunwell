@@ -45,9 +45,6 @@ export default class SpellCard extends Card {
 		dWidth: 507,
 		dHeight: 155,
 	};
-	public raceBannerAsset = null;
-	public raceBannerCoords = null;
-	public raceTextCoords = null;
 	public rarityGemCoords = {
 		sWidth: 116,
 		sHeight: 77,

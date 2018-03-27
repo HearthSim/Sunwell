@@ -1,5 +1,6 @@
 import LineBreaker from "linebreak";
 import CardDef from "./CardDef";
+import RaceBanner from "./Components/RaceBanner";
 import {CardClass, CardSet, CardType, MultiClassGroup, Rarity} from "./Enums";
 import {
 	contextBoundingBox,
@@ -39,6 +40,7 @@ export default abstract class Card {
 	public key: number;
 	public opposing: boolean;
 	public costTextCoords: IPoint;
+	public raceBanner: RaceBanner;
 	public abstract baseCardFrameAsset: string;
 	public abstract baseCardFrameCoords: ICoords;
 	public abstract baseRarityGemAsset: string;
@@ -64,9 +66,6 @@ export default abstract class Card {
 	public abstract artCoords: ICoords;
 	public abstract cardFoundationAsset: string;
 	public abstract cardFoundationCoords: ICoords;
-	public abstract raceBannerAsset: string;
-	public abstract raceBannerCoords: ICoords;
-	public abstract raceTextCoords: ICoords;
 	public abstract premium: boolean;
 
 	private callback: (HTMLCanvasElement) => void;
@@ -158,8 +157,8 @@ export default abstract class Card {
 		if (this.cardDef.elite && this.dragonAsset) {
 			assetsToLoad.push(this.dragonAsset);
 		}
-		if (this.raceText) {
-			assetsToLoad.push(this.raceBannerAsset);
+		if (this.raceBanner) {
+			assetsToLoad.push(this.raceBanner.asset);
 		}
 		if (this.cardDef.silenced) {
 			assetsToLoad.push("silence-x");
@@ -237,8 +236,8 @@ export default abstract class Card {
 				this.drawNameBanner(context, ratio);
 			}
 
-			if (this.raceText) {
-				this.drawRaceBanner(context, ratio);
+			if (this.raceBanner) {
+				this.raceBanner.render(context, ratio);
 			}
 
 			this.drawAttackTexture(context, ratio);
@@ -266,10 +265,6 @@ export default abstract class Card {
 		this.drawName(context, ratio, this.cardDef.name);
 
 		this.drawStats(context, ratio);
-
-		if (this.raceText) {
-			this.drawRaceText(context, ratio, this.raceText);
-		}
 
 		this.drawBodyText(context, ratio, false, this.bodyText);
 
@@ -680,12 +675,6 @@ export default abstract class Card {
 		this.sunwell.drawImage(context, this.nameBannerAsset, coords);
 	}
 
-	public drawRaceBanner(context: CanvasRenderingContext2D, ratio: number) {
-		const coords = this.raceBannerCoords;
-		coords.ratio = ratio;
-		this.drawImage(context, this.raceBannerAsset, coords);
-	}
-
 	/**
 	 * Renders a given number to the defined position.
 	 * The x/y position should be the position on an unscaled card.
@@ -738,54 +727,6 @@ export default abstract class Card {
 			(y - b.h / 2) * s,
 			b.w * s,
 			b.h * s
-		);
-
-		this.sunwell.freeBuffer(buffer);
-	}
-
-	public drawRaceText(context, ratio: number, raceText: string): void {
-		const buffer = this.sunwell.getBuffer(300, 60, true);
-		const bufferCtx = buffer.getContext("2d");
-		let x = 10;
-		const text = raceText.split("");
-		const textSize = 40;
-
-		bufferCtx.font = textSize + "px " + this.titleFont;
-		bufferCtx.lineCap = "round";
-		bufferCtx.lineJoin = "round";
-		bufferCtx.textBaseline = "hanging";
-		bufferCtx.textAlign = "left";
-
-		const xWidth = bufferCtx.measureText("x").width;
-		for (const char of text) {
-			bufferCtx.lineWidth = 7;
-			bufferCtx.strokeStyle = "black";
-			bufferCtx.fillStyle = "black";
-			bufferCtx.fillText(char, x, 10);
-			bufferCtx.strokeText(char, x, 10);
-
-			bufferCtx.fillStyle = "white";
-			bufferCtx.strokeStyle = "white";
-			bufferCtx.lineWidth = 1;
-			bufferCtx.fillText(char, x, 10);
-			// context.strokeText(char, x, y);
-
-			x += bufferCtx.measureText(char).width;
-			x += xWidth * 0.1;
-		}
-
-		const b = contextBoundingBox(bufferCtx);
-
-		context.drawImage(
-			buffer,
-			b.x,
-			b.y,
-			b.w,
-			b.h,
-			(this.raceTextCoords.dx - b.w / 2) * ratio,
-			(this.raceTextCoords.dy - b.h / 2) * ratio,
-			b.w * ratio,
-			b.h * ratio
 		);
 
 		this.sunwell.freeBuffer(buffer);

@@ -1,4 +1,6 @@
 import Card from "./Card";
+import RaceBanner from "./Components/RaceBanner";
+import Sunwell from "./Sunwell";
 
 export default class MinionCard extends Card {
 	public premium = false;
@@ -61,7 +63,7 @@ export default class MinionCard extends Card {
 		dWidth: 485,
 		dHeight: 113,
 	};
-	public raceBannerAsset = "race-banner";
+	public raceTextCoords = {dx: 337, dy: 829};
 	public raceBannerCoords = {
 		dx: 129,
 		dy: 791,
@@ -70,7 +72,7 @@ export default class MinionCard extends Card {
 		sWidth: 408,
 		sHeight: 69,
 	};
-	public raceTextCoords = {dx: 337, dy: 829};
+	public raceBannerAsset = "race-banner";
 	public rarityGemCoords = {dx: 263, dy: 532};
 	public nameTextCurve = {
 		pathMiddle: 0.55,
@@ -108,9 +110,23 @@ export default class MinionCard extends Card {
 		{x: 385, y: 111},
 	];
 
+	constructor(sunwell: Sunwell, props) {
+		super(sunwell, props);
+		if (this.raceText) {
+			this.raceBanner = new RaceBanner(
+				sunwell,
+				this.raceBannerAsset,
+				this.raceBannerCoords,
+				this.raceText,
+				this.titleFont,
+				this.raceTextCoords
+			);
+		}
+	}
+
 	public getWatermarkCoords() {
 		let dy = 604;
-		if (this.raceText) {
+		if (this.raceBanner) {
 			dy -= 10; // Shift up
 		}
 
