@@ -141,7 +141,7 @@ export default class Sunwell {
 
 		const context = card.canvas.getContext("2d");
 
-		this.log("Preparing assets for", card.name);
+		this.log("Preparing assets for", card.cardDef.name);
 
 		const texturesToLoad: string[] = [];
 
@@ -238,7 +238,7 @@ export default class Sunwell {
 		card.canvas = canvas;
 		card.initRender(width, target, callback);
 
-		this.log("Queried render:", card.name);
+		this.log("Queried render:", card.cardDef.name);
 		if (this.renderQuery[card.key]) {
 			this.log("Skipping", card.key, "(already queued)");
 		} else {
