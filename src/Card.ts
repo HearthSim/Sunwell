@@ -1,6 +1,7 @@
 import LineBreaker from "linebreak";
 import CardDef from "./CardDef";
 import RaceBanner from "./Components/RaceBanner";
+import RarityGem from "./Components/RarityGem";
 import {CardClass, CardSet, CardType, MultiClassGroup, Rarity} from "./Enums";
 import {
 	contextBoundingBox,
@@ -41,6 +42,7 @@ export default abstract class Card {
 	public opposing: boolean;
 	public costTextCoords: IPoint;
 	public raceBanner: RaceBanner;
+	public rarityGem: RarityGem;
 	public abstract baseCardFrameAsset: string;
 	public abstract baseCardFrameCoords: ICoords;
 	public abstract baseRarityGemAsset: string;
@@ -72,7 +74,6 @@ export default abstract class Card {
 	private cacheKey: number;
 	private cardFrameAsset: string;
 	private costGemAsset: string;
-	private rarityGemAsset: string;
 	private multiBannerAsset: string;
 	private watermarkAsset: string;
 	private propsJson: string;
@@ -101,8 +102,9 @@ export default abstract class Card {
 		this.texture = props.texture;
 		this.propsJson = JSON.stringify(props);
 
+		this.rarityGem = new RarityGem(sunwell, this);
+
 		this.cardFrameAsset = this.getCardFrameAsset();
-		this.rarityGemAsset = this.getRarityGemAsset();
 		this.watermarkAsset = this.getWatermarkAsset();
 
 		if (this.cardDef.type === CardType.HERO_POWER) {
@@ -135,7 +137,6 @@ export default abstract class Card {
 			this.costGemAsset,
 			this.nameBannerAsset,
 			this.multiBannerAsset,
-			this.rarityGemAsset,
 			this.watermarkAsset,
 		];
 		const assetsToLoad: string[] = [];
@@ -157,9 +158,13 @@ export default abstract class Card {
 		if (this.cardDef.elite && this.dragonAsset) {
 			assetsToLoad.push(this.dragonAsset);
 		}
+
 		if (this.raceBanner) {
-			assetsToLoad.push(this.raceBanner.asset);
+			assetsToLoad.push(...this.raceBanner.assets());
 		}
+
+		assetsToLoad.push(...this.rarityGem.assets());
+
 		if (this.cardDef.silenced) {
 			assetsToLoad.push("silence-x");
 		}
@@ -228,9 +233,7 @@ export default abstract class Card {
 				this.drawCostGem(context, ratio);
 			}
 
-			if (this.rarityGemAsset) {
-				this.drawRarityGem(context, ratio);
-			}
+			this.rarityGem.render(context, ratio);
 
 			if (this.nameBannerAsset) {
 				this.drawNameBanner(context, ratio);
@@ -743,12 +746,6 @@ export default abstract class Card {
 			dy: pt.y,
 			ratio: ratio,
 		});
-	}
-
-	public drawRarityGem(context: CanvasRenderingContext2D, ratio: number): void {
-		const coords = this.rarityGemCoords;
-		coords.ratio = ratio;
-		this.sunwell.drawImage(context, this.rarityGemAsset, coords);
 	}
 
 	public drawStats(context: CanvasRenderingContext2D, ratio: number): void {

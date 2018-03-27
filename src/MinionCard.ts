@@ -1,5 +1,6 @@
 import Card from "./Card";
 import RaceBanner from "./Components/RaceBanner";
+import {ICoords} from "./interfaces";
 import Sunwell from "./Sunwell";
 
 export default class MinionCard extends Card {
@@ -64,7 +65,7 @@ export default class MinionCard extends Card {
 		dHeight: 113,
 	};
 	public raceTextCoords = {dx: 337, dy: 829};
-	public raceBannerCoords = {
+	public raceBannerCoords: ICoords = {
 		dx: 129,
 		dy: 791,
 		dWidth: 408,
@@ -79,7 +80,7 @@ export default class MinionCard extends Card {
 		maxWidth: 450,
 		curve: [{x: 0, y: 88}, {x: 98, y: 112}, {x: 294, y: 13}, {x: 460, y: 80}],
 	};
-	public artCoords = {
+	public artCoords: ICoords = {
 		sWidth: 461,
 		sHeight: 461,
 		dx: 105,
@@ -113,14 +114,7 @@ export default class MinionCard extends Card {
 	constructor(sunwell: Sunwell, props) {
 		super(sunwell, props);
 		if (this.raceText) {
-			this.raceBanner = new RaceBanner(
-				sunwell,
-				this.raceBannerAsset,
-				this.raceBannerCoords,
-				this.raceText,
-				this.titleFont,
-				this.raceTextCoords
-			);
+			this.raceBanner = new RaceBanner(sunwell, this);
 		}
 	}
 
