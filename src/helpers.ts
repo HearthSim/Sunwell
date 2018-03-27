@@ -1,4 +1,5 @@
 import {CardClass, CardSet, CardType, Race, Rarity} from "./Enums";
+import {IPoint} from "./interfaces";
 
 const RaceNames = {};
 RaceNames[Race.MURLOC] = {enUS: "Murloc"};
@@ -9,12 +10,6 @@ RaceNames[Race.DEMON] = {enUS: "Demon"};
 RaceNames[Race.PIRATE] = {enUS: "Pirate"};
 RaceNames[Race.DRAGON] = {enUS: "Dragon"};
 RaceNames[Race.TOTEM] = {enUS: "Totem"};
-
-export interface IPoint {
-	x: number;
-	y: number;
-	r?: number;
-}
 
 export function cleanEnum(val: string | number, e) {
 	if (typeof val === "string") {

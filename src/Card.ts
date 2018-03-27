@@ -11,8 +11,8 @@ import {
 	getPointOnCurve,
 	getRaceText,
 	getRarityGem,
-	IPoint,
 } from "./helpers";
+import {ICoords, IPoint} from "./interfaces";
 import Sunwell from "./Sunwell";
 
 const CTRL_BOLD_START = "\x11";
@@ -22,18 +22,6 @@ const CTRL_ITALIC_END = "\x14";
 
 const ReferenceWidth = 670;
 const ReferenceHeight = 1000;
-
-interface ICoords {
-	sx?: number;
-	sy?: number;
-	sWidth?: number;
-	sHeight?: number;
-	dx: number;
-	dy: number;
-	dWidth?: number;
-	dHeight?: number;
-	ratio?: number;
-}
 
 export default abstract class Card {
 	public cardDef: CardDef;
