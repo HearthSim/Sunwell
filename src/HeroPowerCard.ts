@@ -77,4 +77,8 @@ export default class HeroPowerCard extends Card {
 	public getRarityGemAsset(): string {
 		return "";
 	}
+
+	public getWatermarkAsset(): string {
+		return "";
+	}
 }

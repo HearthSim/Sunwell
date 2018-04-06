@@ -3,6 +3,7 @@ import CardDef from "./CardDef";
 import CardFrame from "./Components/CardFrame";
 import RaceBanner from "./Components/RaceBanner";
 import RarityGem from "./Components/RarityGem";
+import Watermark from "./Components/Watermark";
 import {CardClass, CardSet, CardType, MultiClassGroup, Rarity} from "./Enums";
 import {
 	contextBoundingBox,
@@ -45,6 +46,7 @@ export default abstract class Card {
 	public cardFrame: CardFrame;
 	public raceBanner: RaceBanner;
 	public rarityGem: RarityGem;
+	public watermark: Watermark;
 	public abstract baseCardFrameAsset: string;
 	public abstract baseCardFrameCoords: ICoords;
 	public abstract baseRarityGemAsset: string;
@@ -76,7 +78,6 @@ export default abstract class Card {
 	private cacheKey: number;
 	private costGemAsset: string;
 	private multiBannerAsset: string;
-	private watermarkAsset: string;
 	private propsJson: string;
 	private sunwell: Sunwell;
 
@@ -105,8 +106,7 @@ export default abstract class Card {
 
 		this.cardFrame = new CardFrame(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
-
-		this.watermarkAsset = this.getWatermarkAsset();
+		this.watermark = new Watermark(sunwell, this);
 
 		if (this.cardDef.type === CardType.HERO_POWER) {
 			this.costGemAsset = null;
@@ -137,7 +137,6 @@ export default abstract class Card {
 			this.costGemAsset,
 			this.nameBannerAsset,
 			this.multiBannerAsset,
-			this.watermarkAsset,
 		];
 		const assetsToLoad: string[] = [];
 		for (const asset of assetsToCheck) {
@@ -165,6 +164,7 @@ export default abstract class Card {
 
 		assetsToLoad.push(...this.cardFrame.assets());
 		assetsToLoad.push(...this.rarityGem.assets());
+		assetsToLoad.push(...this.watermark.assets());
 
 		if (this.cardDef.silenced) {
 			assetsToLoad.push("silence-x");
@@ -253,9 +253,7 @@ export default abstract class Card {
 				this.sunwell.drawImage(context, this.dragonAsset, coords);
 			}
 
-			if (this.watermarkAsset) {
-				this.drawWatermark(context, ratio);
-			}
+			this.watermark.render(context, ratio);
 
 			if (this.sunwell.options.cacheSkeleton) {
 				const cacheImage = new this.sunwell.platform.Image();
@@ -818,33 +816,6 @@ export default abstract class Card {
 		const coords = this.cardFoundationCoords;
 		coords.ratio = ratio;
 		this.sunwell.drawImage(context, this.cardFoundationAsset, coords);
-	}
-
-	public drawWatermark(context: CanvasRenderingContext2D, ratio: number): void {
-		const coords = this.getWatermarkCoords();
-		coords.ratio = ratio;
-
-		if (this.cardDef.type === CardType.HERO_POWER) {
-			return;
-		} else if (
-			this.premium ||
-			this.cardDef.type === CardType.MINION ||
-			this.cardDef.type === CardType.HERO
-		) {
-			context.globalCompositeOperation = "multiply";
-			context.globalAlpha = 0.6;
-		} else if (this.cardDef.type === CardType.SPELL) {
-			context.globalCompositeOperation = "multiply";
-			context.globalAlpha = 0.7;
-		} else if (this.cardDef.type === CardType.WEAPON) {
-			context.globalCompositeOperation = "lighten";
-			context.globalAlpha = 0.1;
-		}
-
-		this.sunwell.drawImage(context, this.watermarkAsset, coords);
-
-		context.globalCompositeOperation = "source-over";
-		context.globalAlpha = 1;
 	}
 
 	public getCardFrameAsset(): string {
