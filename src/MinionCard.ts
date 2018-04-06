@@ -46,7 +46,7 @@ export default class MinionCard extends Card {
 		dWidth: 154,
 		dHeight: 173,
 	};
-	public attackTextCoords = {x: 125, y: 824};
+	public attackTextCoords = {dx: 125, dy: 824};
 	public healthGemCoords = {
 		sWidth: 109,
 		sHeight: 164,

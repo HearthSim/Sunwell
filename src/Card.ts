@@ -1,5 +1,6 @@
 import LineBreaker from "linebreak";
 import CardDef from "./CardDef";
+import AttackGem from "./Components/AttackGem";
 import CardFrame from "./Components/CardFrame";
 import CostGem from "./Components/CostGem";
 import RaceBanner from "./Components/RaceBanner";
@@ -44,6 +45,7 @@ export default abstract class Card {
 	public key: number;
 	public opposing: boolean;
 	public costTextCoords: ICoords = {dx: 115, dy: 174};
+	public attackGem: AttackGem;
 	public cardFrame: CardFrame;
 	public costGem: CostGem;
 	public raceBanner: RaceBanner;
@@ -59,7 +61,7 @@ export default abstract class Card {
 	public abstract dragonCoords: ICoords;
 	public abstract attackGemAsset: string;
 	public abstract attackGemCoords: ICoords;
-	public abstract attackTextCoords: IPoint;
+	public abstract attackTextCoords: ICoords;
 	public abstract healthTextCoords: IPoint;
 	public abstract healthGemAsset: string;
 	public abstract healthGemCoords: ICoords;
@@ -105,6 +107,7 @@ export default abstract class Card {
 		this.propsJson = JSON.stringify(props);
 
 		this.cardFrame = new CardFrame(sunwell, this);
+		this.attackGem = new AttackGem(sunwell, this);
 		this.costGem = new CostGem(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
 		this.watermark = new Watermark(sunwell, this);
@@ -162,9 +165,6 @@ export default abstract class Card {
 		}
 
 		if (!this.cardDef.hideStats) {
-			if (this.attackGemAsset) {
-				assetsToLoad.push(this.attackGemAsset);
-			}
 			if (this.healthGemAsset) {
 				assetsToLoad.push(this.healthGemAsset);
 			}
@@ -178,6 +178,7 @@ export default abstract class Card {
 			assetsToLoad.push(...this.raceBanner.assets());
 		}
 
+		assetsToLoad.push(...this.attackGem.assets());
 		assetsToLoad.push(...this.cardFrame.assets());
 		assetsToLoad.push(...this.costGem.assets());
 		assetsToLoad.push(...this.rarityGem.assets());
@@ -247,6 +248,7 @@ export default abstract class Card {
 				});
 			}
 
+			this.attackGem.render(context, ratio);
 			this.costGem.render(context, ratio);
 			this.rarityGem.render(context, ratio);
 
@@ -258,7 +260,6 @@ export default abstract class Card {
 				this.raceBanner.render(context, ratio);
 			}
 
-			this.drawAttackTexture(context, ratio);
 			this.drawHealthTexture(context, ratio);
 
 			if (this.cardDef.elite && this.dragonAsset) {
@@ -755,18 +756,6 @@ export default abstract class Card {
 			return;
 		}
 
-		if (this.attackTextCoords) {
-			this.drawNumber(
-				context,
-				this.attackTextCoords.x,
-				this.attackTextCoords.y,
-				ratio,
-				this.cardDef.attack,
-				statTextSize,
-				this.attackColor
-			);
-		}
-
 		if (this.healthTextCoords) {
 			this.drawNumber(
 				context,
@@ -787,15 +776,6 @@ export default abstract class Card {
 		const coords = this.healthGemCoords;
 		coords.ratio = ratio;
 		this.sunwell.drawImage(context, this.healthGemAsset, coords);
-	}
-
-	public drawAttackTexture(context: CanvasRenderingContext2D, ratio: number): void {
-		if (this.cardDef.hideStats || !this.attackGemAsset) {
-			return;
-		}
-		const coords = this.attackGemCoords;
-		coords.ratio = ratio;
-		this.sunwell.drawImage(context, this.attackGemAsset, coords);
 	}
 
 	public drawCardFoundationAsset(context: CanvasRenderingContext2D, ratio: number): void {
