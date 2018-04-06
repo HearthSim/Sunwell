@@ -397,8 +397,11 @@ export default abstract class Card {
 		let last = 0;
 		let bk;
 		while ((bk = breaker.nextBreak())) {
-			words.push(bodyText.slice(last, bk.position));
+			words.push(bodyText.slice(last, bk.position).replace("\n", ""));
 			last = bk.position;
+			if (bk.required) {
+				words.push("\n");
+			}
 		}
 
 		const bufferText = this.sunwell.getBuffer(bodyWidth, bodyHeight, true);
