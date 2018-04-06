@@ -38,7 +38,6 @@ export default abstract class Card {
 	public bodyText: string;
 	public raceText: string;
 	public language: string;
-	public titleFont: string;
 	public costColor: string;
 	public attackColor: string;
 	public healthColor: string;
@@ -96,7 +95,6 @@ export default abstract class Card {
 		this.costColor = getNumberStyle(props.costStyle);
 		this.attackColor = getNumberStyle(props.costStyle);
 		this.healthColor = getNumberStyle(props.healthStyle);
-		this.titleFont = sunwell.options.titleFont;
 		this.texture = props.texture;
 		this.propsJson = JSON.stringify(props);
 
@@ -627,7 +625,7 @@ export default abstract class Card {
 		let dimensions = [];
 		do {
 			fontSize -= 1;
-			textContext.font = fontSize + "px " + this.titleFont;
+			textContext.font = `${fontSize}px ${this.sunwell.options.titleFont}`;
 		} while (
 			(dimensions = getCharDimensions(name, textContext)).reduce((a, b) => a + b.width, 0) >
 				maxWidth &&

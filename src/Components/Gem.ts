@@ -4,7 +4,6 @@ import {ICoords} from "../interfaces";
 import Sunwell from "../Sunwell";
 
 export default class Gem {
-	public font: string;
 	public gemAsset: string;
 	public gemCoords: ICoords;
 	public showGem: boolean;
@@ -20,7 +19,6 @@ export default class Gem {
 	constructor(sunwell: Sunwell, parent: Card) {
 		this.sunwell = sunwell;
 		this.parent = parent;
-		this.font = parent.titleFont;
 		this.textSize = 124;
 	}
 
@@ -47,7 +45,7 @@ export default class Gem {
 		const bufferCtx = buffer.getContext("2d");
 		let tX = 10;
 
-		bufferCtx.font = `${this.textSize}px ${this.font}`;
+		bufferCtx.font = `${this.textSize}px ${this.sunwell.options.gemFont}`;
 		bufferCtx.lineCap = "round";
 		bufferCtx.lineJoin = "round";
 		bufferCtx.textAlign = "left";
