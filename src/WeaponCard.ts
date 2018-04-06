@@ -52,7 +52,7 @@ export default class WeaponCard extends Card {
 		dWidth: 126,
 		dHeight: 140,
 	};
-	public healthTextCoords = {x: 563, y: 819};
+	public healthTextCoords = {dx: 563, dy: 819};
 	public nameBannerCoords = {
 		sWidth: 514,
 		sHeight: 108,

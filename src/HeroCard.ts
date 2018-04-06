@@ -46,7 +46,7 @@ export default class HeroCard extends Card {
 		dWidth: 115,
 		dHeight: 135,
 	};
-	public healthTextCoords = {x: 554, y: 822};
+	public healthTextCoords = {dx: 554, dy: 822};
 	public nameBannerCoords = {
 		sWidth: 490,
 		sHeight: 122,
@@ -112,7 +112,7 @@ export default class HeroCard extends Card {
 				dWidth: 109,
 				dHeight: 164,
 			};
-			this.healthTextCoords = {x: 556, y: 825};
+			this.healthTextCoords = {dx: 556, dy: 825};
 		}
 	}
 

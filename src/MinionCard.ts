@@ -55,7 +55,7 @@ export default class MinionCard extends Card {
 		dWidth: 109,
 		dHeight: 164,
 	};
-	public healthTextCoords = {x: 556, y: 825};
+	public healthTextCoords = {dx: 556, dy: 825};
 	public nameBannerCoords = {
 		sWidth: 485,
 		sHeight: 113,

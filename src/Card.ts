@@ -3,6 +3,7 @@ import CardDef from "./CardDef";
 import AttackGem from "./Components/AttackGem";
 import CardFrame from "./Components/CardFrame";
 import CostGem from "./Components/CostGem";
+import HealthGem from "./Components/HealthGem";
 import RaceBanner from "./Components/RaceBanner";
 import RarityGem from "./Components/RarityGem";
 import Watermark from "./Components/Watermark";
@@ -48,6 +49,7 @@ export default abstract class Card {
 	public attackGem: AttackGem;
 	public cardFrame: CardFrame;
 	public costGem: CostGem;
+	public healthGem: HealthGem;
 	public raceBanner: RaceBanner;
 	public rarityGem: RarityGem;
 	public watermark: Watermark;
@@ -62,7 +64,7 @@ export default abstract class Card {
 	public abstract attackGemAsset: string;
 	public abstract attackGemCoords: ICoords;
 	public abstract attackTextCoords: ICoords;
-	public abstract healthTextCoords: IPoint;
+	public abstract healthTextCoords: ICoords;
 	public abstract healthGemAsset: string;
 	public abstract healthGemCoords: ICoords;
 	public abstract nameBannerCoords: ICoords;
@@ -109,6 +111,7 @@ export default abstract class Card {
 		this.cardFrame = new CardFrame(sunwell, this);
 		this.attackGem = new AttackGem(sunwell, this);
 		this.costGem = new CostGem(sunwell, this);
+		this.healthGem = new HealthGem(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
 		this.watermark = new Watermark(sunwell, this);
 
@@ -260,8 +263,6 @@ export default abstract class Card {
 				this.raceBanner.render(context, ratio);
 			}
 
-			this.drawHealthTexture(context, ratio);
-
 			if (this.cardDef.elite && this.dragonAsset) {
 				const coords = this.dragonCoords;
 				coords.ratio = ratio;
@@ -280,9 +281,6 @@ export default abstract class Card {
 		// <<<<<<<< Finished Skeleton drawing
 
 		this.drawName(context, ratio, this.cardDef.name);
-
-		this.drawStats(context, ratio);
-
 		this.drawBodyText(context, ratio, false, this.bodyText);
 
 		if (this.cardDef.silenced) {
@@ -747,35 +745,6 @@ export default abstract class Card {
 		);
 
 		this.sunwell.freeBuffer(buffer);
-	}
-
-	public drawStats(context: CanvasRenderingContext2D, ratio: number): void {
-		const statTextSize = 124;
-
-		if (this.cardDef.type === CardType.HERO_POWER) {
-			return;
-		}
-
-		if (this.healthTextCoords) {
-			this.drawNumber(
-				context,
-				this.healthTextCoords.x,
-				this.healthTextCoords.y,
-				ratio,
-				this.cardDef.health,
-				statTextSize,
-				this.healthColor
-			);
-		}
-	}
-
-	public drawHealthTexture(context: CanvasRenderingContext2D, ratio: number): void {
-		if (this.cardDef.hideStats || !this.healthGemAsset) {
-			return;
-		}
-		const coords = this.healthGemCoords;
-		coords.ratio = ratio;
-		this.sunwell.drawImage(context, this.healthGemAsset, coords);
 	}
 
 	public drawCardFoundationAsset(context: CanvasRenderingContext2D, ratio: number): void {
