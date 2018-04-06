@@ -1,6 +1,7 @@
 import LineBreaker from "linebreak";
 import CardDef from "./CardDef";
 import CardFrame from "./Components/CardFrame";
+import CostGem from "./Components/CostGem";
 import RaceBanner from "./Components/RaceBanner";
 import RarityGem from "./Components/RarityGem";
 import Watermark from "./Components/Watermark";
@@ -44,6 +45,7 @@ export default abstract class Card {
 	public opposing: boolean;
 	public costTextCoords: IPoint;
 	public cardFrame: CardFrame;
+	public costGem: CostGem;
 	public raceBanner: RaceBanner;
 	public rarityGem: RarityGem;
 	public watermark: Watermark;
@@ -105,16 +107,14 @@ export default abstract class Card {
 		this.propsJson = JSON.stringify(props);
 
 		this.cardFrame = new CardFrame(sunwell, this);
+		this.costGem = new CostGem(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
 		this.watermark = new Watermark(sunwell, this);
 
 		if (this.cardDef.type === CardType.HERO_POWER) {
 			this.costGemAsset = null;
-		} else if (this.cardDef.costsHealth) {
-			this.costGemAsset = "cost-health";
-		} else {
-			this.costGemAsset = "cost-mana";
 		}
+
 		if (this.cardDef.multiClassGroup) {
 			this.multiBannerAsset =
 				"multi-" + MultiClassGroup[this.cardDef.multiClassGroup].toLowerCase();
@@ -122,6 +122,24 @@ export default abstract class Card {
 	}
 
 	public abstract getWatermarkCoords(): ICoords;
+
+	public getCostGemCoords(): ICoords {
+		if (this.cardDef.costsHealth) {
+			return {dx: 43, dy: 58};
+		} else {
+			return {dx: 47, dy: 105};
+		}
+	}
+
+	public getCostGemAsset(): string {
+		if (this.cardDef.hideStats) {
+			return "";
+		} else if (this.cardDef.costsHealth) {
+			return "cost-health";
+		} else {
+			return "cost-mana";
+		}
+	}
 
 	public initRender(width: number, target, callback?: (HTMLCanvasElement) => void): void {
 		this.width = width;
@@ -163,6 +181,7 @@ export default abstract class Card {
 		}
 
 		assetsToLoad.push(...this.cardFrame.assets());
+		assetsToLoad.push(...this.costGem.assets());
 		assetsToLoad.push(...this.rarityGem.assets());
 		assetsToLoad.push(...this.watermark.assets());
 
@@ -230,10 +249,7 @@ export default abstract class Card {
 				});
 			}
 
-			if (this.costGemAsset) {
-				this.drawCostGem(context, ratio);
-			}
-
+			this.costGem.render(context, ratio);
 			this.rarityGem.render(context, ratio);
 
 			if (this.nameBannerAsset) {
@@ -734,26 +750,9 @@ export default abstract class Card {
 		this.sunwell.freeBuffer(buffer);
 	}
 
-	public drawCostGem(context: CanvasRenderingContext2D, ratio: number): void {
-		const pt = {x: 47, y: 105};
-		if (this.cardDef.costsHealth) {
-			pt.x = 43;
-			pt.y = 58;
-		}
-		this.sunwell.drawImage(context, this.costGemAsset, {
-			dx: pt.x,
-			dy: pt.y,
-			ratio: ratio,
-		});
-	}
-
 	public drawStats(context: CanvasRenderingContext2D, ratio: number): void {
 		const costTextSize = 130;
 		const statTextSize = 124;
-
-		if (this.cardDef.hideStats) {
-			return;
-		}
 
 		this.drawNumber(
 			context,
