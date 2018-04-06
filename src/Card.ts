@@ -43,7 +43,7 @@ export default abstract class Card {
 	public width: number;
 	public key: number;
 	public opposing: boolean;
-	public costTextCoords: IPoint;
+	public costTextCoords: ICoords = {dx: 115, dy: 174};
 	public cardFrame: CardFrame;
 	public costGem: CostGem;
 	public raceBanner: RaceBanner;
@@ -92,8 +92,6 @@ export default abstract class Card {
 		this.cardDef = new CardDef(props);
 		this.language = props.language || "enUS";
 
-		// This only needs to change for HeroPower
-		this.costTextCoords = {x: 115, y: 174};
 		// Sets the player or opponent HeroPower texture
 		this.opposing = props.opposing || false;
 
@@ -751,18 +749,7 @@ export default abstract class Card {
 	}
 
 	public drawStats(context: CanvasRenderingContext2D, ratio: number): void {
-		const costTextSize = 130;
 		const statTextSize = 124;
-
-		this.drawNumber(
-			context,
-			this.costTextCoords.x,
-			this.costTextCoords.y,
-			ratio,
-			this.cardDef.cost,
-			costTextSize,
-			this.costColor
-		);
 
 		if (this.cardDef.type === CardType.HERO_POWER) {
 			return;

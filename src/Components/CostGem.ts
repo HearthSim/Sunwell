@@ -22,11 +22,19 @@ export default class CostGem {
 		const coords = this.parent.getCostGemCoords();
 		coords.ratio = ratio;
 		this.sunwell.drawImage(context, asset, coords);
-	}
 
-	public drawCostGem(context: CanvasRenderingContext2D, ratio: number): void {
-		const coords = this.parent.getCostGemCoords();
-		coords.ratio = ratio;
-		this.sunwell.drawImage(context, this.parent.getCostGemAsset(), coords);
+		const textCoords = this.parent.costTextCoords;
+		textCoords.ratio = ratio;
+		const textSize = 130;
+
+		this.parent.drawNumber(
+			context,
+			textCoords.dx,
+			textCoords.dy,
+			textCoords.ratio,
+			this.parent.cardDef.cost,
+			textSize,
+			this.parent.costColor
+		);
 	}
 }

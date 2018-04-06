@@ -22,7 +22,7 @@ export default class HeroPowerCard extends Card {
 		dWidth: 564,
 		dHeight: 841,
 	};
-	public costTextCoords = {x: 338, y: 124};
+	public costTextCoords = {dx: 338, dy: 124};
 	public baseRarityGemAsset = null;
 	public nameBannerAsset = null;
 	public dragonAsset = null;
