@@ -9,7 +9,7 @@ export default class AttackGem extends Gem {
 		this.showText = !parent.cardDef.hideStats;
 		this.gemAsset = parent.getAttackGemAsset();
 		this.gemCoords = parent.getAttackGemCoords();
-		this.text = parent.cardDef.attack;
+		this.text = parent.cardDef.attack.toString();
 		this.textColor = parent.attackColor;
 		this.textCoords = parent.getAttackTextCoords();
 	}

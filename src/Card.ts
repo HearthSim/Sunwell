@@ -391,13 +391,13 @@ export default abstract class Card {
 		}
 
 		let spellDmg: RegExpExecArray;
-		const spellDamageRegex = /\$(\d)/;
+		const spellDamageRegex = /\$(\d+)/;
 		while ((spellDmg = spellDamageRegex.exec(pBodyText)) !== null) {
 			pBodyText = pBodyText.replace(spellDmg[0], spellDmg[1]);
 		}
 
 		let spellHeal: RegExpExecArray;
-		const spellHealRegex = /#(\d)/;
+		const spellHealRegex = /#(\d+)/;
 		while ((spellHeal = spellHealRegex.exec(pBodyText)) !== null) {
 			pBodyText = pBodyText.replace(spellHeal[0], spellHeal[1]);
 		}
@@ -715,63 +715,6 @@ export default abstract class Card {
 		const coords = this.nameBannerCoords;
 		coords.ratio = ratio;
 		this.sunwell.drawImage(context, this.nameBannerAsset, coords);
-	}
-
-	/**
-	 * Renders a given number to the defined position.
-	 * The x/y position should be the position on an unscaled card.
-	 */
-	public drawNumber(
-		context: CanvasRenderingContext2D,
-		x: number,
-		y: number,
-		s: number,
-		num: number,
-		size: number,
-		color: string
-	): void {
-		const buffer = this.sunwell.getBuffer(256, 256, true);
-		const bufferCtx = buffer.getContext("2d");
-		const n = num.toString().split("");
-		let tX = 10;
-
-		bufferCtx.font = size + "px " + this.titleFont;
-		bufferCtx.lineCap = "round";
-		bufferCtx.lineJoin = "round";
-		bufferCtx.textAlign = "left";
-		bufferCtx.textBaseline = "hanging";
-
-		for (const cnum of n) {
-			bufferCtx.lineWidth = 10;
-			bufferCtx.strokeStyle = "black";
-			bufferCtx.fillStyle = "black";
-			bufferCtx.fillText(cnum, tX, 10);
-			bufferCtx.strokeText(cnum, tX, 10);
-
-			bufferCtx.fillStyle = color;
-			bufferCtx.strokeStyle = color;
-			bufferCtx.lineWidth = 2.5;
-			bufferCtx.fillText(cnum, tX, 10);
-			// context.strokeText(cnum, x, y);
-
-			tX += bufferCtx.measureText(cnum).width;
-		}
-
-		const b = contextBoundingBox(bufferCtx);
-
-		context.drawImage(
-			buffer,
-			b.x,
-			b.y,
-			b.w,
-			b.h,
-			(x - b.w / 2) * s,
-			(y - b.h / 2) * s,
-			b.w * s,
-			b.h * s
-		);
-
-		this.sunwell.freeBuffer(buffer);
 	}
 
 	public drawCardFoundationAsset(context: CanvasRenderingContext2D, ratio: number): void {

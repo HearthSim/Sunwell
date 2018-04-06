@@ -9,7 +9,7 @@ export default class HealthGem extends Gem {
 		this.showText = !parent.cardDef.hideStats;
 		this.gemAsset = parent.getHealthGemAsset();
 		this.gemCoords = parent.getHealthGemCoords();
-		this.text = parent.cardDef.health;
+		this.text = parent.cardDef.health.toString();
 		this.textColor = parent.healthColor;
 		this.textCoords = parent.getHealthTextCoords();
 	}

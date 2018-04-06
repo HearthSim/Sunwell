@@ -9,7 +9,7 @@ export default class CostGem extends Gem {
 		this.showText = !parent.cardDef.hideStats;
 		this.gemAsset = parent.getCostGemAsset();
 		this.gemCoords = parent.getCostGemCoords();
-		this.text = parent.cardDef.cost;
+		this.text = parent.cardDef.cost.toString();
 		this.textColor = parent.costColor;
 		this.textCoords = parent.getCostTextCoords();
 		this.textSize = 130;
