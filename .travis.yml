@@ -30,6 +30,7 @@ jobs:
         - yarn --pure-lockfile
 
       script:
+        - yarn run lint
         - yarn run build
         - NODE_ENV=production yarn run build
         - cp -r assets/ dist/

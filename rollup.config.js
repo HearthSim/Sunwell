@@ -10,9 +10,7 @@ const ExternalModulesList = [].concat(
 	Object.keys(require("./package.json").dependencies)
 );
 
-const PLATFORM = ["web", "node"].includes(process.env.PLATFORM)
-	? process.env.PLATFORM
-	: "node";
+const PLATFORM = ["web", "node"].includes(process.env.PLATFORM) ? process.env.PLATFORM : "node";
 const PRODUCTION = process.env.NODE_ENV === "production";
 export default {
 	input: "src/Sunwell.ts",

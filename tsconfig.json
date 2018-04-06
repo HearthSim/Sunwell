@@ -11,7 +11,5 @@
 		"alwaysStrict": true,
 		"noUnusedLocals": true
 	},
-	"include": [
-		"./src/**/*"
-	]
+	"include": ["./src/**/*"]
 }

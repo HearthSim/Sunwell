@@ -1,61 +1,60 @@
 {
-  "name": "sunwell",
-  "version": "0.3.0",
-  "description": "Canvas-based high quality Hearthstone card renderer",
-  "keywords": [
-    "hearthstone"
-  ],
-  "homepage": "https://github.com/HearthSim/Sunwell#readme",
-  "bugs": {
-    "url": "https://github.com/HearthSim/Sunwell/issues"
-  },
-  "license": "MIT",
-  "author": "Jerome Leclanche <jerome@leclan.ch>",
-  "contributors": [
-    "Benedict Etzel <benedict@hearthsim.net>"
-  ],
-  "main": "dist/sunwell.node.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/HearthSim/Sunwell.git"
-  },
-  "scripts": {
-    "prepublishOnly": "yarn build",
-    "build": "rollup -c && PLATFORM=web rollup -c",
-    "format": "prettier --write \"{src/**/*.ts,*.js}\"",
-    "qa": "tslint src/*.ts src/**/*.ts",
-    "dev": "tsc --watch"
-  },
-  "devDependencies": {
-    "@types/node": "^8.0.13",
-    "prettier": "^1.9.1",
-    "request": "^2.81.0",
-    "rollup": "^0.50.0",
-    "rollup-plugin-cleanup": "^1.0.1",
-    "rollup-plugin-commonjs": "^8.0.2",
-    "rollup-plugin-jscc": "^0.3.3",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-typescript": "^0.8.1",
-    "rollup-plugin-uglify": "^2.0.1",
-    "ts-loader": "^2.0.1",
-    "tslint": "^5.5.0",
-    "typescript": "^2.4.1",
-    "webpack": "^3.2.0",
-    "webpack-node-externals": "^1.6.0"
-  },
-  "dependencies": {
-    "argparse": "^1.0.9",
-    "canvas": "^2.0.0-alpha.12",
-    "linebreak": "^0.3.0",
-    "mkdirp": "^0.5.1",
-    "promise": "^8.0.1"
-  },
-  "prettier": {
-    "printWidth": 100,
-    "useTabs": true,
-    "tabWidth": 4,
-    "bracketSpacing": false,
-    "trailingComma": "es5"
-  }
+	"name": "sunwell",
+	"version": "0.3.0",
+	"description": "Canvas-based high quality Hearthstone card renderer",
+	"keywords": ["hearthstone"],
+	"homepage": "https://github.com/HearthSim/Sunwell#readme",
+	"bugs": {
+		"url": "https://github.com/HearthSim/Sunwell/issues"
+	},
+	"license": "MIT",
+	"author": "Jerome Leclanche <jerome@leclan.ch>",
+	"contributors": ["Benedict Etzel <benedict@hearthsim.net>"],
+	"main": "dist/sunwell.node.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/HearthSim/Sunwell.git"
+	},
+	"scripts": {
+		"prepublishOnly": "yarn build",
+		"build": "rollup -c && PLATFORM=web rollup -c",
+		"format": "yarn format:prettier",
+		"format:prettier": "prettier --write *.{js,json} src/**/*.{ts,tsx,js}",
+		"lint": "yarn lint:prettier",
+		"lint:prettier": "prettier -l *.{js,json} src/**/*.{ts,tsx,js}",
+		"qa": "tslint src/*.ts src/**/*.ts",
+		"dev": "tsc --watch"
+	},
+	"devDependencies": {
+		"@types/node": "^8.0.13",
+		"prettier": "^1.9.1",
+		"request": "^2.81.0",
+		"rollup": "^0.50.0",
+		"rollup-plugin-cleanup": "^1.0.1",
+		"rollup-plugin-commonjs": "^8.0.2",
+		"rollup-plugin-jscc": "^0.3.3",
+		"rollup-plugin-node-resolve": "^3.0.0",
+		"rollup-plugin-replace": "^2.0.0",
+		"rollup-plugin-typescript": "^0.8.1",
+		"rollup-plugin-uglify": "^2.0.1",
+		"ts-loader": "^2.0.1",
+		"tslint": "^5.5.0",
+		"typescript": "^2.4.1",
+		"webpack": "^3.2.0",
+		"webpack-node-externals": "^1.6.0"
+	},
+	"dependencies": {
+		"argparse": "^1.0.9",
+		"canvas": "^2.0.0-alpha.12",
+		"linebreak": "^0.3.0",
+		"mkdirp": "^0.5.1",
+		"promise": "^8.0.1"
+	},
+	"prettier": {
+		"printWidth": 100,
+		"useTabs": true,
+		"tabWidth": 4,
+		"bracketSpacing": false,
+		"trailingComma": "es5"
+	}
 }
