@@ -3,6 +3,7 @@ import {cleanEnum} from "./helpers";
 
 export default class CardDef {
 	public attack: number;
+	public armor: number;
 	public cardClass: CardClass;
 	public cardSet: CardSet;
 	public collectionText: string;
@@ -22,6 +23,7 @@ export default class CardDef {
 
 	constructor(props: any) {
 		this.attack = props.attack || 0;
+		this.armor = props.armor || 0;
 		this.cardClass = cleanEnum(props.cardClass, CardClass) as CardClass;
 		this.cardSet = cleanEnum(props.set, CardSet) as CardSet;
 		this.cost = props.cost || 0;

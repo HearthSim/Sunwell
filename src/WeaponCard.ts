@@ -33,17 +33,6 @@ export default class WeaponCard extends Card {
 		sWidth: 420,
 		sHeight: 247,
 	};
-	public attackGemAsset = "attack-weapon";
-	public healthGemAsset = "durability";
-	public attackGemCoords = {
-		sWidth: 135,
-		sHeight: 133,
-		dx: 65,
-		dy: 753,
-		dWidth: 135,
-		dHeight: 133,
-	};
-	public attackTextCoords = {dx: 136, dy: 820};
 	public healthGemCoords = {
 		sWidth: 126,
 		sHeight: 140,
@@ -52,7 +41,6 @@ export default class WeaponCard extends Card {
 		dWidth: 126,
 		dHeight: 140,
 	};
-	public healthTextCoords = {dx: 563, dy: 819};
 	public nameBannerCoords = {
 		sWidth: 514,
 		sHeight: 108,
@@ -104,6 +92,33 @@ export default class WeaponCard extends Card {
 		{x: 242, y: 167},
 		{x: 287, y: 148},
 	];
+
+	public getAttackGemAsset() {
+		return "attack-weapon";
+	}
+
+	public getAttackGemCoords() {
+		return {
+			sWidth: 135,
+			sHeight: 133,
+			dx: 65,
+			dy: 753,
+			dWidth: 135,
+			dHeight: 133,
+		};
+	}
+
+	public getAttackTextCoords() {
+		return {dx: 136, dy: 820};
+	}
+
+	public getHealthGemAsset() {
+		return "durability";
+	}
+
+	public getHealthTextCoords() {
+		return {dx: 563, dy: 819};
+	}
 
 	public getWatermarkCoords() {
 		return {

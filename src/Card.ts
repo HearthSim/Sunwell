@@ -45,7 +45,6 @@ export default abstract class Card {
 	public width: number;
 	public key: number;
 	public opposing: boolean;
-	public costTextCoords: ICoords = {dx: 115, dy: 174};
 	public attackGem: AttackGem;
 	public cardFrame: CardFrame;
 	public costGem: CostGem;
@@ -61,12 +60,6 @@ export default abstract class Card {
 	public abstract nameBannerAsset: string;
 	public abstract dragonAsset: string;
 	public abstract dragonCoords: ICoords;
-	public abstract attackGemAsset: string;
-	public abstract attackGemCoords: ICoords;
-	public abstract attackTextCoords: ICoords;
-	public abstract healthTextCoords: ICoords;
-	public abstract healthGemAsset: string;
-	public abstract healthGemCoords: ICoords;
 	public abstract nameBannerCoords: ICoords;
 	public abstract bodyTextCoords: ICoords;
 	public abstract nameTextCurve: {
@@ -82,7 +75,6 @@ export default abstract class Card {
 
 	private callback: (HTMLCanvasElement) => void;
 	private cacheKey: number;
-	private costGemAsset: string;
 	private multiBannerAsset: string;
 	private propsJson: string;
 	private sunwell: Sunwell;
@@ -115,10 +107,6 @@ export default abstract class Card {
 		this.rarityGem = new RarityGem(sunwell, this);
 		this.watermark = new Watermark(sunwell, this);
 
-		if (this.cardDef.type === CardType.HERO_POWER) {
-			this.costGemAsset = null;
-		}
-
 		if (this.cardDef.multiClassGroup) {
 			this.multiBannerAsset =
 				"multi-" + MultiClassGroup[this.cardDef.multiClassGroup].toLowerCase();
@@ -127,12 +115,28 @@ export default abstract class Card {
 
 	public abstract getWatermarkCoords(): ICoords;
 
+	public getAttackGemAsset(): string {
+		return "";
+	}
+
+	public getAttackGemCoords(): ICoords {
+		return null;
+	}
+
+	public getAttackTextCoords(): ICoords {
+		return null;
+	}
+
 	public getCostGemCoords(): ICoords {
 		if (this.cardDef.costsHealth) {
 			return {dx: 43, dy: 58};
 		} else {
 			return {dx: 47, dy: 105};
 		}
+	}
+
+	public getCostTextCoords(): ICoords {
+		return {dx: 115, dy: 174};
 	}
 
 	public getCostGemAsset(): string {
@@ -143,6 +147,18 @@ export default abstract class Card {
 		} else {
 			return "cost-mana";
 		}
+	}
+
+	public getHealthGemAsset(): string {
+		return "";
+	}
+
+	public getHealthGemCoords(): ICoords {
+		return null;
+	}
+
+	public getHealthTextCoords(): ICoords {
+		return null;
 	}
 
 	public initRender(width: number, target, callback?: (HTMLCanvasElement) => void): void {
@@ -156,7 +172,6 @@ export default abstract class Card {
 	public getAssetsToLoad(): string[] {
 		const assetsToCheck = [
 			this.cardFoundationAsset,
-			this.costGemAsset,
 			this.nameBannerAsset,
 			this.multiBannerAsset,
 		];
@@ -164,12 +179,6 @@ export default abstract class Card {
 		for (const asset of assetsToCheck) {
 			if (asset) {
 				assetsToLoad.push(asset);
-			}
-		}
-
-		if (!this.cardDef.hideStats) {
-			if (this.healthGemAsset) {
-				assetsToLoad.push(this.healthGemAsset);
 			}
 		}
 
@@ -184,6 +193,7 @@ export default abstract class Card {
 		assetsToLoad.push(...this.attackGem.assets());
 		assetsToLoad.push(...this.cardFrame.assets());
 		assetsToLoad.push(...this.costGem.assets());
+		assetsToLoad.push(...this.healthGem.assets());
 		assetsToLoad.push(...this.rarityGem.assets());
 		assetsToLoad.push(...this.watermark.assets());
 
@@ -253,6 +263,7 @@ export default abstract class Card {
 
 			this.attackGem.render(context, ratio);
 			this.costGem.render(context, ratio);
+			this.healthGem.render(context, ratio);
 			this.rarityGem.render(context, ratio);
 
 			if (this.nameBannerAsset) {

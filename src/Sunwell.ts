@@ -173,6 +173,9 @@ export default class Sunwell {
 		}
 
 		for (const asset of card.getAssetsToLoad()) {
+			if (!asset) {
+				continue;
+			}
 			const path = this.getAssetPath(asset);
 			if (!this.assets[path] || !this.assets[path].complete) {
 				texturesToLoad.push(path);

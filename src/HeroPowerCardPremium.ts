@@ -11,5 +11,5 @@ export default class HeroPowerCardPremium extends HeroPowerCard {
 		sWidth: 564,
 		sHeight: 850,
 	};
-	public costTextCoords = {x: 338, y: 130};
+	public costTextCoords = {dx: 338, dy: 130};
 }

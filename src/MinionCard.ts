@@ -36,34 +36,6 @@ export default class MinionCard extends Card {
 		dWidth: 436,
 		dHeight: 325,
 	};
-	public attackGemAsset = "attack-minion";
-	public healthGemAsset = "health";
-	public attackGemCoords = {
-		sWidth: 154,
-		sHeight: 173,
-		dx: 36,
-		dy: 721,
-		dWidth: 154,
-		dHeight: 173,
-	};
-	public attackTextCoords = {dx: 125, dy: 824};
-	public healthGemCoords = {
-		sWidth: 109,
-		sHeight: 164,
-		dx: 504,
-		dy: 728,
-		dWidth: 109,
-		dHeight: 164,
-	};
-	public healthTextCoords = {dx: 556, dy: 825};
-	public nameBannerCoords = {
-		sWidth: 485,
-		sHeight: 113,
-		dx: 96,
-		dy: 469,
-		dWidth: 485,
-		dHeight: 113,
-	};
 	public raceTextCoords = {dx: 337, dy: 829};
 	public raceBannerCoords: ICoords = {
 		dx: 129,
@@ -75,6 +47,14 @@ export default class MinionCard extends Card {
 	};
 	public raceBannerAsset = "race-banner";
 	public rarityGemCoords = {dx: 263, dy: 532};
+	public nameBannerCoords = {
+		sWidth: 485,
+		sHeight: 113,
+		dx: 96,
+		dy: 469,
+		dWidth: 485,
+		dHeight: 113,
+	};
 	public nameTextCurve = {
 		pathMiddle: 0.55,
 		maxWidth: 450,
@@ -116,6 +96,44 @@ export default class MinionCard extends Card {
 		if (this.raceText) {
 			this.raceBanner = new RaceBanner(sunwell, this);
 		}
+	}
+
+	public getAttackGemCoords() {
+		return {
+			sWidth: 154,
+			sHeight: 173,
+			dx: 36,
+			dy: 721,
+			dWidth: 154,
+			dHeight: 173,
+		};
+	}
+
+	public getAttackTextCoords() {
+		return {dx: 125, dy: 824};
+	}
+
+	public getHealthGemCoords() {
+		return {
+			sWidth: 109,
+			sHeight: 164,
+			dx: 504,
+			dy: 728,
+			dWidth: 109,
+			dHeight: 164,
+		};
+	}
+
+	public getHealthTextCoords() {
+		return {dx: 556, dy: 825};
+	}
+
+	public getAttackGemAsset() {
+		return "attack-minion";
+	}
+
+	public getHealthGemAsset() {
+		return "health";
 	}
 
 	public getWatermarkCoords() {

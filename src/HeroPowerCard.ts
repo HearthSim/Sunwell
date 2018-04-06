@@ -22,17 +22,10 @@ export default class HeroPowerCard extends Card {
 		dWidth: 564,
 		dHeight: 841,
 	};
-	public costTextCoords = {dx: 338, dy: 124};
 	public baseRarityGemAsset = null;
 	public nameBannerAsset = null;
 	public dragonAsset = null;
 	public dragonCoords = null;
-	public attackGemAsset = null;
-	public healthGemAsset = null;
-	public attackGemCoords = null;
-	public attackTextCoords = null;
-	public healthGemCoords = null;
-	public healthTextCoords = null;
 	public nameBannerCoords = null;
 	public rarityGemCoords = null;
 	public nameTextCurve = {
@@ -72,6 +65,14 @@ export default class HeroPowerCard extends Card {
 
 	public getCardFrameAsset(): string {
 		return this.baseCardFrameAsset + (this.opposing ? "opponent" : "player");
+	}
+
+	public getCostGemAsset(): string {
+		return "";
+	}
+
+	public getCostTextCoords() {
+		return {dx: 338, dy: 124};
 	}
 
 	public getRarityGemAsset(): string {

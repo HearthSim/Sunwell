@@ -1,5 +1,4 @@
 import Card from "./Card";
-import Sunwell from "./Sunwell";
 
 export default class HeroCard extends Card {
 	public premium = false;
@@ -34,19 +33,6 @@ export default class HeroCard extends Card {
 		dWidth: 444,
 		dHeight: 298,
 	};
-	public attackGemAsset = null;
-	public healthGemAsset = "armor";
-	public attackGemCoords = null;
-	public attackTextCoords = null;
-	public healthGemCoords = {
-		sWidth: 115,
-		sHeight: 135,
-		dx: 498,
-		dy: 752,
-		dWidth: 115,
-		dHeight: 135,
-	};
-	public healthTextCoords = {dx: 554, dy: 822};
 	public nameBannerCoords = {
 		sWidth: 490,
 		sHeight: 122,
@@ -100,11 +86,22 @@ export default class HeroCard extends Card {
 		{x: 291, y: 145},
 	];
 
-	constructor(sunwell: Sunwell, props) {
-		super(sunwell, props);
-		if (!props.armor) {
-			this.healthGemAsset = "health";
-			this.healthGemCoords = {
+	public getHealthGemAsset() {
+		return this.cardDef.armor ? "armor" : "health";
+	}
+
+	public getHealthGemCoords() {
+		if (this.cardDef.armor) {
+			return {
+				sWidth: 115,
+				sHeight: 135,
+				dx: 498,
+				dy: 752,
+				dWidth: 115,
+				dHeight: 135,
+			};
+		} else {
+			return {
 				sWidth: 109,
 				sHeight: 164,
 				dx: 504,
@@ -112,7 +109,14 @@ export default class HeroCard extends Card {
 				dWidth: 109,
 				dHeight: 164,
 			};
-			this.healthTextCoords = {dx: 556, dy: 825};
+		}
+	}
+
+	public getHealthTextCoords() {
+		if (this.cardDef.armor) {
+			return {dx: 554, dy: 822};
+		} else {
+			return {dx: 556, dy: 825};
 		}
 	}
 
