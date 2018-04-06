@@ -344,14 +344,12 @@ export default abstract class Card {
 			return;
 		}
 
-		const pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g;
 		let xPos = 0;
 		let yPos = 0;
 		let italic = 0;
 		let bold = 0;
 		let lineCount = 0;
 		let justLineBreak: boolean;
-		let plurals: RegExpExecArray;
 		let pBodyText: string;
 		// size of the description text box
 		const bodyWidth = this.bodyTextCoords.dWidth;
@@ -383,12 +381,27 @@ export default abstract class Card {
 			.replace("<i>", CTRL_ITALIC_START)
 			.replace("</i>", CTRL_ITALIC_END);
 
+		const pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g;
+		let plurals: RegExpExecArray;
 		while ((plurals = pluralRegex.exec(bodyText)) !== null) {
 			pBodyText = pBodyText.replace(
 				plurals[0],
 				plurals[1] + plurals[2] + (parseInt(plurals[1], 10) === 1 ? plurals[3] : plurals[4])
 			);
 		}
+
+		let spellDmg: RegExpExecArray;
+		const spellDamageRegex = /\$(\d)/;
+		while ((spellDmg = spellDamageRegex.exec(pBodyText)) !== null) {
+			pBodyText = pBodyText.replace(spellDmg[0], spellDmg[1]);
+		}
+
+		let spellHeal: RegExpExecArray;
+		const spellHealRegex = /#(\d)/;
+		while ((spellHeal = spellHealRegex.exec(pBodyText)) !== null) {
+			pBodyText = pBodyText.replace(spellHeal[0], spellHeal[1]);
+		}
+
 		bodyText = pBodyText;
 		this.sunwell.log("Rendering body", bodyText);
 
