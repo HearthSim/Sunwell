@@ -33,14 +33,6 @@ export default class WeaponCard extends Card {
 		sWidth: 420,
 		sHeight: 247,
 	};
-	public healthGemCoords = {
-		sWidth: 126,
-		sHeight: 140,
-		dx: 501,
-		dy: 744,
-		dWidth: 126,
-		dHeight: 140,
-	};
 	public nameBannerCoords = {
 		sWidth: 514,
 		sHeight: 108,
@@ -114,6 +106,17 @@ export default class WeaponCard extends Card {
 
 	public getHealthGemAsset() {
 		return "durability";
+	}
+
+	public getHealthGemCoords() {
+		return {
+			sWidth: 126,
+			sHeight: 140,
+			dx: 501,
+			dy: 744,
+			dWidth: 126,
+			dHeight: 140,
+		};
 	}
 
 	public getHealthTextCoords() {
