@@ -1,7 +1,5 @@
 import Card from "./Card";
-import RaceBanner from "./Components/RaceBanner";
 import {ICoords} from "./interfaces";
-import Sunwell from "./Sunwell";
 
 export default class MinionCard extends Card {
 	public premium = false;
@@ -35,15 +33,6 @@ export default class MinionCard extends Card {
 		dy: 52,
 		dWidth: 436,
 		dHeight: 325,
-	};
-	public raceTextCoords = {dx: 337, dy: 829};
-	public raceBannerCoords: ICoords = {
-		dx: 129,
-		dy: 791,
-		dWidth: 408,
-		dHeight: 69,
-		sWidth: 408,
-		sHeight: 69,
 	};
 	public raceBannerAsset = "race-banner";
 	public rarityGemCoords = {dx: 263, dy: 532};
@@ -90,13 +79,6 @@ export default class MinionCard extends Card {
 		{x: 425, y: 135},
 		{x: 385, y: 111},
 	];
-
-	constructor(sunwell: Sunwell, props) {
-		super(sunwell, props);
-		if (this.raceText) {
-			this.raceBanner = new RaceBanner(sunwell, this);
-		}
-	}
 
 	public getAttackGemCoords() {
 		return {

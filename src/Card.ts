@@ -53,6 +53,17 @@ export default abstract class Card {
 	public raceBanner: RaceBanner;
 	public rarityGem: RarityGem;
 	public watermark: Watermark;
+	public raceBannerAsset = "";
+	public raceTextCoords = {dx: 337, dy: 829};
+	public raceBannerCoords: ICoords = {
+		dx: 129,
+		dy: 791,
+		dWidth: 408,
+		dHeight: 69,
+		sWidth: 408,
+		sHeight: 69,
+	};
+
 	public abstract baseCardFrameAsset: string;
 	public abstract baseCardFrameCoords: ICoords;
 	public abstract baseRarityGemAsset: string;
@@ -104,6 +115,7 @@ export default abstract class Card {
 		this.costGem = new CostGem(sunwell, this);
 		this.healthGem = new HealthGem(sunwell, this);
 		this.multiClassBanner = new MultiClassBanner(sunwell, this);
+		this.raceBanner = new RaceBanner(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
 		this.watermark = new Watermark(sunwell, this);
 	}
@@ -177,15 +189,12 @@ export default abstract class Card {
 			assetsToLoad.push(this.dragonAsset);
 		}
 
-		if (this.raceBanner) {
-			assetsToLoad.push(...this.raceBanner.assets());
-		}
-
 		assetsToLoad.push(...this.attackGem.assets());
 		assetsToLoad.push(...this.cardFrame.assets());
 		assetsToLoad.push(...this.costGem.assets());
 		assetsToLoad.push(...this.healthGem.assets());
 		assetsToLoad.push(...this.multiClassBanner.assets());
+		assetsToLoad.push(...this.raceBanner.assets());
 		assetsToLoad.push(...this.rarityGem.assets());
 		assetsToLoad.push(...this.watermark.assets());
 
@@ -244,6 +253,7 @@ export default abstract class Card {
 			}
 
 			this.cardFrame.render(context, ratio);
+			this.raceBanner.render(context, ratio);
 			this.attackGem.render(context, ratio);
 			this.multiClassBanner.render(context, ratio);
 			this.costGem.render(context, ratio);
@@ -252,10 +262,6 @@ export default abstract class Card {
 
 			if (this.nameBannerAsset) {
 				this.drawNameBanner(context, ratio);
-			}
-
-			if (this.raceBanner) {
-				this.raceBanner.render(context, ratio);
 			}
 
 			if (this.cardDef.elite && this.dragonAsset) {

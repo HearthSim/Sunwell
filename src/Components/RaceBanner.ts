@@ -1,12 +1,12 @@
+import Card from "../Card";
 import {contextBoundingBox} from "../helpers";
-import MinionCard from "../MinionCard";
 import Sunwell from "../Sunwell";
 
 export default class RaceBanner {
 	private sunwell: Sunwell;
-	private parent: MinionCard;
+	private parent: Card;
 
-	constructor(sunwell: Sunwell, parent: MinionCard) {
+	constructor(sunwell: Sunwell, parent: Card) {
 		this.sunwell = sunwell;
 		this.parent = parent;
 	}
@@ -16,6 +16,9 @@ export default class RaceBanner {
 	}
 
 	public render(context: CanvasRenderingContext2D, ratio: number) {
+		if (!this.parent.raceBannerAsset || !this.parent.raceText) {
+			return;
+		}
 		const coords = this.parent.raceBannerCoords;
 		coords.ratio = ratio;
 		const text = this.parent.raceText.split("");
@@ -29,7 +32,7 @@ export default class RaceBanner {
 		let x = 10;
 		const textSize = 40;
 
-		bufferCtx.font = textSize + "px " + this.parent.titleFont;
+		bufferCtx.font = `${textSize}px ${this.sunwell.options.titleFont}`;
 		bufferCtx.lineCap = "round";
 		bufferCtx.lineJoin = "round";
 		bufferCtx.textBaseline = "hanging";
