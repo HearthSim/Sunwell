@@ -360,10 +360,10 @@ export default abstract class Card {
 
 		// Replace HTML tags with control characters
 		pBodyText = bodyText
-			.replace("<b>", CTRL_BOLD_START)
-			.replace("</b>", CTRL_BOLD_END)
-			.replace("<i>", CTRL_ITALIC_START)
-			.replace("</i>", CTRL_ITALIC_END);
+			.replace(/<b>/g, CTRL_BOLD_START)
+			.replace(/<\/b>/g, CTRL_BOLD_END)
+			.replace(/<i>/g, CTRL_ITALIC_START)
+			.replace(/<\/i>/g, CTRL_ITALIC_END);
 
 		const pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g;
 		let plurals: RegExpExecArray;
