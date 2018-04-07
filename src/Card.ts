@@ -4,6 +4,7 @@ import AttackGem from "./Components/AttackGem";
 import CardFrame from "./Components/CardFrame";
 import CostGem from "./Components/CostGem";
 import HealthGem from "./Components/HealthGem";
+import MultiClassBanner from "./Components/MultiClassBanner";
 import RaceBanner from "./Components/RaceBanner";
 import RarityGem from "./Components/RarityGem";
 import Watermark from "./Components/Watermark";
@@ -48,6 +49,7 @@ export default abstract class Card {
 	public cardFrame: CardFrame;
 	public costGem: CostGem;
 	public healthGem: HealthGem;
+	public multiClassBanner: MultiClassBanner;
 	public raceBanner: RaceBanner;
 	public rarityGem: RarityGem;
 	public watermark: Watermark;
@@ -74,7 +76,6 @@ export default abstract class Card {
 
 	private callback: (HTMLCanvasElement) => void;
 	private cacheKey: number;
-	private multiBannerAsset: string;
 	private propsJson: string;
 	private sunwell: Sunwell;
 
@@ -102,13 +103,9 @@ export default abstract class Card {
 		this.attackGem = new AttackGem(sunwell, this);
 		this.costGem = new CostGem(sunwell, this);
 		this.healthGem = new HealthGem(sunwell, this);
+		this.multiClassBanner = new MultiClassBanner(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
 		this.watermark = new Watermark(sunwell, this);
-
-		if (this.cardDef.multiClassGroup) {
-			this.multiBannerAsset =
-				"multi-" + MultiClassGroup[this.cardDef.multiClassGroup].toLowerCase();
-		}
 	}
 
 	public abstract getWatermarkCoords(): ICoords;
@@ -168,11 +165,7 @@ export default abstract class Card {
 	}
 
 	public getAssetsToLoad(): string[] {
-		const assetsToCheck = [
-			this.cardFoundationAsset,
-			this.nameBannerAsset,
-			this.multiBannerAsset,
-		];
+		const assetsToCheck = [this.cardFoundationAsset, this.nameBannerAsset];
 		const assetsToLoad: string[] = [];
 		for (const asset of assetsToCheck) {
 			if (asset) {
@@ -192,6 +185,7 @@ export default abstract class Card {
 		assetsToLoad.push(...this.cardFrame.assets());
 		assetsToLoad.push(...this.costGem.assets());
 		assetsToLoad.push(...this.healthGem.assets());
+		assetsToLoad.push(...this.multiClassBanner.assets());
 		assetsToLoad.push(...this.rarityGem.assets());
 		assetsToLoad.push(...this.watermark.assets());
 
@@ -250,16 +244,8 @@ export default abstract class Card {
 			}
 
 			this.cardFrame.render(context, ratio);
-
-			if (this.multiBannerAsset) {
-				this.sunwell.drawImage(context, this.multiBannerAsset, {
-					dx: 50,
-					dy: 119,
-					ratio: ratio,
-				});
-			}
-
 			this.attackGem.render(context, ratio);
+			this.multiClassBanner.render(context, ratio);
 			this.costGem.render(context, ratio);
 			this.healthGem.render(context, ratio);
 			this.rarityGem.render(context, ratio);
@@ -729,6 +715,14 @@ export default abstract class Card {
 	public getCardFrameAsset(): string {
 		const cardClass = getCardFrameClass(this.cardDef.cardClass);
 		return this.baseCardFrameAsset + CardClass[cardClass].toLowerCase();
+	}
+
+	public getMultiClassBannerAsset(): string {
+		if (this.cardDef.multiClassGroup) {
+			return "multi-" + MultiClassGroup[this.cardDef.multiClassGroup].toLowerCase();
+		} else {
+			return "";
+		}
 	}
 
 	public getRarityGemAsset(): string {
