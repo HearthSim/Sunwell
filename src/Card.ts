@@ -458,6 +458,11 @@ export default abstract class Card {
 				fontSize = this.sunwell.options.bodyFontSize * 0.8;
 				lineHeight = this.sunwell.options.bodyLineHeight * 0.8;
 			}
+
+			if (totalLength >= 120) {
+				fontSize = this.sunwell.options.bodyFontSize * 0.62;
+				lineHeight = this.sunwell.options.bodyLineHeight * 0.8;
+			}
 		}
 
 		bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
