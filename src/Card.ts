@@ -315,50 +315,12 @@ export default abstract class Card {
 		context.restore();
 	}
 
-	public drawBodyText(
-		context: CanvasRenderingContext2D,
-		s: number,
-		forceSmallerFirstLine: boolean,
-		text: string
-	): void {
-		const manualBreak = text.substr(0, 3) === "[x]";
-		let bodyText = manualBreak ? text.substr(3) : text;
-		if (!bodyText) {
-			return;
+	public getBodyText(): string {
+		let bodyText = this.bodyText;
+		if (this.hasManualBreakMarker()) {
+			bodyText = bodyText.substr(3);
 		}
-
-		let xPos = 0;
-		let yPos = 0;
-		let italic = 0;
-		let bold = 0;
-		let lineCount = 0;
-		let justLineBreak: boolean;
-		let pBodyText: string;
-		// size of the description text box
-		const bodyWidth = this.bodyTextCoords.dWidth;
-		const bodyHeight = this.bodyTextCoords.dHeight;
-		// center of description box (x, y)
-		const centerLeft = this.bodyTextCoords.dx + bodyWidth / 2;
-		const centerTop = this.bodyTextCoords.dy + bodyHeight / 2;
-
-		// draw the text box in debug mode
-		if (this.sunwell.options.debug) {
-			context.save();
-			context.strokeStyle = "red";
-			context.beginPath();
-			context.rect(
-				(centerLeft - bodyWidth / 2) * s,
-				(centerTop - bodyHeight / 2) * s,
-				bodyWidth * s,
-				bodyHeight * s
-			);
-			context.closePath();
-			context.stroke();
-			context.restore();
-		}
-
-		// Replace HTML tags with control characters
-		pBodyText = bodyText
+		bodyText = bodyText
 			.replace(/<b>/g, CTRL_BOLD_START)
 			.replace(/<\/b>/g, CTRL_BOLD_END)
 			.replace(/<i>/g, CTRL_ITALIC_START)
@@ -367,7 +329,7 @@ export default abstract class Card {
 		const pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g;
 		let plurals: RegExpExecArray;
 		while ((plurals = pluralRegex.exec(bodyText)) !== null) {
-			pBodyText = pBodyText.replace(
+			bodyText = bodyText.replace(
 				plurals[0],
 				plurals[1] + plurals[2] + (parseInt(plurals[1], 10) === 1 ? plurals[3] : plurals[4])
 			);
@@ -375,18 +337,45 @@ export default abstract class Card {
 
 		let spellDmg: RegExpExecArray;
 		const spellDamageRegex = /\$(\d+)/;
-		while ((spellDmg = spellDamageRegex.exec(pBodyText)) !== null) {
-			pBodyText = pBodyText.replace(spellDmg[0], spellDmg[1]);
+		while ((spellDmg = spellDamageRegex.exec(bodyText)) !== null) {
+			bodyText = bodyText.replace(spellDmg[0], spellDmg[1]);
 		}
 
 		let spellHeal: RegExpExecArray;
 		const spellHealRegex = /#(\d+)/;
-		while ((spellHeal = spellHealRegex.exec(pBodyText)) !== null) {
-			pBodyText = pBodyText.replace(spellHeal[0], spellHeal[1]);
+		while ((spellHeal = spellHealRegex.exec(bodyText)) !== null) {
+			bodyText = bodyText.replace(spellHeal[0], spellHeal[1]);
 		}
 
-		bodyText = pBodyText;
-		this.sunwell.log("Rendering body", bodyText);
+		return bodyText;
+	}
+
+	public hasManualBreakMarker(): boolean {
+		return this.bodyText.substr(0, 3) === "[x]";
+	}
+
+	public drawBodyText(
+		context: CanvasRenderingContext2D,
+		s: number,
+		forceSmallerFirstLine: boolean,
+		text: string
+	): void {
+		let xPos = 0;
+		let yPos = 0;
+		let italic = 0;
+		let bold = 0;
+		let lineCount = 0;
+		let justLineBreak: boolean;
+		// size of the description text box
+		const bodyWidth = this.bodyTextCoords.dWidth;
+		const bodyHeight = this.bodyTextCoords.dHeight;
+		// center of description box (x, y)
+		const centerLeft = this.bodyTextCoords.dx + bodyWidth / 2;
+		const centerTop = this.bodyTextCoords.dy + bodyHeight / 2;
+
+		const manualBreak = this.hasManualBreakMarker();
+		const bodyText = this.getBodyText();
+		this.sunwell.log("Body text", bodyText);
 
 		const words = [];
 		const breaker = new LineBreaker(bodyText);
@@ -399,6 +388,7 @@ export default abstract class Card {
 				words.push("\n");
 			}
 		}
+		this.sunwell.log("Words", words);
 
 		const bufferText = this.sunwell.getBuffer(bodyWidth, bodyHeight, true);
 		const bufferTextCtx = bufferText.getContext("2d");
