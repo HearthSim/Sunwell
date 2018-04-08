@@ -5,6 +5,7 @@ import CardFrame from "./Components/CardFrame";
 import CostGem from "./Components/CostGem";
 import HealthGem from "./Components/HealthGem";
 import MultiClassBanner from "./Components/MultiClassBanner";
+import NameBanner from "./Components/NameBanner";
 import RaceBanner from "./Components/RaceBanner";
 import RarityGem from "./Components/RarityGem";
 import Watermark from "./Components/Watermark";
@@ -14,9 +15,7 @@ import {
 	drawPolygon,
 	finishLine,
 	getCardFrameClass,
-	getCharDimensions,
 	getNumberStyle,
-	getPointOnCurve,
 	getRaceText,
 	getRarityGem,
 } from "./helpers";
@@ -51,6 +50,7 @@ export default abstract class Card {
 	public healthGem: HealthGem;
 	public multiClassBanner: MultiClassBanner;
 	public raceBanner: RaceBanner;
+	public nameBanner: NameBanner;
 	public rarityGem: RarityGem;
 	public watermark: Watermark;
 	public raceBannerAsset = "";
@@ -116,6 +116,7 @@ export default abstract class Card {
 		this.healthGem = new HealthGem(sunwell, this);
 		this.multiClassBanner = new MultiClassBanner(sunwell, this);
 		this.raceBanner = new RaceBanner(sunwell, this);
+		this.nameBanner = new NameBanner(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
 		this.watermark = new Watermark(sunwell, this);
 	}
@@ -177,7 +178,7 @@ export default abstract class Card {
 	}
 
 	public getAssetsToLoad(): string[] {
-		const assetsToCheck = [this.cardFoundationAsset, this.nameBannerAsset];
+		const assetsToCheck = [this.cardFoundationAsset];
 		const assetsToLoad: string[] = [];
 		for (const asset of assetsToCheck) {
 			if (asset) {
@@ -190,6 +191,7 @@ export default abstract class Card {
 		}
 
 		assetsToLoad.push(...this.attackGem.assets());
+		assetsToLoad.push(...this.nameBanner.assets());
 		assetsToLoad.push(...this.cardFrame.assets());
 		assetsToLoad.push(...this.costGem.assets());
 		assetsToLoad.push(...this.healthGem.assets());
@@ -253,16 +255,13 @@ export default abstract class Card {
 			}
 
 			this.cardFrame.render(context, ratio);
+			this.rarityGem.render(context, ratio);
+			this.nameBanner.render(context, ratio);
 			this.raceBanner.render(context, ratio);
 			this.attackGem.render(context, ratio);
 			this.multiClassBanner.render(context, ratio);
 			this.costGem.render(context, ratio);
 			this.healthGem.render(context, ratio);
-			this.rarityGem.render(context, ratio);
-
-			if (this.nameBannerAsset) {
-				this.drawNameBanner(context, ratio);
-			}
 
 			if (this.cardDef.elite && this.dragonAsset) {
 				const coords = this.dragonCoords;
@@ -281,7 +280,6 @@ export default abstract class Card {
 
 		// <<<<<<<< Finished Skeleton drawing
 
-		this.drawName(context, ratio, this.cardDef.name);
 		this.drawBodyText(context, ratio, false, this.bodyText);
 
 		if (this.cardDef.silenced) {
@@ -575,141 +573,6 @@ export default abstract class Card {
 		);
 
 		this.sunwell.freeBuffer(bufferText);
-	}
-
-	public drawName(context: CanvasRenderingContext2D, ratio: number, name: string): void {
-		// define a box to contain the curved text
-		const boxDims = {width: 460, height: 160};
-		const boxBottomCenter = {x: 335, y: 612};
-		// create a new buffer to draw onto
-		const buffer = this.sunwell.getBuffer(boxDims.width * 2, boxDims.height, true);
-		const textContext = buffer.getContext("2d");
-		const maxWidth = this.nameTextCurve.maxWidth;
-		const curve = this.nameTextCurve.curve;
-		textContext.save();
-
-		if (this.sunwell.options.debug) {
-			textContext.lineWidth = 2;
-			textContext.strokeStyle = "blue";
-			textContext.fillStyle = "red";
-			// draw the curve
-			textContext.beginPath();
-			textContext.moveTo(curve[0].x, curve[0].y);
-			textContext.bezierCurveTo(
-				curve[1].x,
-				curve[1].y,
-				curve[2].x,
-				curve[2].y,
-				curve[3].x,
-				curve[3].y
-			);
-			textContext.stroke();
-			// draw the control points
-			for (const point of curve) {
-				textContext.fillRect(point.x - 4, point.y - 4, 8, 8);
-			}
-			textContext.restore();
-		}
-
-		textContext.lineCap = "round";
-		textContext.lineJoin = "round";
-		textContext.lineWidth = 10;
-		textContext.strokeStyle = "black";
-		textContext.textAlign = "left";
-		textContext.textBaseline = "middle";
-
-		let fontSize = 45;
-		let dimensions = [];
-		do {
-			fontSize -= 1;
-			textContext.font = `${fontSize}px ${this.sunwell.options.titleFont}`;
-		} while (
-			(dimensions = getCharDimensions(name, textContext)).reduce((a, b) => a + b.width, 0) >
-				maxWidth &&
-			fontSize > 10
-		);
-
-		const textWidth = dimensions.reduce((a, b) => a + b.width, 0) / maxWidth;
-		const begin = this.nameTextCurve.pathMiddle - textWidth / 2;
-		const steps = textWidth / name.length;
-
-		// draw text
-		let p: IPoint;
-		let t: number;
-		let leftPos = 0;
-		for (let i = 0; i < name.length; i++) {
-			const char = name[i].trim();
-			const dimension = dimensions[i];
-			if (leftPos === 0) {
-				t = begin + steps * i;
-				p = getPointOnCurve(curve, t);
-				leftPos = p.x;
-			} else {
-				t += 0.01;
-				p = getPointOnCurve(curve, t);
-				while (p.x < leftPos) {
-					t += 0.001;
-					p = getPointOnCurve(curve, t);
-				}
-			}
-
-			if (char.length) {
-				textContext.save();
-				textContext.translate(p.x, p.y);
-
-				if (dimension.scale.x) {
-					textContext.scale(dimension.scale.x, dimension.scale.y);
-				}
-				// textContext.setTransform(1.2, p.r, 0, 1, p.x, p.y);
-				textContext.rotate(p.r);
-
-				// shadow
-				textContext.lineWidth = 9 * (fontSize / 50);
-				textContext.strokeStyle = "black";
-				textContext.fillStyle = "black";
-				textContext.fillText(char, 0, 0);
-				textContext.strokeText(char, 0, 0);
-
-				// text
-				textContext.fillStyle = "white";
-				textContext.strokeStyle = "white";
-				textContext.lineWidth = 2.5 * (fontSize / 50);
-				textContext.fillText(char, 0, 0);
-
-				textContext.restore();
-			}
-
-			leftPos += dimension.width;
-		}
-
-		const coords: ICoords = {
-			sx: 0,
-			sy: 0,
-			sWidth: boxDims.width,
-			sHeight: boxDims.height,
-			dx: (boxBottomCenter.x - boxDims.width / 2) * ratio,
-			dy: (boxBottomCenter.y - boxDims.height) * ratio,
-			dWidth: boxDims.width * ratio,
-			dHeight: boxDims.height * ratio,
-		};
-		context.drawImage(
-			buffer,
-			coords.sx,
-			coords.sy,
-			coords.sWidth,
-			coords.sHeight,
-			coords.dx,
-			coords.dy,
-			coords.dWidth,
-			coords.dHeight
-		);
-		this.sunwell.freeBuffer(buffer);
-	}
-
-	public drawNameBanner(context: CanvasRenderingContext2D, ratio: number) {
-		const coords = this.nameBannerCoords;
-		coords.ratio = ratio;
-		this.sunwell.drawImage(context, this.nameBannerAsset, coords);
 	}
 
 	public drawCardFoundationAsset(context: CanvasRenderingContext2D, ratio: number): void {
