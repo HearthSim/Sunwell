@@ -2,8 +2,9 @@ import Card from "../Card";
 import {contextBoundingBox} from "../helpers";
 import {ICoords} from "../interfaces";
 import Sunwell from "../Sunwell";
+import Component from "./Component";
 
-export default class Gem {
+export default class Gem extends Component {
 	public gemAsset: string;
 	public gemCoords: ICoords;
 	public showGem: boolean;
@@ -13,12 +14,8 @@ export default class Gem {
 	public textCoords: ICoords;
 	public textSize: number;
 
-	private sunwell: Sunwell;
-	private parent: Card;
-
 	constructor(sunwell: Sunwell, parent: Card) {
-		this.sunwell = sunwell;
-		this.parent = parent;
+		super(sunwell, parent);
 		this.textSize = 124;
 	}
 

@@ -1,17 +1,8 @@
-import Card from "../Card";
 import {getCharDimensions, getPointOnCurve} from "../helpers";
 import {ICoords, IPoint} from "../interfaces";
-import Sunwell from "../Sunwell";
+import Component from "./Component";
 
-export default class NameBanner {
-	private sunwell: Sunwell;
-	private parent: Card;
-
-	constructor(sunwell: Sunwell, parent: Card) {
-		this.sunwell = sunwell;
-		this.parent = parent;
-	}
-
+export default class NameBanner extends Component {
 	public assets(): string[] {
 		return [this.parent.nameBannerAsset];
 	}

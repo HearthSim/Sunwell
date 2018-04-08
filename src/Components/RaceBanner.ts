@@ -1,16 +1,7 @@
-import Card from "../Card";
 import {contextBoundingBox} from "../helpers";
-import Sunwell from "../Sunwell";
+import Component from "./Component";
 
-export default class RaceBanner {
-	private sunwell: Sunwell;
-	private parent: Card;
-
-	constructor(sunwell: Sunwell, parent: Card) {
-		this.sunwell = sunwell;
-		this.parent = parent;
-	}
-
+export default class RaceBanner extends Component {
 	public assets(): string[] {
 		return [this.parent.raceBannerAsset];
 	}

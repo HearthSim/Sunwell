@@ -1,15 +1,6 @@
-import Card from "../Card";
-import Sunwell from "../Sunwell";
+import Component from "./Component";
 
-export default class EliteDragon {
-	private sunwell: Sunwell;
-	private parent: Card;
-
-	constructor(sunwell: Sunwell, parent: Card) {
-		this.sunwell = sunwell;
-		this.parent = parent;
-	}
-
+export default class EliteDragon extends Component {
 	public assets(): string[] {
 		return [this.parent.getEliteDragonAsset()];
 	}

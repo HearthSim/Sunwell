@@ -1,16 +1,7 @@
-import Card from "../Card";
 import {CardType} from "../Enums";
-import Sunwell from "../Sunwell";
+import Component from "./Component";
 
-export default class Watermark {
-	private sunwell: Sunwell;
-	private parent: Card;
-
-	constructor(sunwell: Sunwell, parent: Card) {
-		this.sunwell = sunwell;
-		this.parent = parent;
-	}
-
+export default class Watermark extends Component {
 	public assets(): string[] {
 		return [this.parent.getWatermarkAsset()];
 	}

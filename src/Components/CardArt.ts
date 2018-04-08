@@ -1,6 +1,5 @@
-import Card from "../Card";
 import {IPoint} from "../interfaces";
-import Sunwell from "../Sunwell";
+import Component from "./Component";
 
 const ReferenceWidth = 670;
 const ReferenceHeight = 1000;
@@ -27,19 +26,7 @@ export function drawPolygon(
 	context.stroke();
 }
 
-export default class CardArt {
-	private sunwell: Sunwell;
-	private parent: Card;
-
-	constructor(sunwell: Sunwell, parent: Card) {
-		this.sunwell = sunwell;
-		this.parent = parent;
-	}
-
-	public assets(): string[] {
-		return [];
-	}
-
+export default class CardArt extends Component {
 	public render(context: CanvasRenderingContext2D, ratio: number): void {
 		const coords = this.parent.artCoords;
 		const texture = this.parent.getCardArtTexture();

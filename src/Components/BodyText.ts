@@ -1,27 +1,14 @@
 import LineBreaker from "linebreak";
-import Card from "../Card";
 import {CardType} from "../Enums";
 import {contextBoundingBox, finishLine} from "../helpers";
-import Sunwell from "../Sunwell";
+import Component from "./Component";
 
 const CTRL_BOLD_START = "\x11";
 const CTRL_BOLD_END = "\x12";
 const CTRL_ITALIC_START = "\x13";
 const CTRL_ITALIC_END = "\x14";
 
-export default class BodyText {
-	private sunwell: Sunwell;
-	private parent: Card;
-
-	constructor(sunwell: Sunwell, parent: Card) {
-		this.sunwell = sunwell;
-		this.parent = parent;
-	}
-
-	public assets(): string[] {
-		return [];
-	}
-
+export default class BodyText extends Component {
 	public render(context: CanvasRenderingContext2D, ratio: number) {
 		this.drawBodyText(context, ratio, false);
 	}
