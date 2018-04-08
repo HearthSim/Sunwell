@@ -21,9 +21,8 @@ export default class SpellCard extends Card {
 		dHeight: 746,
 	};
 	public baseRarityGemAsset = "rarity-spell-";
-	public nameBannerAsset = "name-banner-spell";
-	public dragonAsset = "elite-spell";
-	public dragonCoords = {
+	public eliteDragonAsset = "elite-spell";
+	public eliteDragonCoords = {
 		sWidth: 476,
 		sHeight: 259,
 		dx: 185,
@@ -31,6 +30,7 @@ export default class SpellCard extends Card {
 		dWidth: 476,
 		dHeight: 259,
 	};
+	public nameBannerAsset = "name-banner-spell";
 	public nameBannerCoords = {
 		sWidth: 507,
 		sHeight: 155,

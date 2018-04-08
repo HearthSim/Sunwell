@@ -29,6 +29,17 @@ export default class SpellCardPremium extends SpellCard {
 		dWidth: 226,
 		dHeight: 754,
 	};
+	public baseRarityGemAsset = "rarity-spell-premium-";
+	public eliteDragonAsset = "elite-spell-premium";
+	public eliteDragonCoords = {
+		dx: 185,
+		dy: 91,
+		dWidth: 476,
+		dHeight: 259,
+		sWidth: 476,
+		sHeight: 259,
+	};
+	public nameBannerAsset = "name-banner-spell-premium";
 	public nameBannerCoords = {
 		dx: 84,
 		dy: 464,
@@ -42,7 +53,6 @@ export default class SpellCardPremium extends SpellCard {
 		maxWidth: 450,
 		curve: [{x: 10, y: 86}, {x: 170, y: 44}, {x: 294, y: 44}, {x: 450, y: 88}],
 	};
-	public baseRarityGemAsset = "rarity-spell-premium-";
 	public rarityGemCoords = {
 		dx: 283,
 		dy: 545,
@@ -50,15 +60,5 @@ export default class SpellCardPremium extends SpellCard {
 		dHeight: 74,
 		sWidth: 107,
 		sHeight: 74,
-	};
-	public nameBannerAsset = "name-banner-spell-premium";
-	public dragonAsset = "elite-spell-premium";
-	public dragonCoords = {
-		dx: 185,
-		dy: 91,
-		sWidth: 476,
-		sHeight: 259,
-		dWidth: 476,
-		dHeight: 259,
 	};
 }

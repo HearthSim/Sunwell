@@ -29,6 +29,7 @@ export default class HeroCardPremium extends HeroCard {
 		sWidth: 223,
 		sHeight: 45,
 	};
+	public eliteDragonAsset = "elite-hero-premium";
 	public nameBannerAsset = "name-banner-hero-premium";
 	public nameBannerCoords = {
 		dx: 87,
@@ -39,5 +40,4 @@ export default class HeroCardPremium extends HeroCard {
 		sHeight: 122,
 	};
 	public rarityGemCoords = {dx: 307, dy: 528};
-	public dragonAsset = "elite-hero-premium";
 }

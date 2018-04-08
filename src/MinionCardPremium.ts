@@ -22,10 +22,8 @@ export default class MinionCardPremium extends MinionCard {
 		dHeight: 329,
 	};
 	public baseRarityGemAsset = "rarity-minion-premium-";
-	public rarityGemCoords = {dx: 245, dy: 528};
-	public nameBannerAsset = "name-banner-minion-premium";
-	public dragonAsset = "elite-minion-premium";
-	public dragonCoords = {
+	public eliteDragonAsset = "elite-minion-premium";
+	public eliteDragonCoords = {
 		dx: 172,
 		dy: 17,
 		sWidth: 485,
@@ -33,6 +31,8 @@ export default class MinionCardPremium extends MinionCard {
 		dWidth: 485,
 		dHeight: 341,
 	};
+	public rarityGemCoords = {dx: 245, dy: 528};
+	public nameBannerAsset = "name-banner-minion-premium";
 	public attackGemAsset = "attack-minion-premium";
 	public healthGemAsset = "health-premium";
 	public raceBannerAsset = "race-banner-premium";

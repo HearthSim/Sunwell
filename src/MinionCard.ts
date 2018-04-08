@@ -24,16 +24,16 @@ export default class MinionCard extends Card {
 		dHeight: 793,
 	};
 	public baseRarityGemAsset = "rarity-minion-";
-	public nameBannerAsset = "name-banner-minion";
-	public dragonAsset = "elite-minion";
-	public dragonCoords = {
-		sWidth: 436,
-		sHeight: 325,
+	public eliteDragonAsset = "elite-minion";
+	public eliteDragonCoords = {
 		dx: 188,
 		dy: 52,
 		dWidth: 436,
 		dHeight: 325,
+		sWidth: 436,
+		sHeight: 325,
 	};
+	public nameBannerAsset = "name-banner-minion";
 	public raceBannerAsset = "race-banner";
 	public rarityGemCoords = {dx: 263, dy: 532};
 	public nameBannerCoords = {

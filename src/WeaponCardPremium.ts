@@ -2,6 +2,7 @@ import WeaponCard from "./WeaponCard";
 
 export default class WeaponCardPremium extends WeaponCard {
 	public premium = true;
+	public attackGemAsset = "attack-weapon-premium";
 	public cardFoundationAsset = "base-weapon-premium";
 	public cardFoundationCoords = {
 		dx: 75,
@@ -20,11 +21,8 @@ export default class WeaponCardPremium extends WeaponCard {
 		sWidth: 226,
 		sHeight: 347,
 	};
-	public nameBannerAsset = "name-banner-weapon-premium";
-	public attackGemAsset = "attack-weapon-premium";
-	public healthGemAsset = "durability-premium";
-	public dragonAsset = "elite-weapon-premium";
-	public dragonCoords = {
+	public eliteDragonAsset = "elite-weapon-premium";
+	public eliteDragonCoords = {
 		dx: 197,
 		dy: 63,
 		dWidth: 420,
@@ -32,4 +30,6 @@ export default class WeaponCardPremium extends WeaponCard {
 		sWidth: 420,
 		sHeight: 247,
 	};
+	public healthGemAsset = "durability-premium";
+	public nameBannerAsset = "name-banner-weapon-premium";
 }

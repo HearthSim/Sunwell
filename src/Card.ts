@@ -3,6 +3,7 @@ import CardDef from "./CardDef";
 import AttackGem from "./Components/AttackGem";
 import CardFrame from "./Components/CardFrame";
 import CostGem from "./Components/CostGem";
+import EliteDragon from "./Components/EliteDragon";
 import HealthGem from "./Components/HealthGem";
 import MultiClassBanner from "./Components/MultiClassBanner";
 import NameBanner from "./Components/NameBanner";
@@ -47,14 +48,17 @@ export default abstract class Card {
 	public attackGem: AttackGem;
 	public cardFrame: CardFrame;
 	public costGem: CostGem;
+	public eliteDragon: EliteDragon;
 	public healthGem: HealthGem;
 	public multiClassBanner: MultiClassBanner;
 	public raceBanner: RaceBanner;
 	public nameBanner: NameBanner;
 	public rarityGem: RarityGem;
 	public watermark: Watermark;
-	public raceBannerAsset = "";
-	public raceTextCoords = {dx: 337, dy: 829};
+	public eliteDragonAsset: string = "";
+	public eliteDragonCoords: ICoords = null;
+	public raceBannerAsset: string = "";
+	public raceTextCoords: ICoords = {dx: 337, dy: 829};
 	public raceBannerCoords: ICoords = {
 		dx: 129,
 		dy: 791,
@@ -67,13 +71,11 @@ export default abstract class Card {
 	public abstract baseCardFrameAsset: string;
 	public abstract baseCardFrameCoords: ICoords;
 	public abstract baseRarityGemAsset: string;
-	public abstract rarityGemCoords: ICoords;
 	public abstract bodyTextColor: string;
-	public abstract nameBannerAsset: string;
-	public abstract dragonAsset: string;
-	public abstract dragonCoords: ICoords;
-	public abstract nameBannerCoords: ICoords;
 	public abstract bodyTextCoords: ICoords;
+	public abstract nameBannerAsset: string;
+	public abstract nameBannerCoords: ICoords;
+	public abstract rarityGemCoords: ICoords;
 	public abstract nameTextCurve: {
 		pathMiddle: number;
 		maxWidth: number;
@@ -112,6 +114,7 @@ export default abstract class Card {
 
 		this.cardFrame = new CardFrame(sunwell, this);
 		this.attackGem = new AttackGem(sunwell, this);
+		this.eliteDragon = new EliteDragon(sunwell, this);
 		this.costGem = new CostGem(sunwell, this);
 		this.healthGem = new HealthGem(sunwell, this);
 		this.multiClassBanner = new MultiClassBanner(sunwell, this);
@@ -186,19 +189,17 @@ export default abstract class Card {
 			}
 		}
 
-		if (this.cardDef.elite && this.dragonAsset) {
-			assetsToLoad.push(this.dragonAsset);
-		}
-
 		assetsToLoad.push(...this.attackGem.assets());
 		assetsToLoad.push(...this.nameBanner.assets());
 		assetsToLoad.push(...this.cardFrame.assets());
 		assetsToLoad.push(...this.costGem.assets());
+		assetsToLoad.push(...this.eliteDragon.assets());
 		assetsToLoad.push(...this.healthGem.assets());
 		assetsToLoad.push(...this.multiClassBanner.assets());
 		assetsToLoad.push(...this.raceBanner.assets());
 		assetsToLoad.push(...this.rarityGem.assets());
 		assetsToLoad.push(...this.watermark.assets());
+		assetsToLoad.push(...this.eliteDragon.assets());
 
 		if (this.cardDef.silenced) {
 			assetsToLoad.push("silence-x");
@@ -256,19 +257,13 @@ export default abstract class Card {
 
 			this.cardFrame.render(context, ratio);
 			this.rarityGem.render(context, ratio);
+			this.eliteDragon.render(context, ratio);
 			this.nameBanner.render(context, ratio);
 			this.raceBanner.render(context, ratio);
 			this.attackGem.render(context, ratio);
 			this.multiClassBanner.render(context, ratio);
 			this.costGem.render(context, ratio);
 			this.healthGem.render(context, ratio);
-
-			if (this.cardDef.elite && this.dragonAsset) {
-				const coords = this.dragonCoords;
-				coords.ratio = ratio;
-				this.sunwell.drawImage(context, this.dragonAsset, coords);
-			}
-
 			this.watermark.render(context, ratio);
 
 			if (this.sunwell.options.cacheSkeleton) {
@@ -584,6 +579,14 @@ export default abstract class Card {
 	public getCardFrameAsset(): string {
 		const cardClass = getCardFrameClass(this.cardDef.cardClass);
 		return this.baseCardFrameAsset + CardClass[cardClass].toLowerCase();
+	}
+
+	public getEliteDragonAsset(): string {
+		if (this.cardDef.elite) {
+			return this.eliteDragonAsset;
+		} else {
+			return "";
+		}
 	}
 
 	public getMultiClassBannerAsset(): string {

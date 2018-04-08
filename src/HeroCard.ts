@@ -23,16 +23,16 @@ export default class HeroCard extends Card {
 		dHeight: 795,
 	};
 	public baseRarityGemAsset = "rarity-";
-	public nameBannerAsset = "name-banner-hero";
-	public dragonAsset = "elite-hero";
-	public dragonCoords = {
-		sWidth: 444,
-		sHeight: 298,
+	public eliteDragonAsset = "elite-hero";
+	public eliteDragonCoords = {
 		dx: 172,
 		dy: 40,
 		dWidth: 444,
 		dHeight: 298,
+		sWidth: 444,
+		sHeight: 298,
 	};
+	public nameBannerAsset = "name-banner-hero";
 	public nameBannerCoords = {
 		sWidth: 490,
 		sHeight: 122,
@@ -41,12 +41,12 @@ export default class HeroCard extends Card {
 		dWidth: 490,
 		dHeight: 122,
 	};
-	public rarityGemCoords = {dx: 311, dy: 529};
 	public nameTextCurve = {
 		pathMiddle: 0.5,
 		maxWidth: 420,
 		curve: [{x: 24, y: 98}, {x: 170, y: 36}, {x: 294, y: 36}, {x: 438, y: 96}],
 	};
+	public rarityGemCoords = {dx: 311, dy: 529};
 	public artCoords = {
 		sWidth: 346,
 		sHeight: 346,

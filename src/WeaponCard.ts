@@ -22,10 +22,9 @@ export default class WeaponCard extends Card {
 		dWidth: 527,
 		dHeight: 775,
 	};
-	public nameBannerAsset = "name-banner-weapon";
 	public baseRarityGemAsset = "rarity-weapon-";
-	public dragonAsset = "elite-weapon";
-	public dragonCoords = {
+	public eliteDragonAsset = "elite-weapon";
+	public eliteDragonCoords = {
 		dx: 199,
 		dy: 62,
 		dWidth: 420,
@@ -33,6 +32,7 @@ export default class WeaponCard extends Card {
 		sWidth: 420,
 		sHeight: 247,
 	};
+	public nameBannerAsset = "name-banner-weapon";
 	public nameBannerCoords = {
 		sWidth: 514,
 		sHeight: 108,
