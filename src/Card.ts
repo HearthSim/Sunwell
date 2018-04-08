@@ -1,6 +1,7 @@
 import CardDef from "./CardDef";
 import AttackGem from "./Components/AttackGem";
 import BodyText from "./Components/BodyText";
+import CardArt from "./Components/CardArt";
 import CardFrame from "./Components/CardFrame";
 import CostGem from "./Components/CostGem";
 import EliteDragon from "./Components/EliteDragon";
@@ -11,18 +12,11 @@ import RaceBanner from "./Components/RaceBanner";
 import RarityGem from "./Components/RarityGem";
 import Watermark from "./Components/Watermark";
 import {CardClass, CardSet, MultiClassGroup, Rarity} from "./Enums";
-import {
-	drawPolygon,
-	getCardFrameClass,
-	getNumberStyle,
-	getRaceText,
-	getRarityGem,
-} from "./helpers";
+import {getCardFrameClass, getNumberStyle, getRaceText, getRarityGem} from "./helpers";
 import {ICoords, IPoint} from "./interfaces";
 import Sunwell from "./Sunwell";
 
 const ReferenceWidth = 670;
-const ReferenceHeight = 1000;
 
 export default abstract class Card {
 	public cardDef: CardDef;
@@ -39,6 +33,7 @@ export default abstract class Card {
 	public opposing: boolean;
 	public attackGem: AttackGem;
 	public bodyText: BodyText;
+	public cardArt: CardArt;
 	public cardFrame: CardFrame;
 	public costGem: CostGem;
 	public eliteDragon: EliteDragon;
@@ -106,6 +101,7 @@ export default abstract class Card {
 
 		this.attackGem = new AttackGem(sunwell, this);
 		this.bodyText = new BodyText(sunwell, this);
+		this.cardArt = new CardArt(sunwell, this);
 		this.cardFrame = new CardFrame(sunwell, this);
 		this.costGem = new CostGem(sunwell, this);
 		this.eliteDragon = new EliteDragon(sunwell, this);
@@ -242,12 +238,11 @@ export default abstract class Card {
 			this.sunwell.log("Skipping skeleton draw");
 			context.drawImage(this.sunwell.renderCache[this.cacheKey], 0, 0);
 		} else {
-			this.drawCardArt(context, ratio);
-
 			if (this.cardFoundationAsset) {
 				this.drawCardFoundationAsset(context, ratio);
 			}
 
+			this.cardArt.render(context, ratio);
 			this.cardFrame.render(context, ratio);
 			this.rarityGem.render(context, ratio);
 			this.eliteDragon.render(context, ratio);
@@ -282,28 +277,6 @@ export default abstract class Card {
 		if (this.target) {
 			this.target.src = canvas.toDataURL();
 		}
-	}
-
-	public drawCardArt(context, ratio: number) {
-		const t = this.getCardArtTexture();
-
-		context.save();
-		drawPolygon(context, this.artClipPolygon, ratio);
-		context.clip();
-		context.fillStyle = "grey";
-		context.fillRect(0, 0, ReferenceWidth * ratio, ReferenceHeight * ratio);
-		context.drawImage(
-			t,
-			0,
-			0,
-			t.width,
-			t.height,
-			this.artCoords.dx * ratio,
-			this.artCoords.dy * ratio,
-			this.artCoords.dWidth * ratio,
-			this.artCoords.dHeight * ratio
-		);
-		context.restore();
 	}
 
 	public getBodyText(): string {

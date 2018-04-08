@@ -23,28 +23,6 @@ export function cleanEnum(val: string | number, e) {
 }
 
 /**
- * Helper function to draw a polygon from a list of points.
- */
-export function drawPolygon(
-	context: CanvasRenderingContext2D,
-	points: IPoint[],
-	ratio: number
-): void {
-	if (points.length < 3) {
-		return;
-	}
-	context.beginPath();
-	// move to start point
-	context.moveTo(points[0].x * ratio, points[0].y * ratio);
-	// draw the lines starting at index 1
-	points.slice(1).forEach(pt => {
-		context.lineTo(pt.x * ratio, pt.y * ratio);
-	});
-	context.closePath();
-	context.stroke();
-}
-
-/**
  * Get the bounding box of a canvas content.
  * @returns {{x: *, y: *, maxX: (number|*|w), maxY: *, w: number, h: number}}
  */
