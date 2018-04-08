@@ -1,6 +1,6 @@
-import LineBreaker from "linebreak";
 import CardDef from "./CardDef";
 import AttackGem from "./Components/AttackGem";
+import BodyText from "./Components/BodyText";
 import CardFrame from "./Components/CardFrame";
 import CostGem from "./Components/CostGem";
 import EliteDragon from "./Components/EliteDragon";
@@ -10,11 +10,9 @@ import NameBanner from "./Components/NameBanner";
 import RaceBanner from "./Components/RaceBanner";
 import RarityGem from "./Components/RarityGem";
 import Watermark from "./Components/Watermark";
-import {CardClass, CardSet, CardType, MultiClassGroup, Rarity} from "./Enums";
+import {CardClass, CardSet, MultiClassGroup, Rarity} from "./Enums";
 import {
-	contextBoundingBox,
 	drawPolygon,
-	finishLine,
 	getCardFrameClass,
 	getNumberStyle,
 	getRaceText,
@@ -22,11 +20,6 @@ import {
 } from "./helpers";
 import {ICoords, IPoint} from "./interfaces";
 import Sunwell from "./Sunwell";
-
-const CTRL_BOLD_START = "\x11";
-const CTRL_BOLD_END = "\x12";
-const CTRL_ITALIC_START = "\x13";
-const CTRL_ITALIC_END = "\x14";
 
 const ReferenceWidth = 670;
 const ReferenceHeight = 1000;
@@ -36,7 +29,6 @@ export default abstract class Card {
 	public target;
 	public texture;
 	public canvas: HTMLCanvasElement;
-	public bodyText: string;
 	public raceText: string;
 	public language: string;
 	public costColor: string;
@@ -46,6 +38,7 @@ export default abstract class Card {
 	public key: number;
 	public opposing: boolean;
 	public attackGem: AttackGem;
+	public bodyText: BodyText;
 	public cardFrame: CardFrame;
 	public costGem: CostGem;
 	public eliteDragon: EliteDragon;
@@ -104,7 +97,6 @@ export default abstract class Card {
 		// Sets the player or opponent HeroPower texture
 		this.opposing = props.opposing || false;
 
-		this.bodyText = this.cardDef.collectionText || this.cardDef.text;
 		this.raceText = getRaceText(this.cardDef.race, this.cardDef.type, this.language);
 		this.costColor = getNumberStyle(props.costStyle);
 		this.attackColor = getNumberStyle(props.costStyle);
@@ -112,14 +104,15 @@ export default abstract class Card {
 		this.texture = props.texture;
 		this.propsJson = JSON.stringify(props);
 
-		this.cardFrame = new CardFrame(sunwell, this);
 		this.attackGem = new AttackGem(sunwell, this);
-		this.eliteDragon = new EliteDragon(sunwell, this);
+		this.bodyText = new BodyText(sunwell, this);
+		this.cardFrame = new CardFrame(sunwell, this);
 		this.costGem = new CostGem(sunwell, this);
+		this.eliteDragon = new EliteDragon(sunwell, this);
 		this.healthGem = new HealthGem(sunwell, this);
 		this.multiClassBanner = new MultiClassBanner(sunwell, this);
-		this.raceBanner = new RaceBanner(sunwell, this);
 		this.nameBanner = new NameBanner(sunwell, this);
+		this.raceBanner = new RaceBanner(sunwell, this);
 		this.rarityGem = new RarityGem(sunwell, this);
 		this.watermark = new Watermark(sunwell, this);
 	}
@@ -273,9 +266,7 @@ export default abstract class Card {
 			}
 		}
 
-		// <<<<<<<< Finished Skeleton drawing
-
-		this.drawBodyText(context, ratio, false, this.bodyText);
+		this.bodyText.render(context, ratio);
 
 		if (this.cardDef.silenced) {
 			this.sunwell.drawImage(context, "silence-x", {dx: 166, dy: 584, ratio: ratio});
@@ -316,248 +307,7 @@ export default abstract class Card {
 	}
 
 	public getBodyText(): string {
-		let bodyText = this.bodyText;
-		if (this.hasManualBreakMarker()) {
-			bodyText = bodyText.substr(3);
-		}
-		bodyText = bodyText
-			.replace(/<b>/g, CTRL_BOLD_START)
-			.replace(/<\/b>/g, CTRL_BOLD_END)
-			.replace(/<i>/g, CTRL_ITALIC_START)
-			.replace(/<\/i>/g, CTRL_ITALIC_END);
-
-		const pluralRegex = /(\d+)(.+?)\|4\((.+?),(.+?)\)/g;
-		let plurals: RegExpExecArray;
-		while ((plurals = pluralRegex.exec(bodyText)) !== null) {
-			bodyText = bodyText.replace(
-				plurals[0],
-				plurals[1] + plurals[2] + (parseInt(plurals[1], 10) === 1 ? plurals[3] : plurals[4])
-			);
-		}
-
-		let spellDmg: RegExpExecArray;
-		const spellDamageRegex = /\$(\d+)/;
-		while ((spellDmg = spellDamageRegex.exec(bodyText)) !== null) {
-			bodyText = bodyText.replace(spellDmg[0], spellDmg[1]);
-		}
-
-		let spellHeal: RegExpExecArray;
-		const spellHealRegex = /#(\d+)/;
-		while ((spellHeal = spellHealRegex.exec(bodyText)) !== null) {
-			bodyText = bodyText.replace(spellHeal[0], spellHeal[1]);
-		}
-
-		return bodyText;
-	}
-
-	public hasManualBreakMarker(): boolean {
-		return this.bodyText.substr(0, 3) === "[x]";
-	}
-
-	public drawBodyText(
-		context: CanvasRenderingContext2D,
-		s: number,
-		forceSmallerFirstLine: boolean,
-		text: string
-	): void {
-		let xPos = 0;
-		let yPos = 0;
-		let italic = 0;
-		let bold = 0;
-		let lineCount = 0;
-		let justLineBreak: boolean;
-		// size of the description text box
-		const bodyWidth = this.bodyTextCoords.dWidth;
-		const bodyHeight = this.bodyTextCoords.dHeight;
-		// center of description box (x, y)
-		const centerLeft = this.bodyTextCoords.dx + bodyWidth / 2;
-		const centerTop = this.bodyTextCoords.dy + bodyHeight / 2;
-
-		const manualBreak = this.hasManualBreakMarker();
-		const bodyText = this.getBodyText();
-		this.sunwell.log("Body text", bodyText);
-
-		const words = [];
-		const breaker = new LineBreaker(bodyText);
-		let last = 0;
-		let bk;
-		while ((bk = breaker.nextBreak())) {
-			words.push(bodyText.slice(last, bk.position).replace("\n", ""));
-			last = bk.position;
-			if (bk.required) {
-				words.push("\n");
-			}
-		}
-		this.sunwell.log("Words", words);
-
-		const bufferText = this.sunwell.getBuffer(bodyWidth, bodyHeight, true);
-		const bufferTextCtx = bufferText.getContext("2d");
-		bufferTextCtx.fillStyle = this.bodyTextColor;
-
-		let fontSize = this.sunwell.options.bodyFontSize;
-		let lineHeight = this.sunwell.options.bodyLineHeight;
-		const totalLength = bodyText.length;
-		this.sunwell.log("Length of text is " + totalLength);
-
-		const bufferRow = this.sunwell.getBuffer(bufferText.width, lineHeight, true);
-		const bufferRowCtx = bufferRow.getContext("2d");
-		bufferRowCtx.fillStyle = this.bodyTextColor;
-		// bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
-
-		if (manualBreak) {
-			let maxWidth = 0;
-			bufferRowCtx.font = this.getFontMaterial(fontSize, false, false);
-			bodyText.split("\n").forEach((line: string) => {
-				const width = this.getLineWidth(bufferRowCtx, fontSize, line);
-				if (width > maxWidth) {
-					maxWidth = width;
-				}
-			});
-			if (maxWidth > bufferText.width) {
-				const ratio = bufferText.width / maxWidth;
-				fontSize *= ratio;
-				lineHeight *= ratio;
-			}
-		} else {
-			if (totalLength >= 65) {
-				fontSize = this.sunwell.options.bodyFontSize * 0.95;
-				lineHeight = this.sunwell.options.bodyLineHeight * 0.95;
-			}
-
-			if (totalLength >= 80) {
-				fontSize = this.sunwell.options.bodyFontSize * 0.9;
-				lineHeight = this.sunwell.options.bodyLineHeight * 0.9;
-			}
-
-			if (totalLength >= 100) {
-				fontSize = this.sunwell.options.bodyFontSize * 0.8;
-				lineHeight = this.sunwell.options.bodyLineHeight * 0.8;
-			}
-
-			if (totalLength >= 120) {
-				fontSize = this.sunwell.options.bodyFontSize * 0.62;
-				lineHeight = this.sunwell.options.bodyLineHeight * 0.8;
-			}
-		}
-
-		bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-		bufferRow.height = lineHeight;
-
-		let smallerFirstLine = false;
-		if (forceSmallerFirstLine || (totalLength >= 75 && this.cardDef.type === CardType.SPELL)) {
-			smallerFirstLine = true;
-		}
-
-		for (const word of words) {
-			const cleanWord = word.trim().replace(/<((?!>).)*>/g, "");
-
-			const width = bufferRowCtx.measureText(cleanWord).width;
-			this.sunwell.log("Next word:", word);
-
-			if (
-				!manualBreak &&
-				(xPos + width > bufferRow.width ||
-					(smallerFirstLine && xPos + width > bufferRow.width * 0.8)) &&
-				!justLineBreak
-			) {
-				this.sunwell.log(xPos + width, ">", bufferRow.width);
-				this.sunwell.log("Calculated line break");
-				smallerFirstLine = false;
-				justLineBreak = true;
-				lineCount++;
-				[xPos, yPos] = finishLine(
-					bufferTextCtx,
-					bufferRow,
-					bufferRowCtx,
-					xPos,
-					yPos,
-					bufferText.width
-				);
-			}
-
-			if (word === "\n") {
-				this.sunwell.log("Manual line break");
-				lineCount++;
-				[xPos, yPos] = finishLine(
-					bufferTextCtx,
-					bufferRow,
-					bufferRowCtx,
-					xPos,
-					yPos,
-					bufferText.width
-				);
-
-				justLineBreak = true;
-				smallerFirstLine = false;
-				continue;
-			}
-
-			justLineBreak = false;
-
-			for (const char of word) {
-				switch (char) {
-					case CTRL_BOLD_START:
-						bold += 1;
-						continue;
-					case CTRL_BOLD_END:
-						bold -= 1;
-						continue;
-					case CTRL_ITALIC_START:
-						italic += 1;
-						continue;
-					case CTRL_ITALIC_END:
-						italic -= 1;
-						continue;
-				}
-
-				// TODO investigate why the following two properites are being reset, for web
-				// likely something to do with getLineWidth()
-				bufferRowCtx.fillStyle = this.bodyTextColor;
-				// move to here from pr.token block above,
-				// text without markup ends up being default font otherwise
-				bufferRowCtx.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-
-				bufferRowCtx.fillText(
-					char,
-					xPos + this.sunwell.options.bodyFontOffset.x,
-					this.sunwell.options.bodyFontOffset.y
-				);
-
-				xPos += bufferRowCtx.measureText(char).width;
-			}
-			const em = bufferRowCtx.measureText("M").width;
-			xPos += 0.275 * em;
-		}
-
-		lineCount++;
-		finishLine(bufferTextCtx, bufferRow, bufferRowCtx, xPos, yPos, bufferText.width);
-
-		this.sunwell.freeBuffer(bufferRow);
-
-		if (this.cardDef.type === CardType.SPELL && lineCount === 4) {
-			if (!smallerFirstLine && !forceSmallerFirstLine) {
-				this.drawBodyText(context, s, true, this.bodyText);
-				return;
-			}
-		}
-
-		const b = contextBoundingBox(bufferTextCtx);
-
-		b.h = Math.ceil(b.h / bufferRow.height) * bufferRow.height;
-
-		context.drawImage(
-			bufferText,
-			b.x,
-			b.y - 2,
-			b.w,
-			b.h,
-			(centerLeft - b.w / 2) * s,
-			(centerTop - b.h / 2) * s,
-			b.w * s,
-			(b.h + 2) * s
-		);
-
-		this.sunwell.freeBuffer(bufferText);
+		return this.cardDef.collectionText || this.cardDef.text;
 	}
 
 	public drawCardFoundationAsset(context: CanvasRenderingContext2D, ratio: number): void {
@@ -614,73 +364,6 @@ export default abstract class Card {
 			default:
 				return "";
 		}
-	}
-
-	protected getFontMaterial(size: number, bold: boolean, italic: boolean): string {
-		let font: string;
-		const weight = bold ? "bold" : "";
-		const style = italic ? "italic" : "";
-		let fontSize = `${size}px`;
-
-		if (this.sunwell.options.bodyLineStyle !== "") {
-			fontSize = `${fontSize}/${this.sunwell.options.bodyLineStyle}`;
-		}
-
-		if (bold && italic) {
-			font = this.sunwell.options.bodyFontBoldItalic;
-		} else if (bold) {
-			font = this.sunwell.options.bodyFontBold;
-		} else if (italic) {
-			font = this.sunwell.options.bodyFontItalic;
-		} else {
-			font = this.sunwell.options.bodyFontRegular;
-		}
-
-		return [weight, style, fontSize, `"${font}", sans-serif`].join(" ");
-	}
-
-	protected getLineWidth(
-		context: CanvasRenderingContext2D,
-		fontSize: number,
-		line: string
-	): number {
-		let width = 0;
-		let bold = 0;
-		let italic = 0;
-
-		for (const word of line.split(" ")) {
-			for (const char of word) {
-				switch (char) {
-					case CTRL_BOLD_START:
-						bold += 1;
-						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-						continue;
-					case CTRL_BOLD_END:
-						bold -= 1;
-						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-						continue;
-					case CTRL_ITALIC_START:
-						italic += 1;
-						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-						continue;
-					case CTRL_ITALIC_END:
-						italic -= 1;
-						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
-						continue;
-				}
-
-				context.fillText(
-					char,
-					width + this.sunwell.options.bodyFontOffset.x,
-					this.sunwell.options.bodyFontOffset.y
-				);
-
-				width += context.measureText(char).width;
-			}
-			width += 0.275 * context.measureText("M").width;
-		}
-
-		return width;
 	}
 
 	private checksum(): number {
