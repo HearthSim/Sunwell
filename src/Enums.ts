@@ -25,6 +25,7 @@ export enum Race {
 	TOTEM = 21,
 	PIRATE = 23,
 	DRAGON = 24,
+	ALL = 26,
 }
 
 export enum Rarity {

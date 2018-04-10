@@ -10,6 +10,7 @@ RaceNames[Race.DEMON] = {enUS: "Demon"};
 RaceNames[Race.PIRATE] = {enUS: "Pirate"};
 RaceNames[Race.DRAGON] = {enUS: "Dragon"};
 RaceNames[Race.TOTEM] = {enUS: "Totem"};
+RaceNames[Race.ALL] = {enUS: "All"};
 
 export function cleanEnum(val: string | number, e) {
 	if (typeof val === "string") {
