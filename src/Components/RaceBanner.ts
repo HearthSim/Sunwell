@@ -1,3 +1,4 @@
+import chars from "chars";
 import {contextBoundingBox} from "../helpers";
 import Component from "./Component";
 
@@ -30,7 +31,7 @@ export default class RaceBanner extends Component {
 		bufferCtx.textAlign = "left";
 
 		const xWidth = bufferCtx.measureText("x").width;
-		for (const char of text) {
+		for (const char of chars(text)) {
 			bufferCtx.lineWidth = 7;
 			bufferCtx.strokeStyle = "black";
 			bufferCtx.fillStyle = "black";

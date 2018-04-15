@@ -1,3 +1,4 @@
+import chars from "chars";
 import LineBreaker from "linebreak";
 import {CardType} from "../Enums";
 import {contextBoundingBox, finishLine} from "../helpers";
@@ -190,7 +191,7 @@ export default class BodyText extends Component {
 
 			justLineBreak = false;
 
-			for (const char of word) {
+			for (const char of chars(word)) {
 				switch (char) {
 					case CTRL_BOLD_START:
 						bold += 1;
@@ -289,7 +290,7 @@ export default class BodyText extends Component {
 		let italic = 0;
 
 		for (const word of line.split(" ")) {
-			for (const char of word) {
+			for (const char of chars(word)) {
 				switch (char) {
 					case CTRL_BOLD_START:
 						bold += 1;

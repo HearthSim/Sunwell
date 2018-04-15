@@ -1,3 +1,4 @@
+import chars from "chars";
 import {CardClass, CardSet, CardType, Race, Rarity} from "./Enums";
 import {IPoint} from "./interfaces";
 
@@ -173,7 +174,7 @@ export function getPointOnCurve(curve: IPoint[], t: number): IPoint {
 export function getCharDimensions(text: string, textContext) {
 	const dim = [];
 	const em = textContext.measureText("M").width;
-	for (const char of text) {
+	for (const char of chars(text)) {
 		textContext.save();
 		const scale = {x: 1, y: 1};
 		let charWidth = textContext.measureText(char).width + 0.1 * em;

@@ -1,3 +1,4 @@
+import chars from "chars";
 import {getCharDimensions, getPointOnCurve} from "../helpers";
 import {ICoords, IPoint} from "../interfaces";
 import Component from "./Component";
@@ -49,14 +50,16 @@ export default class NameBanner extends Component {
 
 		const textWidth = dimensions.reduce((a, b) => a + b.width, 0) / maxWidth;
 		const begin = this.parent.nameTextCurve.pathMiddle - textWidth / 2;
-		const steps = textWidth / name.length;
+		const nameChars = chars(name);
+		const steps = textWidth / nameChars.length;
 
 		// draw text
 		let p: IPoint;
 		let t: number;
 		let leftPos = 0;
-		for (let i = 0; i < name.length; i++) {
-			const char = name[i].trim();
+
+		for (let i = 0; i < nameChars.length; i++) {
+			const char = nameChars[i].trim();
 			const dimension = dimensions[i];
 			if (leftPos === 0) {
 				t = begin + steps * i;
