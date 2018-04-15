@@ -40,7 +40,7 @@ export default class NameBanner extends Component {
 		let dimensions = [];
 		do {
 			fontSize -= 1;
-			textContext.font = `${fontSize}px ${this.sunwell.options.titleFont}`;
+			textContext.font = `${fontSize}px "${this.sunwell.options.titleFont}"`;
 		} while (
 			(dimensions = getCharDimensions(name, textContext)).reduce((a, b) => a + b.width, 0) >
 				maxWidth &&

@@ -42,7 +42,7 @@ export default class Gem extends Component {
 		const bufferCtx = buffer.getContext("2d");
 		let tX = 10;
 
-		bufferCtx.font = `${this.textSize}px ${this.sunwell.options.gemFont}`;
+		bufferCtx.font = `${this.textSize}px "${this.sunwell.options.gemFont}"`;
 		bufferCtx.lineCap = "round";
 		bufferCtx.lineJoin = "round";
 		bufferCtx.textAlign = "left";

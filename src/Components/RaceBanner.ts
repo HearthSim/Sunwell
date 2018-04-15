@@ -23,7 +23,7 @@ export default class RaceBanner extends Component {
 		let x = 10;
 		const textSize = 40;
 
-		bufferCtx.font = `${textSize}px ${this.sunwell.options.titleFont}`;
+		bufferCtx.font = `${textSize}px "${this.sunwell.options.titleFont}"`;
 		bufferCtx.lineCap = "round";
 		bufferCtx.lineJoin = "round";
 		bufferCtx.textBaseline = "hanging";
