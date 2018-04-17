@@ -1,6 +1,6 @@
 {
 	"name": "sunwell",
-	"version": "0.6.3",
+	"version": "0.7.0",
 	"description": "Canvas-based high quality Hearthstone card renderer",
 	"keywords": ["hearthstone"],
 	"homepage": "https://github.com/HearthSim/Sunwell#readme",
