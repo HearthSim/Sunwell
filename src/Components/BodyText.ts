@@ -4,6 +4,7 @@ import {CardType} from "../Enums";
 import {contextBoundingBox, finishLine} from "../helpers";
 import Component from "./Component";
 
+const CTRL_MANUAL_LINEBREAKS = "\x10";
 const CTRL_BOLD_START = "\x11";
 const CTRL_BOLD_END = "\x12";
 const CTRL_ITALIC_START = "\x13";
@@ -14,12 +15,9 @@ export default class BodyText extends Component {
 		this.drawBodyText(context, ratio, false);
 	}
 
-	private parseBodyText(text): {text: string; manualBreak: boolean} {
-		const manualBreak = text.substr(0, 3) === "[x]";
-		if (manualBreak) {
-			text = text.substr(3);
-		}
+	private parseBodyText(text): string {
 		text = text
+			.replace(/\[x\]/g, CTRL_MANUAL_LINEBREAKS)
 			.replace(/<b>/g, CTRL_BOLD_START)
 			.replace(/<\/b>/g, CTRL_BOLD_END)
 			.replace(/<i>/g, CTRL_ITALIC_START)
@@ -46,7 +44,7 @@ export default class BodyText extends Component {
 			text = text.replace(spellHeal[0], spellHeal[1]);
 		}
 
-		return {text: text, manualBreak: manualBreak};
+		return text;
 	}
 
 	private drawBodyText(
@@ -67,8 +65,7 @@ export default class BodyText extends Component {
 		const centerLeft = this.parent.bodyTextCoords.dx + bodyWidth / 2;
 		const centerTop = this.parent.bodyTextCoords.dy + bodyHeight / 2;
 
-		const body = this.parseBodyText(this.parent.getBodyText());
-		const bodyText = body.text;
+		const bodyText = this.parseBodyText(this.parent.getBodyText());
 		this.sunwell.log("Body text", bodyText);
 
 		const words = [];
@@ -98,7 +95,10 @@ export default class BodyText extends Component {
 		bufferRowCtx.fillStyle = this.parent.bodyTextColor;
 		// bufferRowCtx.textBaseline = this.sunwell.options.bodyBaseline;
 
-		if (body.manualBreak) {
+		// XXX: manual breaks can be anywhere, not just at the beginning
+		// cf. AT_132 locale ruRU
+		const manualBreak = bodyText.indexOf(CTRL_MANUAL_LINEBREAKS) === 0;
+		if (manualBreak) {
 			let maxWidth = 0;
 			bufferRowCtx.font = this.getFontMaterial(fontSize, false, false);
 			bodyText.split("\n").forEach((line: string) => {
@@ -152,7 +152,7 @@ export default class BodyText extends Component {
 			this.sunwell.log("Next word:", word);
 
 			if (
-				!body.manualBreak &&
+				!manualBreak &&
 				(xPos + width > bufferRow.width ||
 					(smallerFirstLine && xPos + width > bufferRow.width * 0.8)) &&
 				!justLineBreak
@@ -193,6 +193,9 @@ export default class BodyText extends Component {
 
 			for (const char of chars(word)) {
 				switch (char) {
+					case CTRL_MANUAL_LINEBREAKS:
+						// TODO: Turn on manual linebreaking
+						continue;
 					case CTRL_BOLD_START:
 						bold += 1;
 						continue;
@@ -292,6 +295,8 @@ export default class BodyText extends Component {
 		for (const word of line.split(" ")) {
 			for (const char of chars(word)) {
 				switch (char) {
+					case CTRL_MANUAL_LINEBREAKS:
+						continue;
 					case CTRL_BOLD_START:
 						bold += 1;
 						context.font = this.getFontMaterial(fontSize, !!bold, !!italic);
