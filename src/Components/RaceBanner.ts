@@ -13,7 +13,7 @@ export default class RaceBanner extends Component {
 		}
 		const coords = this.parent.raceBannerCoords;
 		coords.ratio = ratio;
-		const text = this.parent.raceText.split("");
+		const text = this.parent.raceText;
 
 		// Draw the banner
 		this.sunwell.drawImage(context, this.parent.raceBannerAsset, coords);
