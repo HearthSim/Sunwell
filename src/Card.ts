@@ -195,7 +195,7 @@ export default abstract class Card {
 		return assetsToLoad;
 	}
 
-	public getCardArtTexture(): any {
+	public getCardArtTexture(): HTMLImageElement | HTMLCanvasElement {
 		if (!this.texture) {
 			this.sunwell.log("No card texture specified. Creating empty texture.");
 			return this.sunwell.getBuffer(1024, 1024);

@@ -11,11 +11,11 @@ const CTRL_ITALIC_START = "\x13";
 const CTRL_ITALIC_END = "\x14";
 
 export default class BodyText extends Component {
-	public render(context: CanvasRenderingContext2D, ratio: number) {
+	public render(context: CanvasRenderingContext2D, ratio: number): void {
 		this.drawBodyText(context, ratio, false);
 	}
 
-	private parseBodyText(text): string {
+	private parseBodyText(text: string): string {
 		text = text
 			.replace(/\[x\]/g, CTRL_MANUAL_LINEBREAKS)
 			.replace(/<b>/g, CTRL_BOLD_START)
@@ -68,7 +68,7 @@ export default class BodyText extends Component {
 		const bodyText = this.parseBodyText(this.parent.getBodyText());
 		this.sunwell.log("Body text", bodyText);
 
-		const words = [];
+		const words: string[] = [];
 		const breaker = new LineBreaker(bodyText);
 		let last = 0;
 		let bk;

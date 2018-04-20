@@ -333,7 +333,7 @@ export function getCharDimensions(text: string, textContext) {
 	return dim;
 }
 
-export function getCardFrameClass(cardClass: CardClass) {
+export function getCardFrameClass(cardClass: CardClass): CardClass {
 	switch (cardClass) {
 		case CardClass.DREAM:
 			return CardClass.HUNTER;
