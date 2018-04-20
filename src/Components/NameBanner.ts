@@ -1,8 +1,33 @@
 import chars from "chars";
-import {getCharDimensions, getPointOnCurve} from "../helpers";
+import {getPointOnCurve} from "../helpers";
 import {ICoords, IPoint} from "../interfaces";
 import Component from "./Component";
 
+function getCharDimensions(text: string, textContext) {
+	const dim = [];
+	const em = textContext.measureText("M").width;
+	for (const char of chars(text)) {
+		textContext.save();
+		const scale = {x: 1, y: 1};
+		let charWidth = textContext.measureText(char).width + 0.1 * em;
+		switch (char) {
+			case " ":
+				charWidth = 0.2 * em;
+				break;
+			case "'": // see "Death's Bite"
+				charWidth = 0.27 * em;
+				scale.x = 0.5;
+				scale.y = 1;
+				break;
+		}
+		dim.push({
+			scale: scale,
+			width: charWidth,
+		});
+		textContext.restore();
+	}
+	return dim;
+}
 export default class NameBanner extends Component {
 	public assets(): string[] {
 		return [this.parent.nameBannerAsset];

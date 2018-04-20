@@ -1,7 +1,7 @@
 import chars from "chars";
 import LineBreaker from "linebreak";
 import {CardType} from "../Enums";
-import {contextBoundingBox, finishLine} from "../helpers";
+import {contextBoundingBox} from "../helpers";
 import Component from "./Component";
 
 const CTRL_MANUAL_LINEBREAKS = "\x10";
@@ -9,6 +9,44 @@ const CTRL_BOLD_START = "\x11";
 const CTRL_BOLD_END = "\x12";
 const CTRL_ITALIC_START = "\x13";
 const CTRL_ITALIC_END = "\x14";
+
+/**
+ * Finishes a text line and starts a new one.
+ */
+function finishLine(
+	bufferTextCtx: CanvasRenderingContext2D,
+	bufferRow: HTMLCanvasElement,
+	bufferRowCtx: CanvasRenderingContext2D,
+	xPos: number,
+	yPos: number,
+	totalWidth: number
+): [number, number] {
+	let xCalc = totalWidth / 2 - xPos / 2;
+
+	if (xCalc < 0) {
+		xCalc = 0;
+	}
+
+	if (xPos > 0 && bufferRow.width > 0) {
+		bufferTextCtx.drawImage(
+			bufferRow,
+			0,
+			0,
+			xPos > bufferRow.width ? bufferRow.width : xPos,
+			bufferRow.height,
+			xCalc,
+			yPos,
+			Math.min(xPos, bufferRow.width),
+			bufferRow.height
+		);
+	}
+
+	xPos = 5;
+	yPos += bufferRow.height;
+	bufferRowCtx.clearRect(0, 0, bufferRow.width, bufferRow.height);
+
+	return [xPos, yPos];
+}
 
 export default class BodyText extends Component {
 	public render(context: CanvasRenderingContext2D, ratio: number): void {

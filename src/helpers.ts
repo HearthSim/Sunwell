@@ -1,4 +1,3 @@
-import chars from "chars";
 import {CardClass, CardSet, CardType, Race, Rarity} from "./Enums";
 import {IPoint} from "./interfaces";
 
@@ -241,44 +240,6 @@ export function getNumberStyle(style: string) {
 }
 
 /**
- * Finishes a text line and starts a new one.
- */
-export function finishLine(
-	bufferTextCtx: CanvasRenderingContext2D,
-	bufferRow: HTMLCanvasElement,
-	bufferRowCtx: CanvasRenderingContext2D,
-	xPos: number,
-	yPos: number,
-	totalWidth: number
-): [number, number] {
-	let xCalc = totalWidth / 2 - xPos / 2;
-
-	if (xCalc < 0) {
-		xCalc = 0;
-	}
-
-	if (xPos > 0 && bufferRow.width > 0) {
-		bufferTextCtx.drawImage(
-			bufferRow,
-			0,
-			0,
-			xPos > bufferRow.width ? bufferRow.width : xPos,
-			bufferRow.height,
-			xCalc,
-			yPos,
-			Math.min(xPos, bufferRow.width),
-			bufferRow.height
-		);
-	}
-
-	xPos = 5;
-	yPos += bufferRow.height;
-	bufferRowCtx.clearRect(0, 0, bufferRow.width, bufferRow.height);
-
-	return [xPos, yPos];
-}
-
-/**
  * Given a curve and t, the function returns the point on the curve.
  * r is the rotation of the point in radians.
  * @returns {{x: (number|*), y: (number|*), r: number}}
@@ -305,32 +266,6 @@ export function getPointOnCurve(curve: IPoint[], t: number): IPoint {
 		Math.pow(t, 3) * curve[3].y;
 
 	return {x: x, y: y, r: Math.atan2(rY, rX)};
-}
-
-export function getCharDimensions(text: string, textContext) {
-	const dim = [];
-	const em = textContext.measureText("M").width;
-	for (const char of chars(text)) {
-		textContext.save();
-		const scale = {x: 1, y: 1};
-		let charWidth = textContext.measureText(char).width + 0.1 * em;
-		switch (char) {
-			case " ":
-				charWidth = 0.2 * em;
-				break;
-			case "'": // see "Death's Bite"
-				charWidth = 0.27 * em;
-				scale.x = 0.5;
-				scale.y = 1;
-				break;
-		}
-		dim.push({
-			scale: scale,
-			width: charWidth,
-		});
-		textContext.restore();
-	}
-	return dim;
 }
 
 export function getCardFrameClass(cardClass: CardClass): CardClass {
