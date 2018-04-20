@@ -140,9 +140,7 @@ export default abstract class Card {
 	}
 
 	public getCostGemAsset(): string {
-		if (this.cardDef.hideStats) {
-			return "";
-		} else if (this.cardDef.costsHealth) {
+		if (this.cardDef.costsHealth) {
 			return "cost-health";
 		} else {
 			return "cost-mana";
