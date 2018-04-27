@@ -34,12 +34,11 @@ export default class NameBanner extends Component {
 	}
 
 	public render(context: CanvasRenderingContext2D, ratio: number) {
-		if (!this.parent.nameBannerAsset) {
-			return;
+		if (this.parent.nameBannerAsset) {
+			const coords = this.parent.nameBannerCoords;
+			coords.ratio = ratio;
+			this.sunwell.drawImage(context, this.parent.nameBannerAsset, coords);
 		}
-		const coords = this.parent.nameBannerCoords;
-		coords.ratio = ratio;
-		this.sunwell.drawImage(context, this.parent.nameBannerAsset, coords);
 
 		this.renderName(context, ratio, this.parent.cardDef.name);
 	}
