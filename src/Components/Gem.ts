@@ -25,14 +25,13 @@ export default class Gem extends Component {
 
 	public render(context: CanvasRenderingContext2D, ratio: number): void {
 		const asset = this.gemAsset;
-		if (!asset || !this.showGem) {
-			return;
+		if (asset && this.showGem) {
+			const coords = this.gemCoords;
+			coords.ratio = ratio;
+			this.sunwell.drawImage(context, asset, coords);
 		}
-		const coords = this.gemCoords;
-		coords.ratio = ratio;
-		this.sunwell.drawImage(context, asset, coords);
 
-		if (!this.showText) {
+		if (!this.showText || !this.textCoords) {
 			return;
 		}
 		const textCoords = this.textCoords;
