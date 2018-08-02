@@ -273,6 +273,7 @@ export function getCardFrameClass(cardClass: CardClass): CardClass {
 		case CardClass.DREAM:
 			return CardClass.HUNTER;
 		case CardClass.INVALID:
+		case CardClass.WHIZBANG:
 			return CardClass.NEUTRAL;
 		default:
 			return cardClass;

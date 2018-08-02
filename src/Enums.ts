@@ -12,6 +12,7 @@ export enum CardClass {
 	WARRIOR = 10,
 	DREAM = 11,
 	NEUTRAL = 12,
+	WHIZBANG = 13,
 }
 
 export enum Race {
@@ -61,6 +62,7 @@ export enum CardSet {
 	ICECROWN = 1001,
 	LOOTAPALOOZA = 1004,
 	GILNEAS = 1125,
+	BOOMSDAY = 1127,
 }
 
 export enum CardType {
