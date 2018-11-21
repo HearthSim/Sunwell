@@ -1,5 +1,4 @@
 # https://travis-ci.org/HearthSim/Sunwell
-sudo: false
 language: node_js
 node_js:
   - 8
