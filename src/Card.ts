@@ -333,6 +333,7 @@ export default abstract class Card {
 			case CardSet.LOOTAPALOOZA:
 			case CardSet.GILNEAS:
 			case CardSet.BOOMSDAY:
+			case CardSet.TROLL:
 				return "set-" + CardSet[this.cardDef.cardSet].toLowerCase();
 			default:
 				return "";
