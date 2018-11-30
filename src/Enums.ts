@@ -63,6 +63,7 @@ export enum CardSet {
 	LOOTAPALOOZA = 1004,
 	GILNEAS = 1125,
 	BOOMSDAY = 1127,
+	TROLL = 1129,
 }
 
 export enum CardType {
