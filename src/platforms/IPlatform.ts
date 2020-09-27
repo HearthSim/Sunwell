@@ -11,7 +11,3 @@ interface IPlatform {
 }
 
 export default IPlatform;
-
-export interface IPlatformConstructable {
-	new (): IPlatform;
-}
