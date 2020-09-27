@@ -1,9 +1,9 @@
-import typescript from "@rollup/plugin-typescript";
+import typescript from "rollup-plugin-typescript2";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import jscc from "rollup-plugin-jscc";
 import cleanup from "rollup-plugin-cleanup";
-import uglify from "rollup-plugin-uglify";
+import {uglify} from "rollup-plugin-uglify";
 
 const ExternalModulesList = [].concat(
 	require("builtin-modules"),
@@ -18,7 +18,6 @@ export default {
 		format: "cjs",
 		file: `dist/sunwell.${PLATFORM}${PRODUCTION ? ".min" : ""}.js`,
 		name: "Sunwell",
-		dir: "dist",
 	},
 	external: ExternalModulesList,
 	plugins: [
@@ -28,13 +27,13 @@ export default {
 			},
 			extensions: [".js", ".ts"],
 		}),
-		typescript(),
+		typescript({module: "CommonJS"}),
 		resolve(),
-		//commonjs({
-		//	exclude: ExternalModulesList,
-		//	ignoreGlobal: true,
-		//	extensions: [".js", ".ts"],
-		//}),
+		commonjs({
+			exclude: ExternalModulesList,
+			ignoreGlobal: true,
+			extensions: [".js", ".ts"],
+		}),
 		cleanup(),
 		PRODUCTION ? uglify() : undefined,
 	].filter(Boolean),

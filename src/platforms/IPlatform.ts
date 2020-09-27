@@ -2,6 +2,7 @@ interface IPlatform {
 	name: string;
 	buffers: any[];
 	Image: any;
+	Canvas: any;
 	Promise: any;
 	getBuffer(width: number, height: number, clear: boolean): void;
 	freeBuffer(buffer): void;
