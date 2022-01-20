@@ -317,7 +317,9 @@ export default abstract class Card {
 	}
 
 	public getWatermarkAsset(): string {
-		return "set-" + CardSet[this.cardDef.cardSet].toLowerCase().replace("_", "-");
+		if (this.cardDef.cardSet in CardSet)
+			return "set-" + CardSet[this.cardDef.cardSet].toLowerCase().replace("_", "-");
+		else return ""
 	}
 
 	private checksum(): number {
