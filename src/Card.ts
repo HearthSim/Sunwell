@@ -317,28 +317,7 @@ export default abstract class Card {
 	}
 
 	public getWatermarkAsset(): string {
-		switch (this.cardDef.cardSet) {
-			case CardSet.EXPERT1:
-			case CardSet.NAXX:
-			case CardSet.GVG:
-			case CardSet.BRM:
-			case CardSet.TGT:
-			case CardSet.LOE:
-			case CardSet.OG:
-			case CardSet.KARA:
-			case CardSet.GANGS:
-			case CardSet.UNGORO:
-			case CardSet.ICECROWN:
-			case CardSet.HOF:
-			case CardSet.LOOTAPALOOZA:
-			case CardSet.GILNEAS:
-			case CardSet.BOOMSDAY:
-			case CardSet.TROLL:
-			case CardSet.DALARAN:
-				return "set-" + CardSet[this.cardDef.cardSet].toLowerCase();
-			default:
-				return "";
-		}
+		return "set-" + CardSet[this.cardDef.cardSet].toLowerCase().replace("_", "-");
 	}
 
 	private checksum(): number {

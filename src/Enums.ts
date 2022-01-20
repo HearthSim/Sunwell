@@ -47,16 +47,18 @@ export enum MultiClassGroup {
 
 export enum CardSet {
 	INVALID = 0,
-	CORE = 2,
+	BASIC = 2,
 	EXPERT1 = 3,
 	HOF = 4,
+	NONE = 7,
 	NAXX = 12,
 	GVG = 13,
 	BRM = 14,
 	TGT = 15,
+	HERO_SKINS = 17,
 	LOE = 20,
-	KARA = 23,
 	OG = 21,
+	KARA = 23,
 	GANGS = 25,
 	UNGORO = 27,
 	ICECROWN = 1001,
@@ -65,6 +67,18 @@ export enum CardSet {
 	BOOMSDAY = 1127,
 	TROLL = 1129,
 	DALARAN = 1130,
+	ULDUM = 1158,
+	DRAGONS = 1347,
+	BLACK_TEMPLE = 1414,
+	SCHOLOMANCE = 1443,
+	DEMON_HUNTER_INITIATE = 1463,
+	DARKMOON_FAIRE = 1466,
+	THE_BARRENS = 1525,
+	STORMWIND = 1578,
+	ALTERAC_VALLEY = 1626,
+	LEGACY = 1635,
+	CORE = 1637,
+	VANILLA = 1646
 }
 
 export enum CardType {
