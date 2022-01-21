@@ -1,3 +1,5 @@
+**This project is no longer maintained! Please see the [forks page](https://github.com/HearthSim/Sunwell/network) for a list of alternative repositores.**
+
 # Sunwell
 
 A high quality Hearthstone card renderer in TypeScript.
